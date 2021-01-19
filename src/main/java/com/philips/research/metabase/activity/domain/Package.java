@@ -55,6 +55,10 @@ public class Package {
                 .collect(Collectors.toMap(Map.Entry::getKey, e -> e.getValue().getValue().get()));
     }
 
+    public void setValues(Map<Field, ?> values) {
+        values.forEach(this::setValue);
+    }
+
     public <T> Optional<T> getValue(Field field) {
         return this.<T>getFieldValue(field).getValue();
     }

@@ -5,6 +5,7 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
 import java.net.URI;
+import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -51,6 +52,13 @@ class PackageTest {
 
         assertThat(pkg.getValue(FIELD)).contains(VALUE);
         assertThat(pkg.getValues()).containsEntry(FIELD, VALUE);
+    }
+
+    @Test
+    void updatesMultipleFields() {
+        pkg.setValues(Map.of(FIELD, VALUE));
+
+        assertThat(pkg.getValue(FIELD)).contains(VALUE);
     }
 
     @Test

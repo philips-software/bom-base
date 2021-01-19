@@ -26,11 +26,10 @@ public class MetaInteractor implements MetaService {
     @Override
     public void update(URI purl, Map<Field, Object> values) {
         final var pkg = getOrCreatePackage(purl);
-        values.forEach((field, value) -> {
-            pkg.setValue(field, value);
-            listeners.forEach(l -> l.onUpdated(purl, field, value)
-                    .ifPresent(Runnable::run));
-        });
+        pkg.setValues(values);
+        values.forEach((field, value) -> listeners
+                .forEach(l -> l.onUpdated(purl, field, value)
+                        .ifPresent(Runnable::run)));
     }
 
     @Override
