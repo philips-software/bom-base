@@ -4,6 +4,7 @@ import com.philips.research.metabase.activity.Field;
 import com.philips.research.metabase.activity.MetaService;
 import com.philips.research.metabase.activity.MetaService.PackageListener;
 import com.philips.research.metabase.activity.MetaStore;
+import com.philips.research.metabase.activity.UnknownPackageException;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -14,6 +15,7 @@ import java.util.Optional;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -42,6 +44,12 @@ class MetaInteractorTest {
         when(store.findPackage(TYPE, NAME, VERSION)).thenReturn(Optional.of(pkg));
         when(store.createPackage(any(), any(), any()))
                 .thenAnswer((p) -> new Package(p.getArgument(0), p.getArgument(1), p.getArgument(2)));
+    }
+
+    @Test
+    void throws_getValuesForUnknownPackage() {
+        assertThatThrownBy(()->interactor.value(URI.create("type/unknown@version")))
+        .isInstanceOf(UnknownPackageException.class) ;
     }
 
     @Test

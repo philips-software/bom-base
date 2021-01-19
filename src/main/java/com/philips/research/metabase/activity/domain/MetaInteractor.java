@@ -48,5 +48,4 @@ public class MetaInteractor implements MetaService {
         return store.findPackage(temp.getType(), temp.getName(), temp.getVersion())
                 .orElseThrow(() -> new UnknownPackageException(purl));
     }
-
 }

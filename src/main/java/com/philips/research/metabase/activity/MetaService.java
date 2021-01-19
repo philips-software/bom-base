@@ -26,6 +26,7 @@ public interface MetaService {
      *
      * @param purl package URL
      * @return value per field
+     * @throws UnknownPackageException if the package does not exist
      */
     Map<Field, Object> value(URI purl);
 
