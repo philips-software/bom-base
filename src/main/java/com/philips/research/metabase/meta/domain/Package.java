@@ -1,6 +1,6 @@
-package com.philips.research.metabase.activity.domain;
+package com.philips.research.metabase.meta.domain;
 
-import com.philips.research.metabase.activity.Field;
+import com.philips.research.metabase.meta.Field;
 
 import java.net.URI;
 import java.util.HashMap;
@@ -50,9 +50,13 @@ public class Package {
     }
 
     public Map<Field, Object> getValues() {
-        return fields.entrySet().stream()
+        final Map<Field, Object> result = fields.entrySet().stream()
                 .filter(e -> e.getValue().getValue().isPresent())
                 .collect(Collectors.toMap(Map.Entry::getKey, e -> e.getValue().getValue().get()));
+        result.put(Field.TYPE, type);
+        result.put(Field.NAME, name);
+        result.put(Field.VERSION, version);
+        return result;
     }
 
     public void setValues(Map<Field, ?> values) {
@@ -65,8 +69,8 @@ public class Package {
 
     public <T> void setValue(Field field, T value) {
         final Class<?> fieldClass = TYPES.get(field);
-        if (!fieldClass.isAssignableFrom(value.getClass())) {
-            throw new IllegalArgumentException("Value " + value + " can not be assigned to field " + field + " of type " + fieldClass.getSimpleName());
+        if (fieldClass == null || !fieldClass.isAssignableFrom(value.getClass())) {
+            throw new IllegalArgumentException("Value " + value + " can not be assigned to field " + field);
         }
         getOrCreateFieldValue(field).setValue(value);
     }

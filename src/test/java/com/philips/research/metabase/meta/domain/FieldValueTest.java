@@ -1,4 +1,4 @@
-package com.philips.research.metabase.activity.domain;
+package com.philips.research.metabase.meta.domain;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;

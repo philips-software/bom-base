@@ -1,9 +1,9 @@
-package com.philips.research.metabase.activity.domain;
+package com.philips.research.metabase.meta.domain;
 
-import com.philips.research.metabase.activity.Field;
-import com.philips.research.metabase.activity.MetaService;
-import com.philips.research.metabase.activity.MetaStore;
-import com.philips.research.metabase.activity.UnknownPackageException;
+import com.philips.research.metabase.meta.Field;
+import com.philips.research.metabase.meta.MetaService;
+import com.philips.research.metabase.meta.MetaStore;
+import com.philips.research.metabase.meta.UnknownPackageException;
 
 import java.net.URI;
 import java.util.HashSet;
@@ -27,9 +27,7 @@ public class MetaInteractor implements MetaService {
     public void update(URI purl, Map<Field, Object> values) {
         final var pkg = getOrCreatePackage(purl);
         pkg.setValues(values);
-        values.forEach((field, value) -> listeners
-                .forEach(l -> l.onUpdated(purl, field, value)
-                        .ifPresent(Runnable::run)));
+        notifyValueListeners(purl, values.keySet(), pkg.getValues());
     }
 
     @Override
@@ -40,12 +38,23 @@ public class MetaInteractor implements MetaService {
     private Package getOrCreatePackage(URI purl) {
         final var temp = Package.from(purl);
         return store.findPackage(temp.getType(), temp.getName(), temp.getVersion())
-                .orElseGet(() -> store.createPackage(temp.getType(), temp.getName(), temp.getVersion()));
+                .orElseGet(() -> createPackage(purl, temp));
+    }
+
+    private Package createPackage(URI purl, Package temp) {
+        final var pkg = store.createPackage(temp.getType(), temp.getName(), temp.getVersion());
+        final var values = pkg.getValues();
+        notifyValueListeners(purl, values.keySet(), values);
+        return pkg;
     }
 
     private Package validPackage(URI purl) {
         final var temp = Package.from(purl);
         return store.findPackage(temp.getType(), temp.getName(), temp.getVersion())
                 .orElseThrow(() -> new UnknownPackageException(purl));
+    }
+
+    private void notifyValueListeners(URI purl, Set<Field> fields, Map<Field, Object> values) {
+        listeners.forEach(l -> l.onUpdated(purl, fields, values).ifPresent(Runnable::run));
     }
 }

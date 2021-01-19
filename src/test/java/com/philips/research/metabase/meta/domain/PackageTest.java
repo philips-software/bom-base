@@ -1,6 +1,6 @@
-package com.philips.research.metabase.activity.domain;
+package com.philips.research.metabase.meta.domain;
 
-import com.philips.research.metabase.activity.Field;
+import com.philips.research.metabase.meta.Field;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
@@ -29,7 +29,18 @@ class PackageTest {
         assertThat(pkg.getType()).isEqualTo(TYPE);
         assertThat(pkg.getName()).isEqualTo(NAME);
         assertThat(pkg.getVersion()).isEqualTo(VERSION);
-        assertThat(pkg.getValues()).isEmpty();
+    }
+
+    @Test
+    void reportsPackageProperties() {
+        assertThat(pkg.getValues()).isEqualTo(Map.of(Field.TYPE, TYPE, Field.NAME, NAME, Field.VERSION, VERSION));
+    }
+
+    @Test
+    void throws_updateOfPackageProperties() {
+        assertThatThrownBy(() -> pkg.setValue(Field.TYPE, "Other")).isInstanceOf(IllegalArgumentException.class);
+        assertThatThrownBy(() -> pkg.setValue(Field.NAME, "Other")).isInstanceOf(IllegalArgumentException.class);
+        assertThatThrownBy(() -> pkg.setValue(Field.VERSION, "Other")).isInstanceOf(IllegalArgumentException.class);
     }
 
     @Test

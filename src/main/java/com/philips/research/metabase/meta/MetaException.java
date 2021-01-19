@@ -1,4 +1,4 @@
-package com.philips.research.metabase.activity;
+package com.philips.research.metabase.meta;
 
 public class MetaException extends RuntimeException {
     public MetaException(String message) {

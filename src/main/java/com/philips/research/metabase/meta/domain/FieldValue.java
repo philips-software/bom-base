@@ -1,4 +1,4 @@
-package com.philips.research.metabase.activity.domain;
+package com.philips.research.metabase.meta.domain;
 
 import java.time.Instant;
 import java.util.Optional;

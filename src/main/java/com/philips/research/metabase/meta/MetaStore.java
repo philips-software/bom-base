@@ -1,7 +1,7 @@
-package com.philips.research.metabase.activity;
+package com.philips.research.metabase.meta;
 
-import com.philips.research.metabase.activity.domain.FieldValue;
-import com.philips.research.metabase.activity.domain.Package;
+import com.philips.research.metabase.meta.domain.FieldValue;
+import com.philips.research.metabase.meta.domain.Package;
 
 import java.util.List;
 import java.util.Optional;

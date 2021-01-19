@@ -1,4 +1,4 @@
-package com.philips.research.metabase.activity;
+package com.philips.research.metabase.meta;
 
 import java.net.URI;
 

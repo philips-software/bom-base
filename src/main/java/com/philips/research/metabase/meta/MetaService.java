@@ -1,8 +1,9 @@
-package com.philips.research.metabase.activity;
+package com.philips.research.metabase.meta;
 
 import java.net.URI;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 
 public interface MetaService {
 
@@ -34,6 +35,14 @@ public interface MetaService {
      * Callbacks to optionally create an asynchronous task.
      */
     interface PackageListener {
-        Optional<Runnable> onUpdated(URI pkg, Field field, Object value);
+        /**
+         * Notifies given fields were updated.
+         *
+         * @param pkg     package URL
+         * @param updated modified fields
+         * @param values  current package metadata
+         * @return (optional) operation to queue for execution
+         */
+        Optional<Runnable> onUpdated(URI pkg, Set<Field> updated, Map<Field, ?> values);
     }
 }
