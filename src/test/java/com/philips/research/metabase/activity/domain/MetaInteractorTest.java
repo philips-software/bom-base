@@ -1,16 +1,20 @@
 package com.philips.research.metabase.activity.domain;
 
+import com.philips.research.metabase.activity.Field;
 import com.philips.research.metabase.activity.MetaService;
+import com.philips.research.metabase.activity.MetaService.PackageListener;
 import com.philips.research.metabase.activity.MetaStore;
-import com.philips.research.metabase.activity.UnknownPackageException;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.net.URI;
+import java.util.Map;
 import java.util.Optional;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -19,53 +23,43 @@ class MetaInteractorTest {
     private static final String NAME = "Group/Name";
     private static final String VERSION = "Version";
     private static final URI PACKAGE = URI.create("pkg:" + TYPE + "/" + NAME + "@" + VERSION);
-    private static final String INT_FIELD = "IntegerField";
-    private static final String STRING_FIELD = "StringField";
-    private static final Integer INT_VALUE = 42;
-    private static final String STRING_VALUE = "TextString";
+    private static final URI OTHER_PACKAGE = URI.create("pkg:other/group/name@version");
+    private static final Field FIELD = Field.TITLE;
+    private static final Double VALUE = 1.23;
 
     final MetaStore store = mock(MetaStore.class);
     final MetaService interactor = new MetaInteractor(store);
     final Package pkg = new Package(TYPE, NAME, VERSION);
+    final PackageListener listener = mock(PackageListener.class);
+
+    @BeforeAll
+    static void beforeAll() {
+        Package.register(FIELD, Number.class);
+    }
 
     @BeforeEach
     void beforeEach() {
-//        interactor.registerField(STRING_FIELD, String.class);
-//        interactor.registerField(INT_FIELD, Integer.class);
-    }
-
-    @Test
-    void storesPackageField() {
         when(store.findPackage(TYPE, NAME, VERSION)).thenReturn(Optional.of(pkg));
-
-//        interactor.storeFieldValue(PACKAGE, STRING_FIELD, STRING_VALUE);
-        final var value = interactor.value(PACKAGE);
-
-        assertThat(value).containsEntry(STRING_FIELD, STRING_VALUE);
+        when(store.createPackage(any(), any(), any()))
+                .thenAnswer((p) -> new Package(p.getArgument(0), p.getArgument(1), p.getArgument(2)));
     }
 
     @Test
-    void createsPackageForField() {
-        when(store.createPackage(TYPE, NAME, VERSION)).thenReturn(pkg);
+    void updateStoresValue() {
+        interactor.update(PACKAGE, Map.of(FIELD, VALUE));
 
-//        interactor.storeFieldValue(PACKAGE, INT_FIELD, INT_VALUE);
-        final var value = interactor.value(PACKAGE);
-
-        assertThat(value).containsEntry(INT_FIELD, INT_VALUE);
+        assertThat(interactor.value(PACKAGE)).isEqualTo(Map.of(FIELD, VALUE));
     }
 
     @Test
-    void throws_fieldForUnknownPackage() {
-        assertThatThrownBy(() -> interactor.value(PACKAGE))
-                .isInstanceOf(UnknownPackageException.class)
-                .hasMessageContaining(PACKAGE.toString());
+    void updateNotifiesListeners() {
+        final var triggered = new AtomicInteger(0);
+        when(listener.onUpdated(PACKAGE, FIELD, VALUE)).thenReturn(Optional.of(triggered::incrementAndGet));
+        interactor.addListener(listener);
+
+        interactor.update(PACKAGE, Map.of(FIELD, VALUE));
+        interactor.update(OTHER_PACKAGE, Map.of(FIELD, VALUE));
+
+        assertThat(triggered.get()).isEqualTo(1);
     }
-
-    @Test
-    void emptyFieldsAreEmpty() {
-//        interactor.storeFieldValue(PACKAGE, INT_FIELD, 0);
-
-        assertThat(interactor.value(PACKAGE)).isEmpty();
-    }
-
 }

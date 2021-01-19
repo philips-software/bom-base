@@ -6,68 +6,48 @@ import com.philips.research.metabase.activity.MetaStore;
 import com.philips.research.metabase.activity.UnknownPackageException;
 
 import java.net.URI;
-import java.util.List;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
 public class MetaInteractor implements MetaService {
     private final MetaStore store;
+    private final Set<PackageListener> listeners = new HashSet<>();
 
     public MetaInteractor(MetaStore store) {
         this.store = store;
     }
 
     @Override
-    public void addTypeListener(Field type, FieldListener listener) {
-
+    public void addListener(PackageListener listener) {
+        listeners.add(listener);
     }
 
     @Override
-    public void addFieldListener(Field field, FieldListener listener) {
-
+    public void update(URI purl, Map<Field, Object> values) {
+        final var pkg = getOrCreatePackage(purl);
+        values.forEach((field, value) -> {
+            pkg.setValue(field, value);
+            listeners.forEach(l -> l.onUpdated(purl, field, value)
+                    .ifPresent(Runnable::run));
+        });
     }
 
     @Override
-    public <T> void storeFieldValue(URI pkg, Field field, T value) {
-//        final var stringValue = valueConverterFor(field).toString(value);
-//        final Package p = getOrCreatePackage(pkg);
-//        p.getField(field).setValue(stringValue);
+    public Map<Field, Object> value(URI purl) {
+        return validPackage(purl).getValues();
     }
 
-    @Override
-    public void contestField(URI pkg, Field field, Object value) {
-
-    }
-
-    @Override
-    public void overrideField(URI pkg, Field field, Object value) {
-
-    }
-
-    @Override
-    public void clearField(URI pkg, Field field) {
-
-    }
-
-    @Override
-    public Map<String, Object> value(URI pkg) {
-        return null;
-    }
-
-    @Override
-    public List<URI> contested(Field field, int limit) {
-        return null;
-    }
-
-    private Package getOrCreatePackage(URI pkg) {
-        final var temp = Package.from(pkg);
+    private Package getOrCreatePackage(URI purl) {
+        final var temp = Package.from(purl);
         return store.findPackage(temp.getType(), temp.getName(), temp.getVersion())
                 .orElseGet(() -> store.createPackage(temp.getType(), temp.getName(), temp.getVersion()));
     }
 
-    private Package validPackage(URI pkg) {
-        final var temp = Package.from(pkg);
+    private Package validPackage(URI purl) {
+        final var temp = Package.from(purl);
         return store.findPackage(temp.getType(), temp.getName(), temp.getVersion())
-                .orElseThrow(() -> new UnknownPackageException(pkg));
+                .orElseThrow(() -> new UnknownPackageException(purl));
     }
 
 }

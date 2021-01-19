@@ -12,6 +12,7 @@ public class FieldValue<T> {
     private T value;
     private String argument;
     private Instant timestamp = Instant.now();
+
     public FieldValue(Class<T> type) {
         this.type = type;
     }

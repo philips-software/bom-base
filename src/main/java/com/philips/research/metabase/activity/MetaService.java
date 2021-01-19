@@ -1,85 +1,38 @@
 package com.philips.research.metabase.activity;
 
 import java.net.URI;
-import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 public interface MetaService {
 
     /**
-     * Registers an observer for value changes in packages of one type.
+     * Registers an observer for value changes.
      *
-     * @param type     name of the type
      * @param listener observer
      */
-    void addTypeListener(Field type, FieldListener listener);
+    void addListener(PackageListener listener);
 
     /**
-     * Registers an observer for value changes in one field of any package.
+     * Updates fields of package and processes notifications.
      *
-     * @param field    name of the field
-     * @param listener observer
+     * @param purl   package URL
+     * @param values new value per field
      */
-    void addFieldListener(Field field, FieldListener listener);
+    void update(URI purl, Map<Field, Object> values);
 
     /**
-     * Creates or updates the default value of a field.
+     * Reads current field values of a package.
      *
-     * @param pkg   package to update
-     * @param field name of the field
-     * @param value new value
+     * @param purl package URL
+     * @return value per field
      */
-    <T> void storeFieldValue(URI pkg, Field field, T value);
-
-    /**
-     * Marks a field as possibly incorrect
-     *
-     * @param pkg   package of the field
-     * @param field name of the contested field
-     * @param value expected value
-     */
-    void contestField(URI pkg, Field field, Object value);
-
-    /**
-     * Corrects value of a (contested) field
-     *
-     * @param pkg   package of the field
-     * @param field name of the field to override
-     * @param value correction value
-     */
-    void overrideField(URI pkg, Field field, Object value);
-
-    /**
-     * Removes a field from a package
-     *
-     * @param pkg   package of the field
-     * @param field name of the field
-     */
-    void clearField(URI pkg, Field field);
-
-    /**
-     * @param pkg package identifier
-     * @return map all fields with their value for the specified package
-     */
-    Map<String, Object> value(URI pkg);
-
-    /**
-     * @param field name of the field
-     * @param limit maximum number of resulting packages
-     * @return Packages where the indicated field value is contested
-     */
-    List<URI> contested(Field field, int limit);
+    Map<Field, Object> value(URI purl);
 
     /**
      * Callbacks to optionally create an asynchronous task.
      */
-    interface FieldListener {
-        Runnable onStore(URI pkg, Field field, Object value);
-
-        Runnable onContest(URI pkg, Field field, Object value);
-
-        Runnable onOverride(URI pkg, Field field, Object value);
-
-        Runnable onDelete(URI pkg, Field field, Object value);
+    interface PackageListener {
+        Optional<Runnable> onUpdated(URI pkg, Field field, Object value);
     }
 }
