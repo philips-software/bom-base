@@ -7,7 +7,7 @@ import java.util.List;
 import java.util.Optional;
 
 public interface MetaStore {
-    Package createPackage(String type, String name, String version) ;
+    Package createPackage(String type, String name, String version);
 
     Optional<Package> findPackage(String type, String name, String version);
 

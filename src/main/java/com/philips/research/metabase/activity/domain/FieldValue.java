@@ -1,39 +1,30 @@
 package com.philips.research.metabase.activity.domain;
 
-import com.philips.research.metabase.activity.Field;
-
 import java.time.Instant;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Optional;
 
 /**
  *
  */
-public class FieldValue {
-    private static final Map<Field, ValueConverter> convert = new HashMap<>();
-
-    public static void register(Field field, ValueConverter converter) {
-        convert.put(field, converter);
-    }
-
-    private enum State {VALUE, CONTESTED, OVERRIDDEN, ERROR}
-
-    private final Field field;
+public class FieldValue<T> {
+    private final Class<T> type;
     private State state = State.VALUE;
-    private String value;
-    private String parameter;
+    private T value;
+    private String argument;
     private Instant timestamp = Instant.now();
-
-    public FieldValue(Field field) {
-       this.field = field;
+    public FieldValue(Class<T> type) {
+        this.type = type;
     }
 
     public Instant getTimestamp() {
         return timestamp;
     }
 
-    void setValue(String value) {
+    Optional<T> getValue() {
+        return Optional.ofNullable(value);
+    }
+
+    void setValue(T value) {
         if (state == State.OVERRIDDEN) {
             return;
         }
@@ -42,26 +33,22 @@ public class FieldValue {
         timestamp = Instant.now();
     }
 
-    Optional<String> getValue() {
-        return Optional.ofNullable(value);
-    }
-
-    void override(String value) {
+    void override(T value) {
         state = (value != null) ? State.OVERRIDDEN : State.VALUE;
         this.value = value;
         timestamp = Instant.now();
     }
 
-    void contest(String value) {
+    void contest(String alternative) {
         if (this.value == null || (state != State.VALUE && state != State.CONTESTED)) {
             return;
         }
         state = State.CONTESTED;
-        parameter = value;
+        argument = alternative;
     }
 
     Optional<String> getContesting() {
-        return (state == State.CONTESTED) ? Optional.ofNullable(parameter) : Optional.empty();
+        return (state == State.CONTESTED) ? Optional.ofNullable(argument) : Optional.empty();
     }
 
     void error(String message) {
@@ -69,11 +56,13 @@ public class FieldValue {
             return;
         }
         state = State.ERROR;
-        parameter = message;
+        argument = message;
     }
 
     Optional<String> getError() {
-        return (state == State.ERROR) ? Optional.ofNullable(parameter) : Optional.empty();
+        return (state == State.ERROR) ? Optional.ofNullable(argument) : Optional.empty();
     }
+
+    private enum State {VALUE, CONTESTED, OVERRIDDEN, ERROR}
 }
 

@@ -8,7 +8,6 @@ import com.philips.research.metabase.activity.UnknownPackageException;
 import java.net.URI;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 public class MetaInteractor implements MetaService {
     private final MetaStore store;
@@ -51,9 +50,6 @@ public class MetaInteractor implements MetaService {
 
     @Override
     public Map<String, Object> value(URI pkg) {
-        validPackage(pkg)
-                .getFields().entrySet().stream()
-                .collect(Collectors.toMap(e->e.getKey(), e->e.getValue()));
         return null;
     }
 

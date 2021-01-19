@@ -1,7 +1,5 @@
 package com.philips.research.metabase.activity.domain;
 
-import com.philips.research.metabase.activity.Field;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -11,16 +9,10 @@ import java.time.Instant;
 import static org.assertj.core.api.Assertions.assertThat;
 
 class FieldValueTest {
-    private static final String VALUE = "Value";
+    private static final int VALUE = 42;
     private static final String TEXT = "Text";
 
-    final FieldValue field = new FieldValue(Field.TITLE);
-
-    @BeforeAll
-    static void beforeAll() {
-       FieldValue.register(Field.TITLE, new ValueConverter(String.class)) ;
-        FieldValue.register(Field.NUM_FILES, new ValueConverter(Integer.class)) ;
-    }
+    final FieldValue<Integer> field = new FieldValue<>(Integer.class);
 
     @Test
     void createsInstance() {
@@ -92,7 +84,7 @@ class FieldValueTest {
 
         @Test
         void overridesValue() {
-            final var correction = "Correction";
+            final var correction = 73;
 
             field.override(correction);
 
@@ -134,7 +126,7 @@ class FieldValueTest {
 
         @Test
         void ignoresSetValue() {
-            field.setValue("Other");
+            field.setValue(666);
 
             assertThat(field.getValue()).contains(VALUE);
         }
@@ -156,7 +148,7 @@ class FieldValueTest {
 
         @Test
         void overrides() {
-            final var correction = "Correction";
+            final var correction = 73;
 
             field.override(correction);
 

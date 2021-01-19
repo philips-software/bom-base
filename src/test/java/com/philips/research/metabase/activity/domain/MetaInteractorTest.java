@@ -36,7 +36,7 @@ class MetaInteractorTest {
 
     @Test
     void storesPackageField() {
-        when(store.findPackage(TYPE,NAME,VERSION)).thenReturn(Optional.of(pkg));
+        when(store.findPackage(TYPE, NAME, VERSION)).thenReturn(Optional.of(pkg));
 
 //        interactor.storeFieldValue(PACKAGE, STRING_FIELD, STRING_VALUE);
         final var value = interactor.value(PACKAGE);

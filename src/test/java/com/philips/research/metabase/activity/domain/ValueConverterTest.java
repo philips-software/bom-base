@@ -3,11 +3,8 @@ package com.philips.research.metabase.activity.domain;
 import org.junit.jupiter.api.Test;
 import org.springframework.context.ApplicationContext;
 
-import java.time.Instant;
-
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.junit.jupiter.api.Assertions.*;
 
 class ValueConverterTest {
     @Test
@@ -30,18 +27,18 @@ class ValueConverterTest {
 
     @Test
     void throws_encodingUnsupportedValueType() {
-       final var converter = new ValueConverter(Integer.class) ;
+        final var converter = new ValueConverter(Integer.class);
 
-       assertThatThrownBy(()->converter.toString(123.456))
-               .isInstanceOf(IllegalArgumentException.class)
-               .hasMessageContaining(Integer.class.getSimpleName());
+        assertThatThrownBy(() -> converter.toString(123.456))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessageContaining(Integer.class.getSimpleName());
     }
 
     @Test
     void throws_decodingToUnsupportedValueType() {
         final var converter = new ValueConverter(ApplicationContext.class);
 
-        assertThatThrownBy(()->converter.parse("ignore"))
+        assertThatThrownBy(() -> converter.parse("ignore"))
                 .isInstanceOf(UnsupportedOperationException.class)
                 .hasMessageContaining(ApplicationContext.class.getSimpleName());
     }
@@ -50,7 +47,7 @@ class ValueConverterTest {
     void throws_parseToValueFails() {
         final var converter = new ValueConverter(Integer.class);
 
-        assertThatThrownBy(()->converter.parse("1.234"))
+        assertThatThrownBy(() -> converter.parse("1.234"))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessageContaining("parse value");
     }
