@@ -1,6 +1,11 @@
-package com.philips.research.metabase.meta.domain;
+/*
+ * Copyright (c) 2020-2021, Koninklijke Philips N.V., https://www.philips.com
+ * SPDX-License-Identifier: MIT
+ */
 
-import com.philips.research.metabase.meta.Field;
+package com.philips.research.bombase.meta.domain;
+
+import com.philips.research.bombase.meta.Field;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 

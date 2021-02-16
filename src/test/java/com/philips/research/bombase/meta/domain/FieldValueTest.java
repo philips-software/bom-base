@@ -1,4 +1,9 @@
-package com.philips.research.metabase.meta.domain;
+/*
+ * Copyright (c) 2020-2021, Koninklijke Philips N.V., https://www.philips.com
+ * SPDX-License-Identifier: MIT
+ */
+
+package com.philips.research.bombase.meta.domain;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;

@@ -9,9 +9,9 @@
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
     <groupId>com.philips.research</groupId>
-    <artifactId>metabase</artifactId>
+    <artifactId>BOM-base</artifactId>
     <version>0.0.1</version>
-    <name>metabase</name>
+    <name>BOM-base</name>
     <description>FOSS metadata repository</description>
 
     <properties>

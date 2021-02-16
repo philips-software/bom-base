@@ -1,9 +1,14 @@
-package com.philips.research.metabase.meta.domain;
+/*
+ * Copyright (c) 2020-2021, Koninklijke Philips N.V., https://www.philips.com
+ * SPDX-License-Identifier: MIT
+ */
 
-import com.philips.research.metabase.meta.Field;
-import com.philips.research.metabase.meta.MetaService;
-import com.philips.research.metabase.meta.MetaStore;
-import com.philips.research.metabase.meta.UnknownPackageException;
+package com.philips.research.bombase.meta.domain;
+
+import com.philips.research.bombase.meta.Field;
+import com.philips.research.bombase.meta.MetaService;
+import com.philips.research.bombase.meta.MetaStore;
+import com.philips.research.bombase.meta.UnknownPackageException;
 
 import java.net.URI;
 import java.util.HashSet;
@@ -55,6 +60,7 @@ public class MetaInteractor implements MetaService {
     }
 
     private void notifyValueListeners(URI purl, Set<Field> fields, Map<Field, Object> values) {
+        //TODO queue Runnable instances before execution
         listeners.forEach(l -> l.onUpdated(purl, fields, values).ifPresent(Runnable::run));
     }
 }

@@ -1,8 +1,13 @@
-package com.philips.research.metabase.maven.domain;
+/*
+ * Copyright (c) 2020-2021, Koninklijke Philips N.V., https://www.philips.com
+ * SPDX-License-Identifier: MIT
+ */
 
-import com.philips.research.metabase.maven.MavenService;
-import com.philips.research.metabase.meta.Field;
-import com.philips.research.metabase.meta.MetaService;
+package com.philips.research.bombase.maven.domain;
+
+import com.philips.research.bombase.maven.MavenService;
+import com.philips.research.bombase.meta.Field;
+import com.philips.research.bombase.meta.MetaService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;

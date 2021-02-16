@@ -1,10 +1,17 @@
-package com.philips.research.metabase.meta.domain;
+/*
+ * Copyright (c) 2020-2021, Koninklijke Philips N.V., https://www.philips.com
+ * SPDX-License-Identifier: MIT
+ */
+
+package com.philips.research.bombase.meta.domain;
 
 import java.time.Instant;
 import java.util.Optional;
 
 /**
- *
+ * Current timestamped value for a field, with an indication of its reliability.
+ * A contested value indicates an alternate source does not agree with the current value, making it unreliable.
+ * An error indicates a problem occurred while trying to obtain the value from a source.
  */
 public class FieldValue<T> {
     private final Class<T> type;

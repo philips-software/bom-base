@@ -1,21 +1,29 @@
-package com.philips.research.metabase.meta;
+/*
+ * Copyright (c) 2020-2021, Koninklijke Philips N.V., https://www.philips.com
+ * SPDX-License-Identifier: MIT
+ */
+
+package com.philips.research.bombase.meta;
 
 import java.net.URI;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 
+/**
+ * API for managing the storage of metadata.
+ */
 public interface MetaService {
-
     /**
-     * Registers an observer for value changes.
+     * Registers an observer for metadata value changes.
      *
      * @param listener observer
      */
     void addListener(PackageListener listener);
 
     /**
-     * Updates fields of package and processes notifications.
+     * Updates selected fields of a package.
+     * Listeners are automatically notified of changes.
      *
      * @param purl   package URL
      * @param values new value per field
@@ -23,7 +31,7 @@ public interface MetaService {
     void update(URI purl, Map<Field, Object> values);
 
     /**
-     * Reads current field values of a package.
+     * Reads all stored metadata for a package.
      *
      * @param purl package URL
      * @return value per field
