@@ -1,0 +1,43 @@
+@startuml
+
+autoactivate on
+
+participant Client
+box BOM-base service
+participant API
+participant "Metadata\nStore" as Store
+participant Harvester
+participant Task
+end box
+participant "Metadata\nSource" as Source
+
+== Create package ==
+-> Client
+Client -> API: getMetadata(PURL)
+    API -> Store: get
+    return nothing
+    API -> Store: create PURL
+    Store -> Harvester: notify
+    Harvester -> Task **: create
+    deactivate
+    deactivate
+return nothing
+    deactivate Client
+
+== Harvest metadata ==
+activate Task
+Task -> Source: getMetadata(PURL)
+return
+Task -> Store: store(PURL, fields)
+deactivate
+destroy Task
+
+== Retrieve metadata ==
+-> Client
+Client -> API: getMetadata(PURL)
+    API -> Store: get
+    return metadata
+return metadata
+deactivate Client
+
+@enduml
