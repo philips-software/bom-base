@@ -36,24 +36,23 @@ class MetaInteractorTest {
     private static final URI PACKAGE = URI.create("pkg:" + TYPE + "/" + NAME + "@" + VERSION);
     private static final Field FIELD = Field.TITLE;
     private static final Field OTHER_FIELD = Field.DESCRIPTION;
-    private static final Integer VALUE = 42;
-    private static final Double OTHER_VALUE = 1.23;
+    private static final String VALUE = "Value";
+    private static final String OTHER_VALUE = "Other value";
 
     final MetaStore store = mock(MetaStore.class);
     final MetaService interactor = new MetaInteractor(store, new QueuedTaskRunner());
     final Package pkg = new Package(TYPE, NAME, VERSION);
-
-    @BeforeAll
-    static void beforeAll() {
-        Package.register(FIELD, Number.class);
-        Package.register(OTHER_FIELD, Number.class);
-    }
 
     @BeforeEach
     void beforeEach() {
         when(store.findPackage(TYPE, NAME, VERSION)).thenReturn(Optional.of(pkg));
         when(store.createPackage(any(), any(), any()))
                 .thenAnswer((p) -> new Package(p.getArgument(0), p.getArgument(1), p.getArgument(2)));
+    }
+
+    @Test
+    void acceptsFieldValues() {
+
     }
 
     @Test

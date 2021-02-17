@@ -51,5 +51,5 @@ public interface MetaStore {
      * @param field name of the field
      * @return persistent field instance
      */
-    FieldValue<?> createField(Package pkg, String field);
+    FieldValue createField(Package pkg, String field);
 }

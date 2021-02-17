@@ -6,6 +6,7 @@
 package com.philips.research.bombase.meta.domain;
 
 import com.philips.research.bombase.meta.Field;
+import com.philips.research.bombase.meta.MetaException;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
@@ -20,14 +21,9 @@ class PackageTest {
     private static final String NAME = "Group/Name";
     private static final String VERSION = "1.2.3";
     private static final Field FIELD = Field.TITLE;
-    private static final Double VALUE = 1.234;
+    private static final String VALUE = "Value";
 
     final Package pkg = new Package(TYPE, NAME, VERSION);
-
-    @BeforeAll
-    static void BeforeAll() {
-        Package.register(FIELD, Number.class);
-    }
 
     @Test
     void createsInstance() {
@@ -43,9 +39,9 @@ class PackageTest {
 
     @Test
     void throws_updateOfPackageProperties() {
-        assertThatThrownBy(() -> pkg.setValue(Field.TYPE, "Other")).isInstanceOf(IllegalArgumentException.class);
-        assertThatThrownBy(() -> pkg.setValue(Field.NAME, "Other")).isInstanceOf(IllegalArgumentException.class);
-        assertThatThrownBy(() -> pkg.setValue(Field.VERSION, "Other")).isInstanceOf(IllegalArgumentException.class);
+        assertThatThrownBy(() -> pkg.setValue(Field.TYPE, "Other")).isInstanceOf(MetaException.class);
+        assertThatThrownBy(() -> pkg.setValue(Field.NAME, "Other")).isInstanceOf(MetaException.class);
+        assertThatThrownBy(() -> pkg.setValue(Field.VERSION, "Other")).isInstanceOf(MetaException.class);
     }
 
     @Test
@@ -63,7 +59,7 @@ class PackageTest {
 
     @Test
     void updatesExistingField() {
-        pkg.setValue(FIELD, 666.666);
+        pkg.setValue(FIELD, "Old value");
         pkg.setValue(FIELD, VALUE);
 
         assertThat(pkg.getValue(FIELD)).contains(VALUE);
@@ -75,13 +71,6 @@ class PackageTest {
         pkg.setValues(Map.of(FIELD, VALUE));
 
         assertThat(pkg.getValue(FIELD)).contains(VALUE);
-    }
-
-    @Test
-    void throws_setIncompatibleValue() {
-        assertThatThrownBy(() -> pkg.setValue(FIELD, "Not a number"))
-                .isInstanceOf(IllegalArgumentException.class)
-                .hasMessageContaining("can not be assigned");
     }
 
     @Test

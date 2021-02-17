@@ -42,7 +42,7 @@ public class ClearlyDefinedClient {
     }
 
     public Optional<PackageMetadata> getPackageDefinition(String type, String provider, String namespace, String name, String revision) {
-        final var result = query(rest.getDefinition(type, provider, namespace, name, revision));
+        final var result = query(rest.getDefinition(type, provider, namespace.isEmpty() ? "-" : namespace, name, revision));
 
         return result.map(this::metadataFrom);
     }

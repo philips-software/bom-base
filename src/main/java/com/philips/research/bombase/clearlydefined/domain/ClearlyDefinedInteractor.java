@@ -19,6 +19,7 @@ import java.util.Set;
 
 @Service
 public class ClearlyDefinedInteractor implements ClearlyDefinedService {
+    private static final Map<String,String> PROVIDERS = Map.of("maven", "mavencentral", "npm", "npmjs");
     private final MetaService service;
     private final ClearlyDefinedClient client;
 
@@ -41,7 +42,7 @@ public class ClearlyDefinedInteractor implements ClearlyDefinedService {
         if (fields.contains(Field.NAME)) {
             return Optional.of(() -> {
                 final String type = (String) values.get(Field.TYPE);
-                final String provider = type.equals("maven") ? "mavencentral" : type;
+                final String provider = PROVIDERS.getOrDefault(type, type);
                 final String name = (String) values.get(Field.NAME);
                 final String version = (String) values.get(Field.VERSION);
                 client.getPackageDefinition(type, provider, "", name, version)

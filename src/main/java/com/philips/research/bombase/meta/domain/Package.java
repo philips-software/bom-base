@@ -14,22 +14,15 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 public class Package {
-    private static final FieldValue<Object> NO_FIELD_VALUE = new FieldValue<>(Object.class);
-    private static final Map<Field, Class<?>> TYPES = new HashMap<>();
-
     private final String type;
     private final String name;
     private final String version;
-    private final Map<Field, FieldValue<?>> fields = new HashMap<>();
+    private final Map<Field, FieldValue> fields = new HashMap<>();
 
     public Package(String type, String name, String version) {
         this.type = type;
         this.name = name;
         this.version = version;
-    }
-
-    public static void register(Field field, Class<?> type) {
-        TYPES.put(field, type);
     }
 
     static Package from(URI purl) {
@@ -68,25 +61,19 @@ public class Package {
         values.forEach(this::setValue);
     }
 
-    public <T> Optional<T> getValue(Field field) {
-        return this.<T>getFieldValue(field).getValue();
+    public Optional<Object> getValue(Field field) {
+        return this.getFieldValue(field).flatMap(FieldValue::getValue);
     }
 
-    public <T> void setValue(Field field, T value) {
-        final Class<?> fieldClass = TYPES.get(field);
-        if (fieldClass == null || !fieldClass.isAssignableFrom(value.getClass())) {
-            throw new IllegalArgumentException("Value " + value + " can not be assigned to field " + field);
-        }
+    public void setValue(Field field, Object value) {
         getOrCreateFieldValue(field).setValue(value);
     }
 
-    private <T> FieldValue<T> getFieldValue(Field field) {
-        //noinspection unchecked
-        return (FieldValue<T>) fields.getOrDefault(field, NO_FIELD_VALUE);
+    private Optional<FieldValue> getFieldValue(Field field) {
+        return Optional.ofNullable(fields.get(field));
     }
 
-    private <T> FieldValue<T> getOrCreateFieldValue(Field field) {
-        //noinspection unchecked
-        return (FieldValue<T>) fields.computeIfAbsent(field, (f) -> new FieldValue<>(TYPES.get(f)));
+    private FieldValue getOrCreateFieldValue(Field field) {
+        return fields.computeIfAbsent(field, FieldValue::new);
     }
 }

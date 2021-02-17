@@ -5,6 +5,9 @@
 
 package com.philips.research.bombase.meta.domain;
 
+import com.philips.research.bombase.meta.Field;
+import pl.tlinkowski.annotation.basic.NullOr;
+
 import java.time.Instant;
 import java.util.Optional;
 
@@ -13,26 +16,27 @@ import java.util.Optional;
  * A contested value indicates an alternate source does not agree with the current value, making it unreliable.
  * An error indicates a problem occurred while trying to obtain the value from a source.
  */
-public class FieldValue<T> {
-    private final Class<T> type;
+public class FieldValue {
+    private final Field field;
     private State state = State.VALUE;
-    private T value;
-    private String argument;
+    private @NullOr Object value;
+    private @NullOr String argument;
     private Instant timestamp = Instant.now();
 
-    public FieldValue(Class<T> type) {
-        this.type = type;
+    public FieldValue(Field field) {
+        this.field = field;
     }
 
     public Instant getTimestamp() {
         return timestamp;
     }
 
-    Optional<T> getValue() {
+    Optional<Object> getValue() {
         return Optional.ofNullable(value);
     }
 
-    void setValue(T value) {
+    void setValue(Object value) {
+        field.validate(value);
         if (state == State.OVERRIDDEN) {
             return;
         }
@@ -41,7 +45,8 @@ public class FieldValue<T> {
         timestamp = Instant.now();
     }
 
-    void override(T value) {
+    void override(@NullOr Object value) {
+        field.validate(value);
         state = (value != null) ? State.OVERRIDDEN : State.VALUE;
         this.value = value;
         timestamp = Instant.now();

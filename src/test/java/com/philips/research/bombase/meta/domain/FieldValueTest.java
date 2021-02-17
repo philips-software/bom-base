@@ -5,6 +5,7 @@
 
 package com.philips.research.bombase.meta.domain;
 
+import com.philips.research.bombase.meta.Field;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -14,10 +15,10 @@ import java.time.Instant;
 import static org.assertj.core.api.Assertions.assertThat;
 
 class FieldValueTest {
-    private static final int VALUE = 42;
+    private static final String VALUE = "Value";
     private static final String TEXT = "Text";
 
-    final FieldValue<Integer> field = new FieldValue<>(Integer.class);
+    final FieldValue field = new FieldValue(Field.TITLE);
 
     @Test
     void createsInstance() {
@@ -89,7 +90,7 @@ class FieldValueTest {
 
         @Test
         void overridesValue() {
-            final var correction = 73;
+            final var correction = "Correction";
 
             field.override(correction);
 
@@ -131,7 +132,7 @@ class FieldValueTest {
 
         @Test
         void ignoresSetValue() {
-            field.setValue(666);
+            field.setValue("Ignored");
 
             assertThat(field.getValue()).contains(VALUE);
         }
@@ -153,7 +154,7 @@ class FieldValueTest {
 
         @Test
         void overrides() {
-            final var correction = 73;
+            final var correction = "Correction";
 
             field.override(correction);
 

@@ -22,7 +22,7 @@ public class MemoryMetaStore implements MetaStore {
 
     @Override
     public Package createPackage(String type, String name, String version) {
-        return packages.putIfAbsent(purl(type, name, version), new Package(type, name, version));
+        return packages.computeIfAbsent(purl(type, name, version), (key)->new Package(type, name, version));
     }
 
     @Override
@@ -43,7 +43,7 @@ public class MemoryMetaStore implements MetaStore {
 
     @Override
     //TODO Is this actually necessary (now)?
-    public FieldValue<?> createField(Package pkg, String field) {
+    public FieldValue createField(Package pkg, String field) {
         throw new UnsupportedOperationException("Not implemented");
     }
 }
