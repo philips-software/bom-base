@@ -9,12 +9,14 @@ import com.philips.research.bombase.meta.Field;
 import com.philips.research.bombase.meta.MetaService;
 import com.philips.research.bombase.meta.MetaStore;
 import com.philips.research.bombase.meta.UnknownPackageException;
+import org.springframework.stereotype.Service;
 
 import java.net.URI;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
+@Service
 public class MetaInteractor implements MetaService {
     private final MetaStore store;
     private final QueuedTaskRunner runner;
