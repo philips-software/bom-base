@@ -3,13 +3,12 @@
  * SPDX-License-Identifier: MIT
  */
 
-package com.philips.research.bombase.meta;
+package com.philips.research.bombase.clearlydefined;
 
 import com.philips.research.bombase.BusinessException;
 
-public class MetaException extends BusinessException {
-    public MetaException(String message) {
+public class ClearlyDefinedException extends BusinessException {
+    public ClearlyDefinedException(String message) {
         super(message);
     }
 }
-

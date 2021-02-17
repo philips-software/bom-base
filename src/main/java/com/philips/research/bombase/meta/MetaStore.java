@@ -17,8 +17,9 @@ import java.util.Optional;
 public interface MetaStore {
     /**
      * Creates a new unique package from the provided coordinates.
-     * @param type type of the package
-     * @param name namespace and name of the package
+     *
+     * @param type    type of the package
+     * @param name    namespace and name of the package
      * @param version version of the package
      * @return persistent package instance
      */
@@ -26,8 +27,9 @@ public interface MetaStore {
 
     /**
      * Retrieves a package for the provided coordinates if one exists.
-     * @param type type of the package
-     * @param name namespace and name of the package
+     *
+     * @param type    type of the package
+     * @param name    namespace and name of the package
      * @param version version of the package
      * @return persistent package instance, if one exists
      */
@@ -35,6 +37,7 @@ public interface MetaStore {
 
     /**
      * Lists all versions of a package.
+     *
      * @param type type of the package
      * @param name namespace and name of the package
      * @return all known persistent package version instances
@@ -43,7 +46,8 @@ public interface MetaStore {
 
     /**
      * Creates a new field record for a package.
-     * @param pkg package containing the field
+     *
+     * @param pkg   package containing the field
      * @param field name of the field
      * @return persistent field instance
      */

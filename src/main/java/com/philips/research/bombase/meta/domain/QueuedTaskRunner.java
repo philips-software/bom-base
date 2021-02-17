@@ -11,7 +11,7 @@ import org.springframework.stereotype.Service;
 @Service
 public class QueuedTaskRunner {
     @Async("taskExecutor")
-    //@Transactional(propagation = Propagation.REQUIRES_NEW)
+        //@Transactional(propagation = Propagation.REQUIRES_NEW)
     void execute(Runnable task) {
         task.run();
     }
