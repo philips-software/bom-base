@@ -12,6 +12,7 @@ import com.philips.research.bombase.meta.MetaStore;
 import com.philips.research.bombase.meta.UnknownPackageException;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 
@@ -26,8 +27,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 class MetaInteractorTest {
     private static final String TYPE = "Type";
@@ -40,9 +40,8 @@ class MetaInteractorTest {
     private static final Double OTHER_VALUE = 1.23;
 
     final MetaStore store = mock(MetaStore.class);
-    final MetaService interactor = new MetaInteractor(store);
+    final MetaService interactor = new MetaInteractor(store, new QueuedTaskRunner());
     final Package pkg = new Package(TYPE, NAME, VERSION);
-    final PackageListener listener = mock(PackageListener.class);
 
     @BeforeAll
     static void beforeAll() {
@@ -70,32 +69,50 @@ class MetaInteractorTest {
         assertThat(interactor.value(PACKAGE)).containsEntry(FIELD, VALUE);
     }
 
-    @Test
-    void createPackageNotifiesListeners() {
-        when(store.findPackage(any(), any(), any())).thenReturn(Optional.empty());
-        final var triggered = new AtomicBoolean(false);
-        final var values = Map.of(Field.TYPE, TYPE, Field.NAME, NAME, Field.VERSION, VERSION);
-        when(listener.onUpdated(PACKAGE, values.keySet(), values)).thenReturn(Optional.of(() -> triggered.set(true)));
-        interactor.addListener(listener);
+    @Nested
+    class Listeners {
+        final PackageListener listener = mock(PackageListener.class);
 
-        interactor.update(PACKAGE, Map.of());
+        @BeforeEach
+        void beforeEach() {
+            interactor.addListener(listener);
+        }
 
-        assertThat(triggered.get()).isTrue();
-    }
+        @Test
+        void notifiesListeners_createPackage() {
+            when(store.findPackage(any(), any(), any())).thenReturn(Optional.empty());
+            final var triggered = new AtomicBoolean(false);
+            final var values = Map.of(Field.TYPE, TYPE, Field.NAME, NAME, Field.VERSION, VERSION);
+            when(listener.onUpdated(PACKAGE, values.keySet(), values)).thenReturn(Optional.of(() -> triggered.set(true)));
 
-    @Test
-    void updateNotifiesListenersOnce() {
-        final var triggered = new AtomicInteger(0);
-        pkg.setValue(OTHER_FIELD, OTHER_VALUE);
-        //noinspection unchecked
-        final ArgumentCaptor<Map<Field, Object>> captor = ArgumentCaptor.forClass(Map.class);
-        when(listener.onUpdated(eq(PACKAGE), eq(Set.of(FIELD, OTHER_FIELD)), captor.capture()))
-                .thenReturn(Optional.of(triggered::incrementAndGet));
-        interactor.addListener(listener);
+            interactor.update(PACKAGE, Map.of());
 
-        interactor.update(PACKAGE, Map.of(FIELD, VALUE, OTHER_FIELD, OTHER_VALUE));
+            assertThat(triggered.get()).isTrue();
+        }
 
-        assertThat(captor.getValue()).containsEntry(FIELD, VALUE);
-        assertThat(triggered.get()).isEqualTo(1);
+        @Test
+        void notifiesListenersOnce_updateFields() {
+            final var triggered = new AtomicInteger(0);
+            pkg.setValue(OTHER_FIELD, OTHER_VALUE);
+            //noinspection unchecked
+            final ArgumentCaptor<Map<Field, Object>> captor = ArgumentCaptor.forClass(Map.class);
+            when(listener.onUpdated(eq(PACKAGE), eq(Set.of(FIELD, OTHER_FIELD)), captor.capture()))
+                    .thenReturn(Optional.of(triggered::incrementAndGet));
+
+            interactor.update(PACKAGE, Map.of(FIELD, VALUE, OTHER_FIELD, OTHER_VALUE));
+
+            assertThat(captor.getValue()).containsEntry(FIELD, VALUE);
+            assertThat(triggered.get()).isEqualTo(1);
+        }
+
+        @Test
+        void executesListenerGeneratedTasks() {
+            final var task = mock(Runnable.class);
+            when(listener.onUpdated(any(), any(), any())).thenReturn(Optional.of(task));
+
+            interactor.update(PACKAGE, Map.of(FIELD, VALUE));
+
+            verify(task).run();
+        }
     }
 }

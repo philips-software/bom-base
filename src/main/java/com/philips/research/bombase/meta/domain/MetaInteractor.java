@@ -17,10 +17,12 @@ import java.util.Set;
 
 public class MetaInteractor implements MetaService {
     private final MetaStore store;
+    private final QueuedTaskRunner runner;
     private final Set<PackageListener> listeners = new HashSet<>();
 
-    public MetaInteractor(MetaStore store) {
+    public MetaInteractor(MetaStore store, QueuedTaskRunner runner) {
         this.store = store;
+        this.runner = runner;
     }
 
     @Override
@@ -60,7 +62,6 @@ public class MetaInteractor implements MetaService {
     }
 
     private void notifyValueListeners(URI purl, Set<Field> fields, Map<Field, Object> values) {
-        //TODO queue Runnable instances before execution
-        listeners.forEach(l -> l.onUpdated(purl, fields, values).ifPresent(Runnable::run));
+        listeners.forEach(l -> l.onUpdated(purl, fields, values).ifPresent(runner::execute));
     }
 }
