@@ -13,6 +13,9 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+/**
+ * Representation of an item with its properties that can appear in a bill-of-materials.
+ */
 public class Package {
     private final String type;
     private final String name;

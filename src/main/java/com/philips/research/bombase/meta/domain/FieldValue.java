@@ -12,9 +12,13 @@ import java.time.Instant;
 import java.util.Optional;
 
 /**
- * Current timestamped value for a field, with an indication of its reliability.
- * A contested value indicates an alternate source does not agree with the current value, making it unreliable.
- * An error indicates a problem occurred while trying to obtain the value from a source.
+ * Current timestamped value for a field with an indication of its reliability and validation of the type.
+ * <ul>
+ *   <li>A <strong>contested</strong> value indicates an alternate source does not agree with the current value,
+ *   making it unreliable.</li>
+ *   <li>An <strong>error</strong> indicates a problem occurred while trying to obtain the value
+ *   from a source.</li>
+ * </ul>
  */
 public class FieldValue {
     private final Field field;
