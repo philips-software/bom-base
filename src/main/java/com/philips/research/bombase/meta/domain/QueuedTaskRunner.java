@@ -10,8 +10,13 @@ import org.springframework.stereotype.Service;
 
 @Service
 public class QueuedTaskRunner {
+    /**
+     * Queues tasks to run up to a configured maximum in parallel.
+     *
+     * @param task execution unit
+     */
     @Async("taskExecutor")
-        //@Transactional(propagation = Propagation.REQUIRES_NEW)
+    //@Transactional(propagation = Propagation.REQUIRES_NEW)
     void execute(Runnable task) {
         task.run();
     }

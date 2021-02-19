@@ -5,6 +5,8 @@
 
 package com.philips.research.bombase.meta.persistence;
 
+import com.philips.research.bombase.PackageUrl;
+import com.philips.research.bombase.meta.Field;
 import com.philips.research.bombase.meta.MetaStore;
 import com.philips.research.bombase.meta.domain.FieldValue;
 import com.philips.research.bombase.meta.domain.Package;
@@ -18,32 +20,31 @@ import java.util.stream.Collectors;
 
 @Repository
 public class MemoryMetaStore implements MetaStore {
-    private final Map<String, Package> packages = new HashMap<>();
+    private final Map<PackageUrl, Package> packages = new HashMap<>();
 
     @Override
-    public Package createPackage(String type, String name, String version) {
-        return packages.computeIfAbsent(purl(type, name, version), (key)->new Package(type, name, version));
+    public Package createPackage(PackageUrl purl) {
+        return packages.computeIfAbsent(purl, (key) -> new Package(purl));
     }
 
     @Override
-    public Optional<Package> findPackage(String type, String name, String version) {
-        return Optional.ofNullable(packages.get(purl(type, name, version)));
-    }
-
-    private String purl(String type, String name, String version) {
-        return type + ':' + name + "-" + version;
+    public Optional<Package> findPackage(PackageUrl purl) {
+        return Optional.ofNullable(packages.get(purl));
     }
 
     @Override
-    public List<Package> findPackages(String type, String name) {
+    public List<Package> findPackageVersions(PackageUrl purl) {
         return packages.values().stream()
-                .filter(p -> p.getType().equals(type) && p.getName().equals(name))
+                //FIXME Could use a comparator in PackageUrl
+                .filter(p -> p.getPurl().getType().equals(purl.getType()) &&
+                        p.getPurl().getNamespace().equals(purl.getNamespace()) &&
+                        p.getPurl().getName().equals(purl.getName()))
                 .collect(Collectors.toList());
     }
 
     @Override
-    //TODO Is this actually necessary (now)?
-    public FieldValue createField(Package pkg, String field) {
+    //TODO Is this actually necessary (already)?
+    public FieldValue createField(Package pkg, Field field) {
         throw new UnsupportedOperationException("Not implemented");
     }
 }

@@ -68,6 +68,18 @@ class ClearlyDefinedClientTest {
     }
 
     @Test
+    void escapesEmptyNamespaceToServer() throws Exception {
+        mockServer.enqueue(new MockResponse().setBody(new JSONObject()
+                .put("described", new JSONObject())
+                .put("licensed", new JSONObject()).toString()));
+
+        final var metadata = client.getPackageDefinition(TYPE, PROVIDER, "", NAME, REVISION).orElseThrow();
+
+        final var request = mockServer.takeRequest();
+        assertThat(request.getPath()).contains(PROVIDER + "/-/" + NAME);
+    }
+
+    @Test
     void throws_serverNotReachable() {
         var serverlessClient = new ClearlyDefinedClient(URI.create("http://localhost:1234"));
 

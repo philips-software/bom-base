@@ -5,10 +5,10 @@
 
 package com.philips.research.bombase.meta;
 
-import java.net.URI;
+import com.philips.research.bombase.PackageUrl;
 
 public class UnknownPackageException extends MetaException {
-    public UnknownPackageException(URI pkg) {
-        super("Package '" + pkg + "' is unknown");
+    public UnknownPackageException(PackageUrl purl) {
+        super("Package '" + purl + "' is unknown");
     }
 }

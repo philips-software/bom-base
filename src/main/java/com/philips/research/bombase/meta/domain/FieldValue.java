@@ -27,11 +27,11 @@ public class FieldValue {
     private @NullOr String argument;
     private Instant timestamp = Instant.now();
 
-    public FieldValue(Field field) {
+    FieldValue(Field field) {
         this.field = field;
     }
 
-    public Instant getTimestamp() {
+    Instant getTimestamp() {
         return timestamp;
     }
 

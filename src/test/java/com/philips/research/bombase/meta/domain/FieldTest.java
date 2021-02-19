@@ -21,16 +21,10 @@ public class FieldTest {
     class Validation {
         @Test
         void validatesCompatibleType() {
+            //noinspection ConstantConditions
             final var value = Field.TITLE.validate(STRING);
 
             assertThat(value).isSameAs(STRING);
-        }
-
-        @Test
-        void throws_validatingIfNoTypeAssigned() {
-            assertThatThrownBy(() -> Field.TYPE.validate(STRING))
-                    .isInstanceOf(MetaException.class)
-                    .hasMessageContaining("not hold any value");
         }
 
         @Test

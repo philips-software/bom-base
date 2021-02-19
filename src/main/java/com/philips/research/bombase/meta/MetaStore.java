@@ -5,6 +5,7 @@
 
 package com.philips.research.bombase.meta;
 
+import com.philips.research.bombase.PackageUrl;
 import com.philips.research.bombase.meta.domain.FieldValue;
 import com.philips.research.bombase.meta.domain.Package;
 
@@ -18,31 +19,26 @@ public interface MetaStore {
     /**
      * Creates a new unique package from the provided coordinates.
      *
-     * @param type    type of the package
-     * @param name    namespace and name of the package
-     * @param version version of the package
+     * @param purl package id
      * @return persistent package instance
      */
-    Package createPackage(String type, String name, String version);
+    Package createPackage(PackageUrl purl);
 
     /**
      * Retrieves a package for the provided coordinates if one exists.
      *
-     * @param type    type of the package
-     * @param name    namespace and name of the package
-     * @param version version of the package
+     * @param purl package id
      * @return persistent package instance, if one exists
      */
-    Optional<Package> findPackage(String type, String name, String version);
+    Optional<Package> findPackage(PackageUrl purl);
 
     /**
      * Lists all versions of a package.
      *
-     * @param type type of the package
-     * @param name namespace and name of the package
+     * @param purl package id
      * @return all known persistent package version instances
      */
-    List<Package> findPackages(String type, String name);
+    List<Package> findPackageVersions(PackageUrl purl);
 
     /**
      * Creates a new field record for a package.
@@ -51,5 +47,5 @@ public interface MetaStore {
      * @param field name of the field
      * @return persistent field instance
      */
-    FieldValue createField(Package pkg, String field);
+    FieldValue createField(Package pkg, Field field);
 }

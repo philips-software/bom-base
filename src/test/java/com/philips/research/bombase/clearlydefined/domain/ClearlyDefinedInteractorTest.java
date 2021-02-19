@@ -5,6 +5,7 @@
 
 package com.philips.research.bombase.clearlydefined.domain;
 
+import com.philips.research.bombase.PackageUrl;
 import com.philips.research.bombase.clearlydefined.ClearlyDefinedService;
 import com.philips.research.bombase.meta.Field;
 import com.philips.research.bombase.meta.MetaService;
@@ -23,9 +24,10 @@ import static org.mockito.Mockito.*;
 
 class ClearlyDefinedInteractorTest {
     private static final String TYPE = "type";
+    private static final String NAMESPACE = "namespace";
     private static final String NAME = "name";
     private static final String VERSION = "version";
-    private static final URI PURL = URI.create(String.format("pkg:%s/%s/%s", TYPE, NAME, VERSION));
+    private static final PackageUrl PURL = new PackageUrl(String.format("pkg:%s/%s/%s@%s", TYPE, NAMESPACE, NAME, VERSION));
     private static final URI SOURCE_LOCATION = URI.create("git+https://github.com/example");
 
     private final MetaService metaService = mock(MetaService.class);
@@ -50,18 +52,18 @@ class ClearlyDefinedInteractorTest {
 
         @Test
         void harvestsNewPackage() {
-            final var task = listener.onUpdated(PURL, Set.of(Field.NAME), Map.of(Field.TYPE, TYPE, Field.NAME, NAME, Field.VERSION, VERSION)).orElseThrow();
+            final var task = listener.onUpdated(PURL, Set.of(), Map.of()).orElseThrow();
             task.run();
 
-            verify(client).getPackageDefinition(TYPE, TYPE, "", NAME, VERSION);
+            verify(client).getPackageDefinition(TYPE, TYPE, NAMESPACE, NAME, VERSION);
         }
 
         @Test
         void updatesHarvestedMetadata() {
             final var meta = new PackageMetadata().setSourceLocation(SOURCE_LOCATION);
-            when(client.getPackageDefinition(TYPE, TYPE, "", NAME, VERSION)).thenReturn(Optional.of(meta));
+            when(client.getPackageDefinition(TYPE, TYPE, NAMESPACE, NAME, VERSION)).thenReturn(Optional.of(meta));
 
-            final var task = listener.onUpdated(PURL, Set.of(Field.NAME), Map.of(Field.TYPE, TYPE, Field.NAME, NAME, Field.VERSION, VERSION)).orElseThrow();
+            final var task = listener.onUpdated(PURL, Set.of(), Map.of()).orElseThrow();
             task.run();
 
             verify(metaService).update(PURL, Map.of(Field.SOURCE_LOCATION, SOURCE_LOCATION));

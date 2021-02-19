@@ -4,4 +4,4 @@
  */
 
 @pl.tlinkowski.annotation.basic.NonNullPackage
-package com.philips.research.bombase.maven.domain;
+package com.philips.research.bombase.meta.persistence;

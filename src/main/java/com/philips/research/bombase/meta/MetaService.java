@@ -5,7 +5,8 @@
 
 package com.philips.research.bombase.meta;
 
-import java.net.URI;
+import com.philips.research.bombase.PackageUrl;
+
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
@@ -25,19 +26,19 @@ public interface MetaService {
      * Updates selected fields of a package.
      * Listeners are automatically notified of changes.
      *
-     * @param purl   package URL
+     * @param purl   package id
      * @param values new value per field
      */
-    void update(URI purl, Map<Field, Object> values);
+    void update(PackageUrl purl, Map<Field, Object> values);
 
     /**
      * Reads all stored metadata for a package.
      *
-     * @param purl package URL
+     * @param purl package id
      * @return value per field
      * @throws UnknownPackageException if the package does not exist
      */
-    Map<Field, Object> value(URI purl);
+    Map<Field, Object> value(PackageUrl purl);
 
     /**
      * Callbacks to optionally create an asynchronous task.
@@ -46,11 +47,11 @@ public interface MetaService {
         /**
          * Notifies given fields were updated.
          *
-         * @param pkg     package URL
+         * @param purl    package id
          * @param updated modified fields
          * @param values  current package metadata
          * @return (optional) operation to queue for execution
          */
-        Optional<Runnable> onUpdated(URI pkg, Set<Field> updated, Map<Field, ?> values);
+        Optional<Runnable> onUpdated(PackageUrl purl, Set<Field> updated, Map<Field, ?> values);
     }
 }
