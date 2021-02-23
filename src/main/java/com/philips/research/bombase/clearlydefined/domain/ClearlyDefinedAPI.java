@@ -46,7 +46,7 @@ public interface ClearlyDefinedAPI {
     }
 
     class FacetJson {
-       @NullOr AttributionJson attribution;
+        @NullOr AttributionJson attribution;
         @NullOr DiscoveredJson discovered;
     }
 

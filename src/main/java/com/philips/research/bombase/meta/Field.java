@@ -16,10 +16,13 @@ public enum Field {
     TITLE(String.class), // Short name of the package
     DESCRIPTION(String.class), // More elaborate description of the package
     HOME_PAGE(URI.class), // Project home page
+    COPYRIGHT(String.class), // Project home page
     DOWNLOAD_LOCATION(URI.class), // URL for the distribution representation
     SOURCE_LOCATION(URI.class), // URL for the source code
     DECLARED_LICENSE(String.class), // License according to the distributor
-    DETECTED_LICENSE(String.class); // License according to authors
+    DETECTED_LICENSE(String.class), // License according to authors
+    SHA1(String.class), // Hash of distribution artifact
+    SHA256(String.class); // Hash of distribution artifact
 
     private final Class<?> typeClass;
 

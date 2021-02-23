@@ -44,7 +44,7 @@ class PackageTest {
     @Test
     void updatesExistingField() {
         pkg.setValue(ORIGIN, FIELD, "Old value");
-        pkg.setValue(ORIGIN , FIELD, VALUE);
+        pkg.setValue(ORIGIN, FIELD, VALUE);
 
         assertThat(pkg.getValue(FIELD)).contains(VALUE);
         assertThat(pkg.getValues()).containsEntry(FIELD, VALUE);

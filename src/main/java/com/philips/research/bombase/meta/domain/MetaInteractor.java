@@ -9,7 +9,7 @@ import com.philips.research.bombase.PackageUrl;
 import com.philips.research.bombase.meta.*;
 import org.springframework.stereotype.Service;
 
-import java.util.HashSet;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
@@ -17,7 +17,7 @@ import java.util.Set;
 public class MetaInteractor implements MetaService {
     private final MetaStore store;
     private final QueuedTaskRunner runner;
-    private final Set<PackageListener> listeners = new HashSet<>();
+    private final Map<PackageListener, Origin> listeners = new HashMap<>();
 
     public MetaInteractor(MetaStore store, QueuedTaskRunner runner) {
         this.store = store;
@@ -25,15 +25,15 @@ public class MetaInteractor implements MetaService {
     }
 
     @Override
-    public void addListener(PackageListener listener) {
-        listeners.add(listener);
+    public void addListener(Origin origin, PackageListener listener) {
+        listeners.put(listener, origin);
     }
 
     @Override
     public void update(Origin origin, PackageUrl purl, Map<Field, Object> values) {
         final var pkg = getOrCreatePackage(purl);
         pkg.setValues(origin, values);
-        notifyValueListeners(purl, values.keySet(), pkg.getValues());
+        notifyValueListeners(origin, purl, values.keySet(), pkg.getValues());
     }
 
     @Override
@@ -48,7 +48,7 @@ public class MetaInteractor implements MetaService {
 
     private Package createPackage(PackageUrl purl) {
         final var pkg = store.createPackage(purl);
-        notifyValueListeners(purl, Set.of(), Map.of());
+        notifyValueListeners(Origin.META, purl, Set.of(), Map.of());
         return pkg;
     }
 
@@ -57,7 +57,10 @@ public class MetaInteractor implements MetaService {
                 .orElseThrow(() -> new UnknownPackageException(purl));
     }
 
-    private void notifyValueListeners(PackageUrl purl, Set<Field> fields, Map<Field, Object> values) {
-        listeners.forEach(l -> l.onUpdated(purl, fields, values).ifPresent(runner::execute));
+    private void notifyValueListeners(Origin origin, PackageUrl purl, Set<Field> fields, Map<Field, Object> values) {
+        listeners.entrySet().stream()
+                .filter(e -> e.getValue() != origin)
+                .map(Map.Entry::getKey)
+                .forEach(l -> l.onUpdated(purl, fields, values).ifPresent(runner::execute));
     }
 }

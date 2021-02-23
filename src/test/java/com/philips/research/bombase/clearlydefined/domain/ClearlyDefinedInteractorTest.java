@@ -41,13 +41,13 @@ class ClearlyDefinedInteractorTest {
 
         @BeforeEach
         void beforeEach() {
-            doAnswer(p -> listener = p.getArgument(0)).when(metaService).addListener(any());
+            doAnswer(p -> listener = p.getArgument(1)).when(metaService).addListener(any(), any());
             interactor.init();
         }
 
         @Test
         void registersWithMetaService() {
-            verify(metaService).addListener(any());
+            verify(metaService).addListener(eq(Origin.CLEARLY_DEFINED), any());
             assertThat(listener).isNotNull();
         }
 

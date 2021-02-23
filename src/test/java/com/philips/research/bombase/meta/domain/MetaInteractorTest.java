@@ -34,7 +34,8 @@ class MetaInteractorTest {
     private static final Field OTHER_FIELD = Field.DESCRIPTION;
     private static final String VALUE = "Value";
     private static final String OTHER_VALUE = "Other value";
-    private static final Origin ORIGIN = Origin.API;
+    private static final Origin MY_ORIGIN = Origin.API;
+    private static final Origin OTHER_ORIGIN = Origin.CLEARLY_DEFINED;
 
     final MetaStore store = mock(MetaStore.class);
     final MetaService interactor = new MetaInteractor(store, new QueuedTaskRunner());
@@ -48,11 +49,6 @@ class MetaInteractorTest {
     }
 
     @Test
-    void acceptsFieldValues() {
-//TODO Implement me!?
-    }
-
-    @Test
     void throws_getValuesForUnknownPackage() {
         assertThatThrownBy(() -> interactor.valuesOf(new PackageUrl("type/unknown@version")))
                 .isInstanceOf(UnknownPackageException.class);
@@ -60,7 +56,7 @@ class MetaInteractorTest {
 
     @Test
     void updateStoresValue() {
-        interactor.update(ORIGIN, PURL, Map.of(FIELD, VALUE));
+        interactor.update(MY_ORIGIN, PURL, Map.of(FIELD, VALUE));
 
         assertThat(interactor.valuesOf(PURL)).containsEntry(FIELD, VALUE);
     }
@@ -71,7 +67,7 @@ class MetaInteractorTest {
 
         @BeforeEach
         void beforeEach() {
-            interactor.addListener(listener);
+            interactor.addListener(OTHER_ORIGIN, listener);
         }
 
         @Test
@@ -80,7 +76,7 @@ class MetaInteractorTest {
             final var triggered = new AtomicBoolean(false);
             when(listener.onUpdated(PURL, Set.of(), Map.of())).thenReturn(Optional.of(() -> triggered.set(true)));
 
-            interactor.update(ORIGIN, PURL, Map.of());
+            interactor.update(MY_ORIGIN, PURL, Map.of());
 
             assertThat(triggered.get()).isTrue();
         }
@@ -88,16 +84,23 @@ class MetaInteractorTest {
         @Test
         void notifiesListenersOnce_updateFields() {
             final var triggered = new AtomicInteger(0);
-            pkg.setValue(ORIGIN, OTHER_FIELD, OTHER_VALUE);
+            pkg.setValue(MY_ORIGIN, OTHER_FIELD, OTHER_VALUE);
             //noinspection unchecked
             final ArgumentCaptor<Map<Field, Object>> captor = ArgumentCaptor.forClass(Map.class);
             when(listener.onUpdated(eq(PURL), eq(Set.of(FIELD, OTHER_FIELD)), captor.capture()))
                     .thenReturn(Optional.of(triggered::incrementAndGet));
 
-            interactor.update(ORIGIN, PURL, Map.of(FIELD, VALUE, OTHER_FIELD, OTHER_VALUE));
+            interactor.update(MY_ORIGIN, PURL, Map.of(FIELD, VALUE, OTHER_FIELD, OTHER_VALUE));
 
             assertThat(captor.getValue()).containsEntry(FIELD, VALUE);
             assertThat(triggered.get()).isEqualTo(1);
+        }
+
+        @Test
+        void ignoresOriginatingListener_updateFields() {
+            interactor.update(OTHER_ORIGIN, PURL, Map.of(FIELD, VALUE));
+
+            verify(listener, never()).onUpdated(any(), any(), any());
         }
 
         @Test
@@ -105,7 +108,7 @@ class MetaInteractorTest {
             final var task = mock(Runnable.class);
             when(listener.onUpdated(any(), any(), any())).thenReturn(Optional.of(task));
 
-            interactor.update(ORIGIN, PURL, Map.of(FIELD, VALUE));
+            interactor.update(MY_ORIGIN, PURL, Map.of(FIELD, VALUE));
 
             verify(task).run();
         }

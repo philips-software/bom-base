@@ -18,9 +18,10 @@ public interface MetaService {
     /**
      * Registers an observer for metadata value changes.
      *
+     * @param origin service identifier
      * @param listener observer
      */
-    void addListener(PackageListener listener);
+    void addListener(Origin origin, PackageListener listener);
 
     /**
      * Updates selected fields of a package.

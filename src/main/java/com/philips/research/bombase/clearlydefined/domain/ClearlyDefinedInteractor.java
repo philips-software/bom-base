@@ -36,7 +36,7 @@ public class ClearlyDefinedInteractor implements ClearlyDefinedService {
 
     @Override
     public void init() {
-        service.addListener(this::onUpdated);
+        service.addListener(Origin.CLEARLY_DEFINED, this::onUpdated);
     }
 
     private Optional<Runnable> onUpdated(PackageUrl purl, Set<Field> fields, Map<Field, ?> values) {
