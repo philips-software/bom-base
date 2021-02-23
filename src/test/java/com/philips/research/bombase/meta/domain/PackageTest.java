@@ -7,6 +7,7 @@ package com.philips.research.bombase.meta.domain;
 
 import com.philips.research.bombase.PackageUrl;
 import com.philips.research.bombase.meta.Field;
+import com.philips.research.bombase.meta.Origin;
 import org.junit.jupiter.api.Test;
 
 import java.util.Map;
@@ -17,6 +18,7 @@ class PackageTest {
     private static final PackageUrl PURL = new PackageUrl("pkg:type/name@version");
     private static final Field FIELD = Field.TITLE;
     private static final String VALUE = "Value";
+    private static final Origin ORIGIN = Origin.API;
 
     final Package pkg = new Package(PURL);
 
@@ -33,7 +35,7 @@ class PackageTest {
 
     @Test
     void storesValueInNewField() {
-        pkg.setValue(FIELD, VALUE);
+        pkg.setValue(ORIGIN, FIELD, VALUE);
 
         assertThat(pkg.getValue(FIELD)).contains(VALUE);
         assertThat(pkg.getValues()).containsEntry(FIELD, VALUE);
@@ -41,8 +43,8 @@ class PackageTest {
 
     @Test
     void updatesExistingField() {
-        pkg.setValue(FIELD, "Old value");
-        pkg.setValue(FIELD, VALUE);
+        pkg.setValue(ORIGIN, FIELD, "Old value");
+        pkg.setValue(ORIGIN , FIELD, VALUE);
 
         assertThat(pkg.getValue(FIELD)).contains(VALUE);
         assertThat(pkg.getValues()).containsEntry(FIELD, VALUE);
@@ -50,7 +52,7 @@ class PackageTest {
 
     @Test
     void updatesMultipleFields() {
-        pkg.setValues(Map.of(FIELD, VALUE));
+        pkg.setValues(ORIGIN, Map.of(FIELD, VALUE));
 
         assertThat(pkg.getValue(FIELD)).contains(VALUE);
     }

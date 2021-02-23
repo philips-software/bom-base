@@ -7,6 +7,7 @@ package com.philips.research.bombase.meta.domain;
 
 import com.philips.research.bombase.PackageUrl;
 import com.philips.research.bombase.meta.Field;
+import com.philips.research.bombase.meta.Origin;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -34,16 +35,16 @@ public class Package {
                 .collect(Collectors.toMap(Map.Entry::getKey, e -> e.getValue().getValue().get()));
     }
 
-    public void setValues(Map<Field, ?> values) {
-        values.forEach(this::setValue);
+    public void setValues(Origin origin, Map<Field, ?> values) {
+        values.forEach((field, value) -> setValue(origin, field, value));
     }
 
     public Optional<Object> getValue(Field field) {
         return this.getFieldValue(field).flatMap(FieldValue::getValue);
     }
 
-    public void setValue(Field field, Object value) {
-        getOrCreateFieldValue(field).setValue(value);
+    public void setValue(Origin origin, Field field, Object value) {
+        getOrCreateFieldValue(field).setValue(origin, value);
     }
 
     private Optional<FieldValue> getFieldValue(Field field) {

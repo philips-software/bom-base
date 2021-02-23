@@ -6,11 +6,8 @@
 package com.philips.research.bombase.meta.domain;
 
 import com.philips.research.bombase.PackageUrl;
-import com.philips.research.bombase.meta.Field;
-import com.philips.research.bombase.meta.MetaService;
+import com.philips.research.bombase.meta.*;
 import com.philips.research.bombase.meta.MetaService.PackageListener;
-import com.philips.research.bombase.meta.MetaStore;
-import com.philips.research.bombase.meta.UnknownPackageException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -37,6 +34,7 @@ class MetaInteractorTest {
     private static final Field OTHER_FIELD = Field.DESCRIPTION;
     private static final String VALUE = "Value";
     private static final String OTHER_VALUE = "Other value";
+    private static final Origin ORIGIN = Origin.API;
 
     final MetaStore store = mock(MetaStore.class);
     final MetaService interactor = new MetaInteractor(store, new QueuedTaskRunner());
@@ -56,15 +54,15 @@ class MetaInteractorTest {
 
     @Test
     void throws_getValuesForUnknownPackage() {
-        assertThatThrownBy(() -> interactor.value(new PackageUrl("type/unknown@version")))
+        assertThatThrownBy(() -> interactor.valuesOf(new PackageUrl("type/unknown@version")))
                 .isInstanceOf(UnknownPackageException.class);
     }
 
     @Test
     void updateStoresValue() {
-        interactor.update(PURL, Map.of(FIELD, VALUE));
+        interactor.update(ORIGIN, PURL, Map.of(FIELD, VALUE));
 
-        assertThat(interactor.value(PURL)).containsEntry(FIELD, VALUE);
+        assertThat(interactor.valuesOf(PURL)).containsEntry(FIELD, VALUE);
     }
 
     @Nested
@@ -82,7 +80,7 @@ class MetaInteractorTest {
             final var triggered = new AtomicBoolean(false);
             when(listener.onUpdated(PURL, Set.of(), Map.of())).thenReturn(Optional.of(() -> triggered.set(true)));
 
-            interactor.update(PURL, Map.of());
+            interactor.update(ORIGIN, PURL, Map.of());
 
             assertThat(triggered.get()).isTrue();
         }
@@ -90,13 +88,13 @@ class MetaInteractorTest {
         @Test
         void notifiesListenersOnce_updateFields() {
             final var triggered = new AtomicInteger(0);
-            pkg.setValue(OTHER_FIELD, OTHER_VALUE);
+            pkg.setValue(ORIGIN, OTHER_FIELD, OTHER_VALUE);
             //noinspection unchecked
             final ArgumentCaptor<Map<Field, Object>> captor = ArgumentCaptor.forClass(Map.class);
             when(listener.onUpdated(eq(PURL), eq(Set.of(FIELD, OTHER_FIELD)), captor.capture()))
                     .thenReturn(Optional.of(triggered::incrementAndGet));
 
-            interactor.update(PURL, Map.of(FIELD, VALUE, OTHER_FIELD, OTHER_VALUE));
+            interactor.update(ORIGIN, PURL, Map.of(FIELD, VALUE, OTHER_FIELD, OTHER_VALUE));
 
             assertThat(captor.getValue()).containsEntry(FIELD, VALUE);
             assertThat(triggered.get()).isEqualTo(1);
@@ -107,7 +105,7 @@ class MetaInteractorTest {
             final var task = mock(Runnable.class);
             when(listener.onUpdated(any(), any(), any())).thenReturn(Optional.of(task));
 
-            interactor.update(PURL, Map.of(FIELD, VALUE));
+            interactor.update(ORIGIN, PURL, Map.of(FIELD, VALUE));
 
             verify(task).run();
         }

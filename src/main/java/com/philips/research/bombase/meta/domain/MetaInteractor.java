@@ -6,10 +6,7 @@
 package com.philips.research.bombase.meta.domain;
 
 import com.philips.research.bombase.PackageUrl;
-import com.philips.research.bombase.meta.Field;
-import com.philips.research.bombase.meta.MetaService;
-import com.philips.research.bombase.meta.MetaStore;
-import com.philips.research.bombase.meta.UnknownPackageException;
+import com.philips.research.bombase.meta.*;
 import org.springframework.stereotype.Service;
 
 import java.util.HashSet;
@@ -33,14 +30,14 @@ public class MetaInteractor implements MetaService {
     }
 
     @Override
-    public void update(PackageUrl purl, Map<Field, Object> values) {
+    public void update(Origin origin, PackageUrl purl, Map<Field, Object> values) {
         final var pkg = getOrCreatePackage(purl);
-        pkg.setValues(values);
+        pkg.setValues(origin, values);
         notifyValueListeners(purl, values.keySet(), pkg.getValues());
     }
 
     @Override
-    public Map<Field, Object> value(PackageUrl purl) {
+    public Map<Field, Object> valuesOf(PackageUrl purl) {
         return validPackage(purl).getValues();
     }
 

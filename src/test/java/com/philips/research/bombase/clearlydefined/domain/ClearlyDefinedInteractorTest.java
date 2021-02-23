@@ -9,6 +9,7 @@ import com.philips.research.bombase.PackageUrl;
 import com.philips.research.bombase.clearlydefined.ClearlyDefinedService;
 import com.philips.research.bombase.meta.Field;
 import com.philips.research.bombase.meta.MetaService;
+import com.philips.research.bombase.meta.Origin;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -66,7 +67,7 @@ class ClearlyDefinedInteractorTest {
             final var task = listener.onUpdated(PURL, Set.of(), Map.of()).orElseThrow();
             task.run();
 
-            verify(metaService).update(PURL, Map.of(Field.SOURCE_LOCATION, SOURCE_LOCATION));
+            verify(metaService).update(Origin.CLEARLY_DEFINED, PURL, Map.of(Field.SOURCE_LOCATION, SOURCE_LOCATION));
         }
     }
 }

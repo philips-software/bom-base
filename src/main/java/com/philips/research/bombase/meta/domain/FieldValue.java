@@ -6,6 +6,7 @@
 package com.philips.research.bombase.meta.domain;
 
 import com.philips.research.bombase.meta.Field;
+import com.philips.research.bombase.meta.Origin;
 import pl.tlinkowski.annotation.basic.NullOr;
 
 import java.time.Instant;
@@ -24,6 +25,7 @@ public class FieldValue {
     private final Field field;
     private State state = State.VALUE;
     private @NullOr Object value;
+    private @NullOr Origin origin;
     private @NullOr String argument;
     private Instant timestamp = Instant.now();
 
@@ -35,24 +37,30 @@ public class FieldValue {
         return timestamp;
     }
 
+    public Optional<Origin> getOrigin() {
+        return Optional.ofNullable(origin);
+    }
+
     Optional<Object> getValue() {
         return Optional.ofNullable(value);
     }
 
-    void setValue(Object value) {
+    void setValue(Origin origin, Object value) {
         field.validate(value);
         if (state == State.OVERRIDDEN) {
             return;
         }
         state = State.VALUE;
         this.value = value;
+        this.origin = origin;
         timestamp = Instant.now();
     }
 
-    void override(@NullOr Object value) {
+    void override(Origin origin, @NullOr Object value) {
         field.validate(value);
         state = (value != null) ? State.OVERRIDDEN : State.VALUE;
         this.value = value;
+        this.origin = (value != null) ? origin : null;
         timestamp = Instant.now();
     }
 

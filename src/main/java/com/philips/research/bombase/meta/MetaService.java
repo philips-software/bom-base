@@ -26,10 +26,11 @@ public interface MetaService {
      * Updates selected fields of a package.
      * Listeners are automatically notified of changes.
      *
+     * @Param origin source of the updated value(s)
      * @param purl   package id
      * @param values new value per field
      */
-    void update(PackageUrl purl, Map<Field, Object> values);
+    void update(Origin origin, PackageUrl purl, Map<Field, Object> values);
 
     /**
      * Reads all stored metadata for a package.
@@ -38,7 +39,7 @@ public interface MetaService {
      * @return value per field
      * @throws UnknownPackageException if the package does not exist
      */
-    Map<Field, Object> value(PackageUrl purl);
+    Map<Field, Object> valuesOf(PackageUrl purl);
 
     /**
      * Callbacks to optionally create an asynchronous task.

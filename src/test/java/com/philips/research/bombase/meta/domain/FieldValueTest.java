@@ -6,6 +6,7 @@
 package com.philips.research.bombase.meta.domain;
 
 import com.philips.research.bombase.meta.Field;
+import com.philips.research.bombase.meta.Origin;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -17,12 +18,15 @@ import static org.assertj.core.api.Assertions.assertThat;
 class FieldValueTest {
     private static final String VALUE = "Value";
     private static final String TEXT = "Text";
+    private static final Origin ORIGIN = Origin.CLEARLY_DEFINED;
+    private static final Origin OTHER_ORIGIN = Origin.API;
 
     final FieldValue field = new FieldValue(Field.TITLE);
 
     @Test
     void createsInstance() {
         assertThat(field.getValue()).isEmpty();
+        assertThat(field.getOrigin()).isEmpty();
         assertThat(field.getContesting()).isEmpty();
         assertThat(field.getError()).isEmpty();
         assertThat(field.getTimestamp()).isBeforeOrEqualTo(Instant.now());
@@ -34,9 +38,10 @@ class FieldValueTest {
         @Test
         void setsValue() {
             final var previous = field.getTimestamp();
-            field.setValue(VALUE);
+            field.setValue(Origin.CLEARLY_DEFINED, VALUE);
 
             assertThat(field.getValue()).contains(VALUE);
+            assertThat(field.getOrigin()).contains(ORIGIN);
             assertThat(field.getTimestamp()).isAfter(previous);
         }
 
@@ -45,6 +50,7 @@ class FieldValueTest {
             field.contest(TEXT);
 
             assertThat(field.getValue()).isEmpty();
+            assertThat(field.getOrigin()).isEmpty();
             assertThat(field.getContesting()).isEmpty();
         }
 
@@ -53,6 +59,7 @@ class FieldValueTest {
             field.error(TEXT);
 
             assertThat(field.getValue()).isEmpty();
+            assertThat(field.getOrigin()).isEmpty();
             assertThat(field.getError()).contains(TEXT);
         }
     }
@@ -61,7 +68,7 @@ class FieldValueTest {
     class HasValue {
         @BeforeEach
         void beforeEach() {
-            field.setValue(VALUE);
+            field.setValue(ORIGIN, VALUE);
         }
 
         @Test
@@ -69,6 +76,7 @@ class FieldValueTest {
             field.contest(TEXT);
 
             assertThat(field.getValue()).contains(VALUE);
+            assertThat(field.getOrigin()).contains(ORIGIN);
             assertThat(field.getContesting()).contains(TEXT);
         }
 
@@ -77,6 +85,7 @@ class FieldValueTest {
             field.error(TEXT);
 
             assertThat(field.getValue()).contains(VALUE);
+            assertThat(field.getOrigin()).contains(ORIGIN);
             assertThat(field.getError()).contains(TEXT);
         }
 
@@ -92,9 +101,10 @@ class FieldValueTest {
         void overridesValue() {
             final var correction = "Correction";
 
-            field.override(correction);
+            field.override(OTHER_ORIGIN, correction);
 
             assertThat(field.getValue()).contains(correction);
+            assertThat(field.getOrigin()).contains(OTHER_ORIGIN);
         }
     }
 
@@ -116,9 +126,10 @@ class FieldValueTest {
         @Test
         void clearsErrorBySettingValue() {
             field.error(TEXT);
-            field.setValue(VALUE);
+            field.setValue(ORIGIN, VALUE);
 
             assertThat(field.getValue()).contains(VALUE);
+            assertThat(field.getOrigin()).contains(ORIGIN);
             assertThat(field.getError()).isEmpty();
         }
     }
@@ -127,14 +138,15 @@ class FieldValueTest {
     class Overridden {
         @BeforeEach
         void BeforeEach() {
-            field.override(VALUE);
+            field.override(ORIGIN, VALUE);
         }
 
         @Test
         void ignoresSetValue() {
-            field.setValue("Ignored");
+            field.setValue(OTHER_ORIGIN, "Ignored");
 
             assertThat(field.getValue()).contains(VALUE);
+            assertThat(field.getOrigin()).contains(ORIGIN);
         }
 
         @Test
@@ -149,6 +161,7 @@ class FieldValueTest {
             field.error(TEXT);
 
             assertThat(field.getValue()).contains(VALUE);
+            assertThat(field.getOrigin()).contains(ORIGIN);
             assertThat(field.getError()).isEmpty();
         }
 
@@ -156,17 +169,19 @@ class FieldValueTest {
         void overrides() {
             final var correction = "Correction";
 
-            field.override(correction);
+            field.override(OTHER_ORIGIN, correction);
 
             assertThat(field.getValue()).contains(correction);
+            assertThat(field.getOrigin()).contains(OTHER_ORIGIN);
         }
 
         @Test
         void clearsOverride() {
-            field.override(null);
+            field.override(OTHER_ORIGIN, null);
             field.error(TEXT);
 
             assertThat(field.getValue()).isEmpty();
+            assertThat(field.getOrigin()).isEmpty();
             assertThat(field.getError()).contains(TEXT);
         }
     }

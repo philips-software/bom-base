@@ -11,9 +11,7 @@ import retrofit2.http.GET;
 import retrofit2.http.Path;
 
 import java.net.URI;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 
 public interface ClearlyDefinedAPI {
     @GET("definitions/{type}/{provider}/{namespace}/{name}/{revision}")
@@ -30,6 +28,7 @@ public interface ClearlyDefinedAPI {
         @NullOr SourceLocationJson sourceLocation;
         Map<String, URI> urls = new HashMap<>();
         Map<String, String> hashes = new HashMap<>();
+        @NullOr URI projectWebsite;
 
         public Optional<URI> getSourceLocation() {
             return Optional.ofNullable((sourceLocation != null && sourceLocation.url != null) ? sourceLocation.url : null);
@@ -43,5 +42,20 @@ public interface ClearlyDefinedAPI {
     class LicensedJson {
         @SuppressWarnings("NotNullFieldNotInitialized")
         String declared;
+        Map<String, FacetJson> facets = new HashMap<>();
     }
+
+    class FacetJson {
+       @NullOr AttributionJson attribution;
+        @NullOr DiscoveredJson discovered;
+    }
+
+    class AttributionJson {
+        List<String> parties = new ArrayList<>();
+    }
+
+    class DiscoveredJson {
+        List<String> expressions = new ArrayList<>();
+    }
+
 }

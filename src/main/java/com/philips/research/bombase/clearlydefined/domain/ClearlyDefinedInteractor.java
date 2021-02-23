@@ -9,6 +9,7 @@ import com.philips.research.bombase.PackageUrl;
 import com.philips.research.bombase.clearlydefined.ClearlyDefinedService;
 import com.philips.research.bombase.meta.Field;
 import com.philips.research.bombase.meta.MetaService;
+import com.philips.research.bombase.meta.Origin;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -47,7 +48,7 @@ public class ClearlyDefinedInteractor implements ClearlyDefinedService {
                         .ifPresent(pkg -> {
                             final var update = new HashMap<Field, Object>();
                             pkg.getSourceLocation().ifPresent(l -> update.put(Field.SOURCE_LOCATION, l));
-                            service.update(purl, update);
+                            service.update(Origin.CLEARLY_DEFINED, purl, update);
                         });
             });
         }
