@@ -1,0 +1,19 @@
+@startuml
+
+class Attribute {
+    name
+    value
+    origin
+    isContested
+    isConfirmed
+}
+
+class Package {
+    type
+    namespace
+    name
+    version
+}
+Package *-> "*" Attribute
+
+@enduml

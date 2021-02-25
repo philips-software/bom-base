@@ -1,0 +1,17 @@
+@startuml
+
+skinparam actorStyle hollow
+
+actor Curator
+actor Operator
+rectangle Client
+collections Sources
+
+usecase System
+
+Client -> System: Request\npackage
+Curator -u-> System: Curate\nmetadata
+Operator -u-> System: Maintain\nsystem
+System -> Sources: Harvest\nattributes
+
+@enduml
