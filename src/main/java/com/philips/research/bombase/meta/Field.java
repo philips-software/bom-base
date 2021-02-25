@@ -8,6 +8,8 @@ package com.philips.research.bombase.meta;
 import pl.tlinkowski.annotation.basic.NullOr;
 
 import java.net.URI;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Supported metadata fields.
@@ -16,13 +18,13 @@ public enum Field {
     TITLE(String.class), // Short name of the package
     DESCRIPTION(String.class), // More elaborate description of the package
     HOME_PAGE(URI.class), // Project home page
-    COPYRIGHT(String.class), // Project home page
+    ATTRIBUTION(StringList.class), // Copyright owners
     DOWNLOAD_LOCATION(URI.class), // URL for the distribution representation
-    SOURCE_LOCATION(URI.class), // URL for the source code
-    DECLARED_LICENSE(String.class), // License according to the distributor
-    DETECTED_LICENSE(String.class), // License according to authors
     SHA1(String.class), // Hash of distribution artifact
-    SHA256(String.class); // Hash of distribution artifact
+    SHA256(String.class), // Hash of distribution artifact
+    SOURCE_LOCATION(URI.class), // URL for the source code
+    DECLARED_LICENSE(String.class), // License string according to the distributor
+    DETECTED_LICENSE(String.class); // License string according to authors
 
     private final Class<?> typeClass;
 
@@ -36,4 +38,9 @@ public enum Field {
         }
         return value;
     }
+
+    /**
+     * Represents a <code>List&lt;String&gt;</code> without type erasure.
+     */
+    static class StringList extends ArrayList<String> {}
 }

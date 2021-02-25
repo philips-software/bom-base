@@ -13,10 +13,8 @@ import com.philips.research.bombase.meta.Origin;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
+import java.net.URI;
+import java.util.*;
 
 @Service
 public class ClearlyDefinedInteractor implements ClearlyDefinedService {
@@ -47,12 +45,29 @@ public class ClearlyDefinedInteractor implements ClearlyDefinedService {
                 client.getPackageDefinition(purl.getType(), provider, namespace, purl.getName(), purl.getVersion())
                         .ifPresent(pkg -> {
                             final var update = new HashMap<Field, Object>();
-                            pkg.getSourceLocation().ifPresent(l -> update.put(Field.SOURCE_LOCATION, l));
+                            copyIfPresent(pkg.getHomePage(), Field.HOME_PAGE, update);
+                            copyIfPresent(pkg.getAttribution(), Field.ATTRIBUTION, update);
+                            copyIfPresent(pkg.getDownloadLocation(), Field.DOWNLOAD_LOCATION, update);
+                            copyIfPresent(pkg.getSourceLocation(), Field.SOURCE_LOCATION, update);
+                            copyIfPresent(pkg.getDeclaredLicense(), Field.DECLARED_LICENSE, update);
+                            copyIfPresent(pkg.getDetectedLicense(), Field.DETECTED_LICENSE, update);
+                            copyIfPresent(pkg.getSha1(), Field.SHA1, update);
+                            copyIfPresent(pkg.getSha256(), Field.SHA256, update);
                             service.update(Origin.CLEARLY_DEFINED, purl, update);
                         });
             });
         }
         return Optional.empty();
+    }
+
+    private void copyIfPresent(Optional<? extends Object> value, Field field, Map<Field,Object> map) {
+       value.ifPresent(v -> map.put(field, v));
+    }
+
+    private void copyIfPresent(List<? extends Object> value, Field field, Map<Field,Object> map) {
+        if (!value.isEmpty()) {
+            map.put(field, value);
+        }
     }
 
     private String providerFor(PackageUrl purl) {

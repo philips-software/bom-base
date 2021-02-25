@@ -26,7 +26,8 @@ class ClearlyDefinedClientTest {
     private static final String NAMESPACE = "Namespace";
     private static final String NAME = "Name";
     private static final String REVISION = "Revision";
-    private static final String SOURCE_LOCATION = "https://example.com/path";
+    private static final String SOURCE_LOCATION = "https://example.com/source";
+    private static final String HOME_PAGE = "https://example.com/home-page";
 
     private final ClearlyDefinedClient client = new ClearlyDefinedClient(URI.create("http://localhost:" + PORT));
     private final MockWebServer mockServer = new MockWebServer();

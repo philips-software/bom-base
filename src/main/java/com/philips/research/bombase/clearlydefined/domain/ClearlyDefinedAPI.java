@@ -57,5 +57,4 @@ public interface ClearlyDefinedAPI {
     class DiscoveredJson {
         List<String> expressions = new ArrayList<>();
     }
-
 }
