@@ -7,11 +7,8 @@ package com.philips.research.bombase.core.meta.registry;
 
 import com.philips.research.bombase.PackageUrl;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-
-import java.net.URI;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -26,7 +23,7 @@ class PackageModifierTest {
 
     @Test
     void tracksModifiedFields() {
-        modifier.get(Field.SOURCE_LOCATION, URI.class);
+        modifier.get(Field.SOURCE_LOCATION);
         modifier.update(Field.DOWNLOAD_LOCATION, null);
         modifier.update(Field.TITLE, VALUE);
         modifier.set(Field.DESCRIPTION, VALUE);
@@ -42,7 +39,7 @@ class PackageModifierTest {
         void getsFieldValue() {
             modifier.set(FIELD, VALUE);
 
-            assertThat(modifier.get(FIELD, String.class)).contains(VALUE);
+            assertThat(modifier.get(FIELD)).contains(VALUE);
         }
 
         @Test
@@ -56,7 +53,7 @@ class PackageModifierTest {
         void updatesField() {
             modifier.update(FIELD, VALUE);
 
-            assertThat(modifier.get(FIELD, String.class)).contains(VALUE);
+            assertThat(modifier.get(FIELD)).contains(VALUE);
         }
 
     }
@@ -65,7 +62,7 @@ class PackageModifierTest {
     class NewField {
         @Test
         void noValueForUndefinedField() {
-            assertThat(modifier.get(Field.ATTRIBUTION, String.class)).isEmpty();
+            assertThat(modifier.get(Field.ATTRIBUTION)).isEmpty();
         }
 
         @Test
@@ -90,15 +87,6 @@ class PackageModifierTest {
             modifier.update(FIELD, null);
 
             assertThat(attribute.getValue()).contains(VALUE);
-        }
-
-        @Test
-        @Disabled("Should this be handled by attribute?")
-        void contestsField_nonMatchingUpdate() {
-            modifier.update(FIELD, OTHER_VALUE);
-
-            assertThat(attribute.getValue()).contains(VALUE);
-            assertThat(attribute.getContesting()).contains(OTHER_VALUE);
         }
 
         @Test

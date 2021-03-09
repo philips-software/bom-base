@@ -25,6 +25,12 @@ public interface ClearlyDefinedAPI {
     class ResponseJson implements PackageDefinition {
         DescribedJson described;
         LicensedJson licensed;
+        ScoresJson scores;
+
+        @Override
+        public boolean isValid() {
+            return scores.effective > 0;
+        }
 
         @Override
         public Optional<URI> getDownloadLocation() {
@@ -156,5 +162,9 @@ public interface ClearlyDefinedAPI {
 
     class DiscoveredJson {
         List<String> expressions = new ArrayList<>();
+    }
+
+    class ScoresJson {
+        int effective;
     }
 }

@@ -10,6 +10,8 @@ import java.util.List;
 import java.util.Optional;
 
 public interface PackageDefinition {
+    boolean isValid();
+
     Optional<URI> getDownloadLocation();
 
     Optional<URI> getSourceLocation();

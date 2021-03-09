@@ -5,30 +5,82 @@
 
 package com.philips.research.bombase.core.meta.registry;
 
+import com.philips.research.bombase.core.meta.MetaException;
 import nl.jqno.equalsverifier.EqualsVerifier;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
 import java.time.Instant;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 class AttributeTest {
     private static final String VALUE = "Value";
-    private static final String TEXT = "Text";
     private static final Field FIELD = Field.TITLE;
 
-    final Attribute field = new Attribute(FIELD);
+    private final Instant start = Instant.now();
+    private final Attribute field = new Attribute(FIELD);
 
     @Test
     void createsInstance() {
         assertThat(field.getField()).isEqualTo(FIELD);
         assertThat(field.getValue()).isEmpty();
-        assertThat(field.getContesting()).isEmpty();
-        assertThat(field.getError()).isEmpty();
-        assertThat(field.getTimestamp()).isBeforeOrEqualTo(Instant.now());
-        assertThat(field.getTimestamp()).isAfter(Instant.now().minusSeconds(5));
+        assertThat(field.getTimestamp()).isBetween(start, Instant.now());
+    }
+
+    @Test
+    void setsValue() {
+        field.setValue(VALUE);
+
+        assertThat(field.getValue()).contains(VALUE);
+        assertThat(field.getTimestamp()).isBetween(start, Instant.now());
+    }
+
+    @Test
+    void throws_ValueOfWrongType() {
+        assertThatThrownBy(() -> field.setValue(666))
+                .isInstanceOf(MetaException.class)
+                .hasMessageContaining("cannot hold");
+    }
+
+    @Test
+    void ignoresNullValue() {
+        field.setValue(VALUE);
+        field.setValue(null);
+
+        assertThat(field.getValue()).contains(VALUE);
+        assertThat(field.getContested()).containsExactly(VALUE);
+    }
+
+    @Test
+    void ignoresSetValue_overridden() {
+        field.setValue("Other value");
+        field.override(VALUE);
+        final var timestamp = field.getTimestamp();
+        field.setValue("Other value");
+
+        assertThat(field.getValue()).contains(VALUE);
+        assertThat(field.getTimestamp()).isEqualTo(timestamp);
+    }
+
+    @Test
+    void listsContestingValues() {
+        final var otherValue = "Other";
+        field.setValue(VALUE);
+        field.setValue(VALUE);
+        field.setValue(otherValue);
+
+        assertThat(field.getContested()).containsExactlyInAnyOrder(VALUE, otherValue);
+    }
+
+    @Test
+    void overrideClearsContestingValues() {
+        field.setValue("Some");
+        field.override(VALUE);
+        field.setValue("Other");
+
+        assertThat(field.getValue()).contains(VALUE);
+        assertThat(field.getContested()).isEmpty();
     }
 
     @Test
@@ -37,147 +89,5 @@ class AttributeTest {
                 .withOnlyTheseFields("field")
                 .withNonnullFields("field")
                 .verify();
-    }
-
-    @Nested
-    class NoPriorValue {
-        @Test
-        void setsValue() {
-            final var previous = field.getTimestamp();
-            field.setValue(VALUE);
-
-            assertThat(field.getValue()).contains(VALUE);
-            assertThat(field.getTimestamp()).isAfter(previous);
-        }
-
-        @Test
-        void ignoresContesting() {
-            field.contest(TEXT);
-
-            assertThat(field.getValue()).isEmpty();
-            assertThat(field.getContesting()).isEmpty();
-        }
-
-        @Test
-        void recordsError() {
-            field.error(TEXT);
-
-            assertThat(field.getValue()).isEmpty();
-            assertThat(field.getError()).contains(TEXT);
-        }
-    }
-
-    @Nested
-    class HasValue {
-        @BeforeEach
-        void beforeEach() {
-            field.setValue(VALUE);
-        }
-
-        @Test
-        void contestsValue() {
-            field.contest(TEXT);
-
-            assertThat(field.getValue()).contains(VALUE);
-            assertThat(field.getContesting()).contains(TEXT);
-        }
-
-        @Test
-        void indicatesError() {
-            field.error(TEXT);
-
-            assertThat(field.getValue()).contains(VALUE);
-            assertThat(field.getError()).contains(TEXT);
-        }
-
-        @Test
-        void overwritesContest() {
-            field.contest("Other");
-            field.contest(TEXT);
-
-            assertThat(field.getContesting()).contains(TEXT);
-        }
-
-        @Test
-        void overridesValue() {
-            final var correction = "Correction";
-
-            field.override(correction);
-
-            assertThat(field.getValue()).contains(correction);
-        }
-    }
-
-    @Nested
-    class HasError {
-        @BeforeEach
-        void beforeEach() {
-            field.error(TEXT);
-        }
-
-        @Test
-        void ignoresContest() {
-            field.contest("Other");
-
-            assertThat(field.getError()).contains(TEXT);
-            assertThat(field.getContesting()).isEmpty();
-        }
-
-        @Test
-        void clearsErrorBySettingValue() {
-            field.error(TEXT);
-            field.setValue(VALUE);
-
-            assertThat(field.getValue()).contains(VALUE);
-            assertThat(field.getError()).isEmpty();
-        }
-    }
-
-    @Nested
-    class Overridden {
-        @BeforeEach
-        void BeforeEach() {
-            field.override(VALUE);
-        }
-
-        @Test
-        void ignoresSetValue() {
-            field.setValue("Ignored");
-
-            assertThat(field.getValue()).contains(VALUE);
-        }
-
-        @Test
-        void ignoresContesting() {
-            field.contest(TEXT);
-
-            assertThat(field.getContesting()).isEmpty();
-        }
-
-        @Test
-        void ignoresError() {
-            field.error(TEXT);
-
-            assertThat(field.getValue()).contains(VALUE);
-            assertThat(field.getError()).isEmpty();
-        }
-
-        @Test
-        void overrides() {
-            final var correction = "Correction";
-
-            field.override(correction);
-
-            assertThat(field.getValue()).contains(correction);
-        }
-
-        @Test
-        void clearsOverride() {
-            field.override(null);
-            field.error(TEXT);
-
-            assertThat(field.getValue()).isEmpty();
-            assertThat(field.getError()).contains(TEXT);
-        }
     }
 }

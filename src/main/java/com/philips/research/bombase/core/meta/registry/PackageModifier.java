@@ -12,6 +12,7 @@ import java.util.HashSet;
 import java.util.Optional;
 import java.util.Set;
 
+//TODO Rename to better reveal intention (FieldEditor?)
 public class PackageModifier {
     private final Package pkg;
     private final Set<Field> modifiedFields = new HashSet<>();
@@ -25,11 +26,6 @@ public class PackageModifier {
     }
 
     public <T> Optional<T> get(Field field) {
-        return pkg.getAttributeFor(field).flatMap(Attribute::getValue);
-    }
-
-    //TODO Remove clazz parameter version?
-    public <T> Optional<T> get(Field field, Class<T> clazz) {
         return pkg.getAttributeFor(field).flatMap(Attribute::getValue);
     }
 

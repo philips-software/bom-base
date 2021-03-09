@@ -41,7 +41,9 @@ public class ClearlyDefinedClient {
     }
 
     public Optional<PackageDefinition> getPackageDefinition(String type, String provider, String namespace, String name, String revision) {
-        return query(rest.getDefinition(type, provider, namespace.isEmpty() ? "-" : namespace, name, revision));
+        return query(rest.getDefinition(type, provider, namespace.isEmpty() ? "-" : namespace, name, revision))
+                .map(def -> (PackageDefinition) def)
+                .filter(PackageDefinition::isValid);
     }
 
     private <T> Optional<T> query(Call<? extends T> query) {

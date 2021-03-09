@@ -50,6 +50,15 @@ class ClearlyDefinedClientTest {
     }
 
     @Test
+    void skipsUnknownPackage() throws Exception {
+        mockServer.enqueue(new MockResponse().setBody(new JSONObject()
+                .put("scores", new JSONObject()
+                        .put("effective", 0)).toString()));
+
+        assertThat(client.getPackageDefinition(TYPE, PROVIDER, NAMESPACE, NAME, REVISION)).isEmpty();
+    }
+
+    @Test
     void getsMetadataFromServer() throws Exception {
         mockServer.enqueue(new MockResponse().setBody(new JSONObject()
                 .put("described", new JSONObject()
@@ -70,7 +79,9 @@ class ClearlyDefinedClientTest {
                                                         .put(ATTRIBUTION)))
                                         .put("discovered", new JSONObject()
                                                 .put("expressions", new JSONArray()
-                                                        .put(DETECTED_LICENSE)))))).toString()));
+                                                        .put(DETECTED_LICENSE))))))
+                .put("scores", new JSONObject()
+                        .put("effective", 100)).toString()));
 
         final var definition = client.getPackageDefinition(TYPE, PROVIDER, NAMESPACE, NAME, REVISION).orElseThrow();
 
@@ -91,7 +102,9 @@ class ClearlyDefinedClientTest {
     void acceptsEmptyMetadataFromServer() throws Exception {
         mockServer.enqueue(new MockResponse().setBody(new JSONObject()
                 .put("described", new JSONObject())
-                .put("licensed", new JSONObject()).toString()));
+                .put("licensed", new JSONObject())
+                .put("scores", new JSONObject()
+                        .put("effective", 100)).toString()));
 
         final var metadata = client.getPackageDefinition(TYPE, PROVIDER, NAMESPACE, NAME, REVISION).orElseThrow();
 
@@ -102,9 +115,11 @@ class ClearlyDefinedClientTest {
     void escapesEmptyNamespaceToServer() throws Exception {
         mockServer.enqueue(new MockResponse().setBody(new JSONObject()
                 .put("described", new JSONObject())
-                .put("licensed", new JSONObject()).toString()));
+                .put("licensed", new JSONObject())
+                .put("scores", new JSONObject()
+                        .put("effective", 100)).toString()));
 
-        final var metadata = client.getPackageDefinition(TYPE, PROVIDER, "", NAME, REVISION).orElseThrow();
+        client.getPackageDefinition(TYPE, PROVIDER, "", NAME, REVISION).orElseThrow();
 
         final var request = mockServer.takeRequest();
         assertThat(request.getPath()).contains(PROVIDER + "/-/" + NAME);

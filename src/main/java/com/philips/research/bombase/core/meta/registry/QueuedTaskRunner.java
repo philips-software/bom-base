@@ -35,7 +35,7 @@ public class QueuedTaskRunner {
         store.findPackage(purl).ifPresent(pkg -> {
             final var modifier = new PackageModifier(pkg);
             task.accept(modifier);
-            LOG.info("Updated {}",modifier.getModifiedFields());
+            LOG.info("Updated {}", modifier.getModifiedFields());
         });
     }
 }
