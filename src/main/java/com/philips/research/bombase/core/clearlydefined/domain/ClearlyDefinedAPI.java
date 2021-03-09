@@ -13,7 +13,6 @@ import retrofit2.http.Path;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Function;
 
@@ -70,15 +69,12 @@ public interface ClearlyDefinedAPI {
 
     class DescribedJson {
         @NullOr SourceLocationJson sourceLocation;
-        List<UrlJson> urls = new ArrayList<>();
-        List<HashJson> hashes = new ArrayList<>();
+        @NullOr UrlJson urls;
+        @NullOr HashJson hashes;
         @NullOr URI projectWebsite;
 
         Optional<URI> getDownloadLocation() {
-            return urls.stream()
-                    .filter(json -> json.download != null)
-                    .findFirst()
-                    .map(json -> json.download);
+            return Optional.ofNullable((urls != null && urls.download != null) ? urls.download : null);
         }
 
         Optional<URI> getSourceLocation() {
@@ -90,18 +86,11 @@ public interface ClearlyDefinedAPI {
         }
 
         Optional<String> getSha1() {
-            return firstSha(sha -> sha.sha1);
+            return Optional.ofNullable((hashes != null && hashes.sha1 != null) ? hashes.sha1 : null);
         }
 
         Optional<String> getSha256() {
-            return firstSha(sha -> sha.sha256);
-        }
-
-        private Optional<String> firstSha(Function<HashJson, @NullOr String> which) {
-            return hashes.stream()
-                    .map(which)
-                    .filter(Objects::nonNull)
-                    .findFirst();
+            return Optional.ofNullable((hashes != null && hashes.sha256 != null) ? hashes.sha256 : null);
         }
     }
 
@@ -120,7 +109,7 @@ public interface ClearlyDefinedAPI {
 
     class LicensedJson {
         @NullOr String declared;
-        List<FacetsJson> facets = new ArrayList<>();
+        @NullOr FacetsJson facets;
 
         Optional<String> getDeclaredLicense() {
             if ("NOASSERTION".equals(declared)) {
@@ -130,21 +119,17 @@ public interface ClearlyDefinedAPI {
         }
 
         List<String> getDetectedLicenses() {
-            //noinspection ConstantConditions
-            return listFromFirstCoreFacet(f -> f.core.getExpressions());
+            return listFromFirstCoreFacet(FacetJson::getExpressions);
         }
 
         List<String> getAttribution() {
-            //noinspection ConstantConditions
-            return listFromFirstCoreFacet(f -> f.core.getAttribution());
+            return listFromFirstCoreFacet(FacetJson::getAttribution);
         }
 
-        private List<String> listFromFirstCoreFacet(Function<@NullOr FacetsJson, List<String>> accessor) {
-            return facets.stream()
-                    .filter(f -> f.core != null)
-                    .findFirst()
-                    .map(accessor)
-                    .orElse(List.of());
+        private List<String> listFromFirstCoreFacet(Function<@NullOr FacetJson, List<String>> accessor) {
+            return (facets != null && facets.core != null)
+                    ? accessor.apply(facets.core)
+                    : List.of();
         }
     }
 

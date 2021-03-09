@@ -26,6 +26,7 @@ public class LegacyRoute {
 
     @PostMapping("/packages")
     LicenseJson getLicense(@RequestBody RequestJson body) {
+        //TODO Only query, and leave harvesting to core layer
         //TODO Check for null PURL
         service.update(body.purl, Map.of());
         return new LicenseJson();

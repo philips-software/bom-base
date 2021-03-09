@@ -9,6 +9,8 @@ import com.philips.research.bombase.PackageUrl;
 import com.philips.research.bombase.core.meta.registry.Field;
 import com.philips.research.bombase.core.meta.registry.MetaRegistry;
 import com.philips.research.bombase.core.meta.registry.PackageModifier;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -20,7 +22,9 @@ import java.util.function.Consumer;
 
 @Service
 public class ClearlyDefinedListener implements MetaRegistry.PackageListener {
+    private static final Logger LOG = LoggerFactory.getLogger(ClearlyDefinedListener.class);
     private static final Map<String, String> PROVIDERS = Map.of("maven", "mavencentral", "npm", "npmjs");
+
     private final ClearlyDefinedClient client;
 
     @Autowired
@@ -34,22 +38,24 @@ public class ClearlyDefinedListener implements MetaRegistry.PackageListener {
 
     @Override
     public Optional<Consumer<PackageModifier>> onUpdated(PackageUrl purl, Set<Field> fields, Map<Field, ?> values) {
-        if (fields.isEmpty()) {
-            return Optional.of(modifier -> harvest(purl, modifier));
+        if (!fields.isEmpty()) {
+            return Optional.empty();
         }
 
-        return Optional.empty();
+        LOG.info("Created ClearlyDefined task for {}", purl);
+        return Optional.of(modifier -> harvest(purl, modifier));
     }
 
     private void harvest(PackageUrl purl, PackageModifier modifier) {
-        readPackage(purl).ifPresent(def -> {
+        readPackage(purl).ifPresentOrElse(def -> {
+            LOG.info("Updating {} from ClearlyDefined", purl);
             storeField(modifier, Field.SOURCE_LOCATION, def.getSourceLocation());
             storeField(modifier, Field.DOWNLOAD_LOCATION, def.getDownloadLocation());
             storeField(modifier, Field.HOME_PAGE, def.getHomepage());
-            storeField(modifier, Field.ATTRIBUTION, def.getAuthors());
+//            storeField(modifier, Field.ATTRIBUTION, def.getAuthors());
             storeField(modifier, Field.DECLARED_LICENSE, def.getDeclaredLicense());
             storeField(modifier, Field.DETECTED_LICENSE, joinByAnd(def.getDetectedLicenses()));
-        });
+        }, () -> LOG.info("No metadata for {} from ClearlyDefined", purl));
     }
 
     private <T> void storeField(PackageModifier modifier, Field field, Optional<T> value) {
@@ -63,6 +69,7 @@ public class ClearlyDefinedListener implements MetaRegistry.PackageListener {
     }
 
     private Optional<PackageDefinition> readPackage(PackageUrl purl) {
+        //TODO What about multiple provides for a single type?
         final var provider = PROVIDERS.getOrDefault(purl.getType(), purl.getType());
         final var namespace = purl.getNamespace().orElse("");
 

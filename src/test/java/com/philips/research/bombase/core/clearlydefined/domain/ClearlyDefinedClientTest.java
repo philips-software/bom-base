@@ -55,24 +55,22 @@ class ClearlyDefinedClientTest {
                 .put("described", new JSONObject()
                         .put("sourceLocation", new JSONObject()
                                 .put("url", SOURCE_LOCATION))
-                        .put("urls", new JSONArray().put(new JSONObject()
-                                .put("download", DOWNLOAD_LOCATION)))
+                        .put("urls", new JSONObject()
+                                .put("download", DOWNLOAD_LOCATION))
                         .put("projectWebsite", HOMEPAGE)
-                        .put("hashes", new JSONArray()
-                                .put(new JSONObject().put("sha1", SHA1))
-                                .put(new JSONObject().put("sha256", SHA256))
-                        ))
+                        .put("hashes", new JSONObject()
+                                .put("sha1", SHA1)
+                                .put("sha256", SHA256)))
                 .put("licensed", new JSONObject()
                         .put("declared", DECLARED_LICENSE)
-                        .put("facets", new JSONArray()
-                                .put(new JSONObject().put("core", new JSONObject()
+                        .put("facets", new JSONObject()
+                                .put("core", new JSONObject()
                                         .put("attribution", new JSONObject()
                                                 .put("parties", new JSONArray()
                                                         .put(ATTRIBUTION)))
                                         .put("discovered", new JSONObject()
                                                 .put("expressions", new JSONArray()
-                                                        .put(DETECTED_LICENSE)))
-                                )))).toString()));
+                                                        .put(DETECTED_LICENSE)))))).toString()));
 
         final var definition = client.getPackageDefinition(TYPE, PROVIDER, NAMESPACE, NAME, REVISION).orElseThrow();
 
