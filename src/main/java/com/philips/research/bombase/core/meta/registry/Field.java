@@ -10,6 +10,7 @@ import pl.tlinkowski.annotation.basic.NullOr;
 
 import java.net.URI;
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Supported metadata fields.
@@ -18,7 +19,8 @@ public enum Field {
     TITLE(String.class), // Short name of the package
     DESCRIPTION(String.class), // More elaborate description of the package
     HOME_PAGE(URI.class), // Project home page
-    ATTRIBUTION(StringList.class), // Copyright owners
+    //TODO Is there a way around type-erasure?
+    ATTRIBUTION(List.class), // Copyright owners
     DOWNLOAD_LOCATION(URI.class), // URL for the distribution representation
     SHA1(String.class), // Hash of distribution artifact
     SHA256(String.class), // Hash of distribution artifact
@@ -37,11 +39,5 @@ public enum Field {
             throw new MetaException("Field " + this + " cannot hold a value of type " + value.getClass());
         }
         return value;
-    }
-
-    /**
-     * Represents a <code>List&lt;String&gt;</code> without type erasure.
-     */
-    static class StringList extends ArrayList<String> {
     }
 }

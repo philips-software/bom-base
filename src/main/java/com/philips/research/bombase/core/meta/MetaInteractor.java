@@ -41,7 +41,7 @@ public class MetaInteractor implements MetaService {
             registry.edit(pkgUrl, pkg -> {
             });
         } catch (Exception e) {
-            throw new IllegalArgumentException("Not a valid package URL: " + purl);
+            throw new IllegalArgumentException("Not a valid package URL: " + purl, e);
         }
     }
 

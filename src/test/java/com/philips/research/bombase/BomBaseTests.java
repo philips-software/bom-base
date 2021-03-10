@@ -9,7 +9,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
 @SpringBootTest
-class MetabaseApplicationTests {
+class BomBaseTests {
 
     @Test
     void contextLoads() {

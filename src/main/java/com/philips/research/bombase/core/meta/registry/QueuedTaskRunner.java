@@ -12,6 +12,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
+import java.util.Set;
 import java.util.function.Consumer;
 
 @Service
@@ -35,7 +36,11 @@ public class QueuedTaskRunner {
         store.findPackage(purl).ifPresent(pkg -> {
             final var editor = new PackageAttributeEditor(pkg);
             task.accept(editor);
-            LOG.info("Updated {}", editor.getModifiedFields());
+
+            final var modified = editor.getModifiedFields();
+            if (!modified.isEmpty()) {
+                LOG.info("Updated {} for {}", modified, purl);
+            }
         });
     }
 }
