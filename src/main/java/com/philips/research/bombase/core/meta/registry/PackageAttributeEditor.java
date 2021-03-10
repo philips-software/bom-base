@@ -5,12 +5,11 @@
 
 package com.philips.research.bombase.core.meta.registry;
 
+import com.github.packageurl.PackageURL;
 import pl.tlinkowski.annotation.basic.NullOr;
 
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * Tracks edits of package field values.
@@ -24,10 +23,26 @@ public class PackageAttributeEditor {
     }
 
     /**
+     * @return Package URL of the edited package.
+     */
+    public PackageURL getPurl() {
+        return pkg.getPurl();
+    }
+
+    /**
      * @return current value of the indicated field
      */
     public <T> Optional<T> get(Field field) {
         return pkg.getAttributeFor(field).flatMap(Attribute::getValue);
+    }
+
+    /**
+     * @return snapshot of the current fields with values
+     */
+    public Map<Field, Object> getValues() {
+        return pkg.getAttributes()
+                .filter(a -> a.getValue().isPresent())
+                .collect(Collectors.toMap(Attribute::getField, attribute -> attribute.getValue().get()));
     }
 
     /**
@@ -58,4 +73,12 @@ public class PackageAttributeEditor {
     Set<Field> getModifiedFields() {
         return Collections.unmodifiableSet(modifiedFields);
     }
+
+    /**
+     * @return true if this editor modified the package
+     */
+    boolean isModified() {
+        return !modifiedFields.isEmpty();
+    }
+
 }

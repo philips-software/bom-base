@@ -13,6 +13,7 @@ public interface PackageDefinition {
     boolean isValid();
 
     int getDescribedScore();
+
     int getLicensedScore();
 
     Optional<URI> getDownloadLocation();

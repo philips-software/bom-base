@@ -14,7 +14,7 @@ import org.junit.jupiter.api.Test;
 import static org.assertj.core.api.Assertions.assertThat;
 
 class ClearlyDefinedAPITest {
-    private static  final int MAX_SCORE = 70;
+    private static final int MAX_SCORE = 70;
 
     @Test
     void derivesMetadataScore() {
@@ -23,17 +23,17 @@ class ClearlyDefinedAPITest {
         response.described.score = new ScoreJson();
         response.described.score.total = 50;
 
-        assertThat(response.getDescribedScore()).isEqualTo((int)(50/100f * MAX_SCORE));
+        assertThat(response.getDescribedScore()).isEqualTo((int) (50 / 100f * MAX_SCORE));
     }
 
     @Test
     void derivesLicenseScore() {
         final var response = new ResponseJson();
-        response.licensed= new LicensedJson();
+        response.licensed = new LicensedJson();
         response.licensed.score = new ScoreJson();
         response.licensed.score.total = 50;
 
-        assertThat(response.getLicensedScore()).isEqualTo((int)(50/100f * MAX_SCORE));
+        assertThat(response.getLicensedScore()).isEqualTo((int) (50 / 100f * MAX_SCORE));
     }
 
     @Test

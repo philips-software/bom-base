@@ -60,8 +60,18 @@ public class MetaRegistry {
     }
 
     private void notifyValueListeners(Package pkg, Set<Field> fields, Map<Field, ?> values) {
-        listeners.forEach(l -> l.onUpdated(pkg.getPurl(), fields, values)
-                .ifPresent(task -> runner.execute(pkg.getPurl(), task)));
+        notifyValueListeners(pkg.getPurl(), fields, values);
+    }
+
+    private void notifyValueListeners(PackageURL purl, Set<Field> fields, Map<Field, ?> values) {
+        listeners.forEach(l -> l.onUpdated(purl, fields, values)
+                .ifPresent(task -> runner.execute(purl, task, this::cascadeListeners)));
+    }
+
+    private void cascadeListeners(PackageAttributeEditor editor) {
+        if (editor.isModified()) {
+            notifyValueListeners(editor.getPurl(), editor.getModifiedFields(), editor.getValues());
+        }
     }
 
     /**

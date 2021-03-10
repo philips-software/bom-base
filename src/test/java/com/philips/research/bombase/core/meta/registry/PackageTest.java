@@ -24,6 +24,7 @@ class PackageTest {
             throw new IllegalArgumentException(e);
         }
     }
+
     @Test
     void createsInstance() {
         assertThat(pkg.getPurl()).isEqualTo(PURL);

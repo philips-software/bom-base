@@ -14,6 +14,7 @@ import org.junit.jupiter.api.Test;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Consumer;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -88,6 +89,28 @@ class MetaRegistryTest {
 
             //noinspection unchecked
             verify(task).accept(any(PackageAttributeEditor.class));
+        }
+
+        @Test
+        void cascadesEditsToListenersUntilNoMoreEditsAreMade() {
+            final var counter = new AtomicInteger();
+            final var task = mock(Consumer.class);
+            //noinspection unchecked
+            when(listener.onUpdated(any(), any(), any())).thenReturn(Optional.of(task));
+            //noinspection unchecked
+            doAnswer(param -> {
+                final PackageAttributeEditor editor = param.getArgument(0);
+                final var offset = counter.incrementAndGet();
+                if (offset < 10) {
+                    editor.update(FIELD, SCORE + offset, VALUE + offset);
+                }
+                return null;
+            }).when(task).accept(any());
+
+            registry.edit(PURL, editor -> editor.update(FIELD, SCORE, VALUE));
+
+            //noinspection unchecked
+            verify(task, times(10)).accept(any());
         }
     }
 }

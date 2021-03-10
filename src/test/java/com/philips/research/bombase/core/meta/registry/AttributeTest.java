@@ -109,6 +109,17 @@ class AttributeTest {
     }
 
     @Test
+    void promotesContestingValue() {
+        field.setValue(LOWER_SCORE, VALUE);
+        field.setValue(SCORE, OTHER_VALUE);
+        final var modified = field.setValue(HIGHER_SCORE, VALUE);
+
+        assertThat(modified).isTrue();
+        assertThat(field.getValue()).contains(VALUE);
+        assertThat(field.getContested()).contains(OTHER_VALUE);
+    }
+
+    @Test
     void keepsAbsoluteTruth() {
         field.setValue(SCORE, "Removed");
         field.setValue(100, VALUE);

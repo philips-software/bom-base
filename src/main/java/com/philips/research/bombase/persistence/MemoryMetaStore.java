@@ -35,10 +35,7 @@ public class MemoryMetaStore implements MetaStore {
     @Override
     public List<Package> findPackageVersions(PackageURL purl) {
         return packages.values().stream()
-                //FIXME Could use a comparator in PackageUrl
-                .filter(p -> p.getPurl().getType().equals(purl.getType()) &&
-                        p.getPurl().getNamespace().equals(purl.getNamespace()) &&
-                        p.getPurl().getName().equals(purl.getName()))
+                .filter(p -> p.getPurl().equals(purl))
                 .collect(Collectors.toList());
     }
 

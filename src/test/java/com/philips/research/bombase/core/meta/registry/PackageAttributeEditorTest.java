@@ -10,6 +10,7 @@ import com.github.packageurl.PackageURL;
 import org.junit.jupiter.api.Test;
 
 import java.net.URI;
+import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -31,6 +32,11 @@ class PackageAttributeEditorTest {
     }
 
     @Test
+    void indicatesPackageUrl() {
+        assertThat(editor.getPurl()).isEqualTo(PURL);
+    }
+
+    @Test
     void tracksFieldValues() {
         final var attr = new Attribute(Field.TITLE);
         attr.setValue(SCORE, TITLE);
@@ -49,6 +55,7 @@ class PackageAttributeEditorTest {
         editor.update(Field.TITLE, SCORE, TITLE);
 
         assertThat(editor.getModifiedFields()).containsExactly(Field.TITLE);
+        assertThat(editor.isModified()).isTrue();
     }
 
     @Test
@@ -56,5 +63,18 @@ class PackageAttributeEditorTest {
         editor.update(Field.TITLE, SCORE, TITLE);
 
         assertThat(pkg.getAttributeFor(Field.TITLE).orElseThrow().getValue()).contains(TITLE);
+        assertThat(editor.isModified()).isTrue();
+    }
+
+    @Test
+    void snapshotsValues() {
+        pkg.add(new Attribute(Field.SHA1));
+        editor.update(Field.TITLE, SCORE, TITLE);
+        final var snapshot = editor.getValues();
+
+        editor.update(Field.TITLE, SCORE + 1, "Changed");
+        editor.update(Field.DESCRIPTION, SCORE, "Created");
+
+        assertThat(snapshot).isEqualTo(Map.of(Field.TITLE, TITLE));
     }
 }

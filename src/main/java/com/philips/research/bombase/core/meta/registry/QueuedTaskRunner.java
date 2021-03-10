@@ -12,12 +12,12 @@ import org.slf4j.LoggerFactory;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
-import java.util.Set;
 import java.util.function.Consumer;
 
 @Service
 public class QueuedTaskRunner {
     private static final Logger LOG = LoggerFactory.getLogger(QueuedTaskRunner.class);
+
     private final MetaStore store;
 
     public QueuedTaskRunner(MetaStore store) {
@@ -32,15 +32,11 @@ public class QueuedTaskRunner {
     @Async("taskExecutor")
     public
     //@Transactional(propagation = Propagation.REQUIRES_NEW)
-    void execute(PackageURL purl, Consumer<PackageAttributeEditor> task) {
+    void execute(PackageURL purl, Consumer<PackageAttributeEditor> task, Consumer<PackageAttributeEditor> callback) {
         store.findPackage(purl).ifPresent(pkg -> {
             final var editor = new PackageAttributeEditor(pkg);
             task.accept(editor);
-
-            final var modified = editor.getModifiedFields();
-            if (!modified.isEmpty()) {
-                LOG.info("Updated {} for {}", modified, purl);
-            }
+            callback.accept(editor);
         });
     }
 }

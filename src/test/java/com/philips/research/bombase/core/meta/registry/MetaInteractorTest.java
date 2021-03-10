@@ -26,11 +26,11 @@ class MetaInteractorTest {
     final Package pkg = new Package(PURL);
 
     static PackageURL toPurl(String uri) {
-       try {
-           return new PackageURL(uri);
-       } catch (Exception e) {
-           throw new IllegalArgumentException(e);
-       }
+        try {
+            return new PackageURL(uri);
+        } catch (Exception e) {
+            throw new IllegalArgumentException(e);
+        }
     }
 
     //TODO Add tests ... :-)
