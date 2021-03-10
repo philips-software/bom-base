@@ -36,6 +36,7 @@ class ClearlyDefinedListenerTest {
     private static final String DETECTED_LICENSE = "Detected";
     private static final String SHA1 = "Sha1";
     private static final String SHA256 = "Sha256";
+    private static final int SCORE = 50;
 
     private final ClearlyDefinedClient client = mock(ClearlyDefinedClient.class);
     private final ClearlyDefinedListener listener = new ClearlyDefinedListener(client);
@@ -79,13 +80,13 @@ class ClearlyDefinedListenerTest {
 
             task.accept(modifier);
 
-            verify(modifier).update(Field.SOURCE_LOCATION, SOURCE_LOCATION);
-            verify(modifier).update(Field.DOWNLOAD_LOCATION, DOWNLOAD_LOCATION);
-            verify(modifier).update(Field.HOME_PAGE, HOMEPAGE);
+            verify(modifier).update(Field.SOURCE_LOCATION, SCORE, SOURCE_LOCATION);
+            verify(modifier).update(Field.DOWNLOAD_LOCATION, SCORE, DOWNLOAD_LOCATION);
+            verify(modifier).update(Field.HOME_PAGE, SCORE, HOMEPAGE);
             //TODO Temporarily disabled until lists are properly handled by fields
 //            verify(modifier).update(Field.ATTRIBUTION, ATTRIBUTION);
-            verify(modifier).update(Field.DETECTED_LICENSE, DETECTED_LICENSE);
-            verify(modifier).update(Field.DECLARED_LICENSE, DECLARED_LICENSE);
+            verify(modifier).update(Field.DETECTED_LICENSE, SCORE, DETECTED_LICENSE);
+            verify(modifier).update(Field.DECLARED_LICENSE, SCORE, DECLARED_LICENSE);
         }
 
         //TODO Concatenation of licenses

@@ -7,20 +7,20 @@ package com.philips.research.bombase.core.meta.registry;
 
 import pl.tlinkowski.annotation.basic.NullOr;
 
-import java.time.Instant;
-import java.util.HashSet;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.Set;
 
 /**
  * Current value for a field.
  */
 public class Attribute {
+    private static final int TRUTH = 100;
+
     private final Field field;
-    private final Set<Object> values = new HashSet<>();
-    private Instant timestamp = Instant.now();
-    private boolean confirmed;
+    private int score;
+    private @NullOr Object value;
+    private int altScore;
+    private @NullOr Object altValue;
 
     Attribute(Field field) {
         this.field = field;
@@ -30,33 +30,60 @@ public class Attribute {
         return this.field;
     }
 
-    Instant getTimestamp() {
-        return timestamp;
-    }
-
     <T> Optional<T> getValue() {
-        //noinspection unchecked
-        return values.stream().findFirst().map(v -> (T) v);
+        return Optional.ofNullable((T) value);
     }
 
-    <T> void setValue(@NullOr T value) {
-        if (confirmed || value == null) {
-            return;
+    boolean setValue(int score, @NullOr Object value) {
+        if (value == null || score <= 0 || (this.score == TRUTH && score < TRUTH)) {
+            return false;
         }
+
         field.validate(value);
-        values.add(value);
-        timestamp = Instant.now();
+        if (score >= TRUTH) {
+            updateTruth(value);
+            return true;
+        } else if (score > this.score) {
+            return updateValue(score, value);
+        } else {
+            updateAltValue(score, value);
+            return false;
+        }
     }
 
-    void override(@NullOr Object value) {
-        values.clear();
-        confirmed = false;
-        setValue(value);
-        confirmed = true;
+    private void updateTruth(Object value) {
+        this.score = TRUTH;
+        this.value = value;
+        this.altScore = 0;
+        this.altValue = null;
     }
 
-    public Set<Object> getContested() {
-        return confirmed ? Set.of() : values;
+    private void updateAltValue(int score, Object value) {
+        if (score > this.altScore) {
+            this.altScore = score;
+            this.altValue = value;
+        }
+    }
+
+    private boolean updateValue(int score, Object value) {
+        if (!value.equals(this.value)) {
+            replaceValue(score, value);
+            return true;
+        } else {
+            this.score = score;
+            return false;
+        }
+    }
+
+    private void replaceValue(int score, Object value) {
+        this.altScore = this.score;
+        this.altValue = this.value;
+        this.value = value;
+        this.score = score;
+    }
+
+    public Optional<Object> getContested() {
+        return Optional.ofNullable((altScore > 0) ? altValue : null);
     }
 
     @Override

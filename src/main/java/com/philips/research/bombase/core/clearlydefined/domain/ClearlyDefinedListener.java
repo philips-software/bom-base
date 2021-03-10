@@ -24,6 +24,8 @@ import java.util.function.Consumer;
 public class ClearlyDefinedListener implements MetaRegistry.PackageListener {
     private static final Logger LOG = LoggerFactory.getLogger(ClearlyDefinedListener.class);
     private static final Map<String, String> PROVIDERS = Map.of("maven", "mavencentral", "npm", "npmjs");
+    //TODO Replace by score provided with data
+    private static final int SCORE = 70;
 
     private final ClearlyDefinedClient client;
 
@@ -59,12 +61,12 @@ public class ClearlyDefinedListener implements MetaRegistry.PackageListener {
     }
 
     private <T> void storeField(PackageModifier modifier, Field field, Optional<T> value) {
-        value.ifPresent(v -> modifier.update(field, v));
+        value.ifPresent(v -> modifier.update(field, SCORE, v));
     }
 
     private <T> void storeField(PackageModifier modifier, Field field, List<T> values) {
         if (!values.isEmpty()) {
-            modifier.update(field, values);
+            modifier.update(field, SCORE, values);
         }
     }
 

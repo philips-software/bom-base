@@ -17,16 +17,18 @@ class PackageModifierTest {
     private static final Field FIELD = Field.TITLE;
     private static final String VALUE = "Value";
     private static final String OTHER_VALUE = "Other value";
+    private static final int SCORE = 50;
 
     private final Package pkg = new Package(PURL);
     private final PackageModifier modifier = new PackageModifier(pkg);
 
     @Test
     void tracksModifiedFields() {
+        //TODO Do these tests cover everything?
         modifier.get(Field.SOURCE_LOCATION);
-        modifier.update(Field.DOWNLOAD_LOCATION, null);
-        modifier.update(Field.TITLE, VALUE);
-        modifier.set(Field.DESCRIPTION, VALUE);
+        modifier.update(Field.DOWNLOAD_LOCATION, SCORE, null);
+        modifier.update(Field.TITLE, SCORE, VALUE);
+        modifier.update(Field.DESCRIPTION, 100, VALUE);
 
         assertThat(modifier.getModifiedFields()).containsExactlyInAnyOrder(Field.TITLE, Field.DESCRIPTION);
     }
@@ -36,26 +38,11 @@ class PackageModifierTest {
         private final Attribute attr = pkg.add(new Attribute(FIELD));
 
         @Test
-        void getsFieldValue() {
-            modifier.set(FIELD, VALUE);
+        void providesFieldValue() {
+            modifier.update(FIELD, SCORE, VALUE);
 
             assertThat(modifier.get(FIELD)).contains(VALUE);
         }
-
-        @Test
-        void setsFieldValue() {
-            modifier.set(FIELD, VALUE);
-
-            assertThat(attr.getValue()).contains(VALUE);
-        }
-
-        @Test
-        void updatesField() {
-            modifier.update(FIELD, VALUE);
-
-            assertThat(modifier.get(FIELD)).contains(VALUE);
-        }
-
     }
 
     @Nested
@@ -67,7 +54,7 @@ class PackageModifierTest {
 
         @Test
         void createsNewAttribute() {
-            modifier.set(FIELD, VALUE);
+            modifier.update(FIELD, SCORE, VALUE);
 
             assertThat(pkg.getAttributeFor(FIELD).orElseThrow().getValue()).contains(VALUE);
         }
@@ -79,19 +66,19 @@ class PackageModifierTest {
 
         @BeforeEach
         void beforeEach() {
-            modifier.update(FIELD, VALUE);
+            modifier.update(FIELD, SCORE, VALUE);
         }
 
         @Test
         void ignoresNullValue() {
-            modifier.update(FIELD, null);
+            modifier.update(FIELD, SCORE, null);
 
             assertThat(attribute.getValue()).contains(VALUE);
         }
 
         @Test
         void overridesField() {
-            modifier.set(FIELD, OTHER_VALUE);
+            modifier.update(FIELD, SCORE, OTHER_VALUE);
 
             assertThat(attribute.getValue()).contains(OTHER_VALUE);
         }

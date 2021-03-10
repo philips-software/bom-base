@@ -27,6 +27,7 @@ class MetaRegistryTest {
     private static final PackageUrl PURL = new PackageUrl("pkg:" + TYPE + "/" + NAME + "@" + VERSION);
     private static final Field FIELD = Field.TITLE;
     private static final String VALUE = "Value";
+    private static final int SCORE = 50;
 
     final MetaStore store = mock(MetaStore.class);
     final MetaRegistry registry = new MetaRegistry(store, new QueuedTaskRunner(store));
@@ -41,7 +42,7 @@ class MetaRegistryTest {
 
     @Test
     void editsPackageFields() {
-        registry.edit(PURL, modifier -> modifier.update(FIELD, VALUE));
+        registry.edit(PURL, modifier -> modifier.update(FIELD, SCORE, VALUE));
 
         assertThat(pkg.getAttributeFor(FIELD).orElseThrow().getValue()).contains(VALUE);
     }
@@ -64,7 +65,7 @@ class MetaRegistryTest {
 
         @Test
         void notifiesListeners_modifiedFields() {
-            registry.edit(PURL, pkg -> pkg.set(FIELD, VALUE));
+            registry.edit(PURL, pkg -> pkg.update(FIELD, SCORE, VALUE));
 
             verify(listener).onUpdated(PURL, Set.of(FIELD), Map.of(FIELD, VALUE));
         }
@@ -75,7 +76,7 @@ class MetaRegistryTest {
             //noinspection unchecked
             when(listener.onUpdated(any(), any(), any())).thenReturn(Optional.of(task));
 
-            registry.edit(PURL, modifier -> modifier.set(FIELD, VALUE));
+            registry.edit(PURL, modifier -> modifier.update(FIELD, SCORE, VALUE));
 
             //noinspection unchecked
             verify(task).accept(any(PackageModifier.class));

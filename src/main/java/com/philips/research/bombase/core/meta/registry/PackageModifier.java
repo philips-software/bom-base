@@ -29,17 +29,12 @@ public class PackageModifier {
         return pkg.getAttributeFor(field).flatMap(Attribute::getValue);
     }
 
-    public PackageModifier update(Field field, @NullOr Object value) {
+    public PackageModifier update(Field field, int score, @NullOr Object value) {
         if (value == null) {
             return this;
         }
-        getOrCreateAttr(field).setValue(value);
-        modifiedFields.add(field);
-        return this;
-    }
-
-    public PackageModifier set(Field field, String value) {
-        getOrCreateAttr(field).override(value);
+        getOrCreateAttr(field).setValue(score, value);
+        //TODO Only track if it modified the value
         modifiedFields.add(field);
         return this;
     }
