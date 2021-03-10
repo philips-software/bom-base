@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: MIT
  */
 
-package com.philips.research.bombase;
+package com.philips.research.bombase.core;
 
 public abstract class BusinessException extends RuntimeException {
     public BusinessException(String message) {

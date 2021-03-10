@@ -5,7 +5,7 @@
 
 package com.philips.research.bombase.core.meta;
 
-import com.philips.research.bombase.BusinessException;
+import com.philips.research.bombase.core.BusinessException;
 
 public class MetaException extends BusinessException {
     public MetaException(String message) {

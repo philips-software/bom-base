@@ -5,7 +5,7 @@
 
 package com.philips.research.bombase.core.clearlydefined;
 
-import com.philips.research.bombase.BusinessException;
+import com.philips.research.bombase.core.BusinessException;
 
 public class ClearlyDefinedException extends BusinessException {
     public ClearlyDefinedException(String message) {
