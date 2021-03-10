@@ -5,18 +5,25 @@
 
 package com.philips.research.bombase.core.meta.registry;
 
-import com.philips.research.bombase.PackageUrl;
+import com.github.packageurl.PackageURL;
 import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 class PackageTest {
-    private static final PackageUrl PURL = new PackageUrl("pkg:type/name@version");
+    private static final PackageURL PURL = toPurl("pkg:type/name@version");
     private static final Field FIELD = Field.TITLE;
 
     final Package pkg = new Package(PURL);
 
+    static PackageURL toPurl(String uri) {
+        try {
+            return new PackageURL(uri);
+        } catch (Exception e) {
+            throw new IllegalArgumentException(e);
+        }
+    }
     @Test
     void createsInstance() {
         assertThat(pkg.getPurl()).isEqualTo(PURL);

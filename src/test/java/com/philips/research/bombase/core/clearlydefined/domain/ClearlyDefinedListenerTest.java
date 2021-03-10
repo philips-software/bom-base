@@ -5,7 +5,7 @@
 
 package com.philips.research.bombase.core.clearlydefined.domain;
 
-import com.philips.research.bombase.PackageUrl;
+import com.github.packageurl.PackageURL;
 import com.philips.research.bombase.core.meta.registry.Field;
 import com.philips.research.bombase.core.meta.registry.PackageAttributeEditor;
 import org.junit.jupiter.api.BeforeEach;
@@ -27,7 +27,7 @@ class ClearlyDefinedListenerTest {
     private static final String NAMESPACE = "namespace";
     private static final String NAME = "name";
     private static final String VERSION = "version";
-    private static final PackageUrl PURL = new PackageUrl(String.format("pkg:%s/%s/%s@%s", TYPE, NAMESPACE, NAME, VERSION));
+    private static final PackageURL PURL = toPurl(String.format("pkg:%s/%s/%s@%s", TYPE, NAMESPACE, NAME, VERSION));
     private static final URI HOMEPAGE = URI.create("https://example.com/home");
     private static final URI DOWNLOAD_LOCATION = URI.create("https://example.com/download");
     private static final URI SOURCE_LOCATION = URI.create("git+https://github.com/source");
@@ -40,6 +40,14 @@ class ClearlyDefinedListenerTest {
 
     private final ClearlyDefinedClient client = mock(ClearlyDefinedClient.class);
     private final ClearlyDefinedListener listener = new ClearlyDefinedListener(client);
+
+    static PackageURL toPurl(String uri) {
+        try {
+            return new PackageURL(uri);
+        } catch (Exception e) {
+            throw new IllegalArgumentException(e);
+        }
+    }
 
     @Nested
     class ListenerNotification {

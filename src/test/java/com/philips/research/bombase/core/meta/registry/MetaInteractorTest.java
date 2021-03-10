@@ -5,7 +5,7 @@
 
 package com.philips.research.bombase.core.meta.registry;
 
-import com.philips.research.bombase.PackageUrl;
+import com.github.packageurl.PackageURL;
 import com.philips.research.bombase.core.MetaService;
 import com.philips.research.bombase.core.meta.MetaInteractor;
 
@@ -15,7 +15,7 @@ class MetaInteractorTest {
     private static final String TYPE = "Type";
     private static final String NAME = "Group/Name";
     private static final String VERSION = "Version";
-    private static final PackageUrl PURL = new PackageUrl("pkg:" + TYPE + "/" + NAME + "@" + VERSION);
+    private static final PackageURL PURL = toPurl("pkg:" + TYPE + "/" + NAME + "@" + VERSION);
     private static final Field FIELD = Field.TITLE;
     private static final Field OTHER_FIELD = Field.DESCRIPTION;
     private static final String VALUE = "Value";
@@ -24,4 +24,14 @@ class MetaInteractorTest {
     final MetaRegistry registry = mock(MetaRegistry.class);
     final MetaService interactor = new MetaInteractor(registry);
     final Package pkg = new Package(PURL);
+
+    static PackageURL toPurl(String uri) {
+       try {
+           return new PackageURL(uri);
+       } catch (Exception e) {
+           throw new IllegalArgumentException(e);
+       }
+    }
+
+    //TODO Add tests ... :-)
 }

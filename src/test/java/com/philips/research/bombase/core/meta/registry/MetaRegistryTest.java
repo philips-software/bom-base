@@ -5,7 +5,7 @@
 
 package com.philips.research.bombase.core.meta.registry;
 
-import com.philips.research.bombase.PackageUrl;
+import com.github.packageurl.PackageURL;
 import com.philips.research.bombase.core.meta.MetaStore;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
@@ -24,7 +24,7 @@ class MetaRegistryTest {
     private static final String TYPE = "Type";
     private static final String NAME = "Group/Name";
     private static final String VERSION = "Version";
-    private static final PackageUrl PURL = new PackageUrl("pkg:" + TYPE + "/" + NAME + "@" + VERSION);
+    private static final PackageURL PURL = toPurl("pkg:" + TYPE + "/" + NAME + "@" + VERSION);
     private static final Field FIELD = Field.TITLE;
     private static final String VALUE = "Value";
     private static final int SCORE = 50;
@@ -32,6 +32,14 @@ class MetaRegistryTest {
     final MetaStore store = mock(MetaStore.class);
     final MetaRegistry registry = new MetaRegistry(store, new QueuedTaskRunner(store));
     final Package pkg = new Package(PURL);
+
+    static PackageURL toPurl(String uri) {
+        try {
+            return new PackageURL(uri);
+        } catch (Exception e) {
+            throw new IllegalArgumentException(e);
+        }
+    }
 
     @BeforeEach
     void beforeEach() {

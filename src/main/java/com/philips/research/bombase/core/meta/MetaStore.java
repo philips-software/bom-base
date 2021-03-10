@@ -5,7 +5,7 @@
 
 package com.philips.research.bombase.core.meta;
 
-import com.philips.research.bombase.PackageUrl;
+import com.github.packageurl.PackageURL;
 import com.philips.research.bombase.core.meta.registry.Attribute;
 import com.philips.research.bombase.core.meta.registry.Field;
 import com.philips.research.bombase.core.meta.registry.Package;
@@ -23,7 +23,7 @@ public interface MetaStore {
      * @param purl package id
      * @return persistent package instance
      */
-    Package createPackage(PackageUrl purl);
+    Package createPackage(PackageURL purl);
 
     /**
      * Retrieves a package for the provided coordinates if one exists.
@@ -31,7 +31,7 @@ public interface MetaStore {
      * @param purl package id
      * @return persistent package instance, if one exists
      */
-    Optional<Package> findPackage(PackageUrl purl);
+    Optional<Package> findPackage(PackageURL purl);
 
     /**
      * Lists all versions of a package.
@@ -39,7 +39,7 @@ public interface MetaStore {
      * @param purl package id
      * @return all known persistent package version instances
      */
-    List<Package> findPackageVersions(PackageUrl purl);
+    List<Package> findPackageVersions(PackageURL purl);
 
     /**
      * Creates a new field record for a package.

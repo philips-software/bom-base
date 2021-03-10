@@ -5,7 +5,7 @@
 
 package com.philips.research.bombase.core.clearlydefined.domain;
 
-import com.philips.research.bombase.PackageUrl;
+import com.github.packageurl.PackageURL;
 import com.philips.research.bombase.core.meta.registry.Field;
 import com.philips.research.bombase.core.meta.registry.MetaRegistry;
 import com.philips.research.bombase.core.meta.registry.PackageAttributeEditor;
@@ -39,7 +39,7 @@ public class ClearlyDefinedListener implements MetaRegistry.PackageListener {
     }
 
     @Override
-    public Optional<Consumer<PackageAttributeEditor>> onUpdated(PackageUrl purl, Set<Field> fields, Map<Field, ?> values) {
+    public Optional<Consumer<PackageAttributeEditor>> onUpdated(PackageURL purl, Set<Field> fields, Map<Field, ?> values) {
         if (!fields.isEmpty()) {
             return Optional.empty();
         }
@@ -48,7 +48,7 @@ public class ClearlyDefinedListener implements MetaRegistry.PackageListener {
         return Optional.of(pkg -> harvest(purl, pkg));
     }
 
-    private void harvest(PackageUrl purl, PackageAttributeEditor pkg) {
+    private void harvest(PackageURL purl, PackageAttributeEditor pkg) {
         readPackage(purl).ifPresentOrElse(def -> {
             LOG.info("Updating {} from ClearlyDefined", purl);
             storeField(pkg, Field.SOURCE_LOCATION, def.getSourceLocation());
@@ -66,12 +66,11 @@ public class ClearlyDefinedListener implements MetaRegistry.PackageListener {
         value.ifPresent(v -> pkg.update(field, SCORE, v));
     }
 
-    private Optional<PackageDefinition> readPackage(PackageUrl purl) {
+    private Optional<PackageDefinition> readPackage(PackageURL purl) {
         //TODO What about multiple provides for a single type?
         final var provider = PROVIDERS.getOrDefault(purl.getType(), purl.getType());
-        final var namespace = purl.getNamespace().orElse("");
 
-        return client.getPackageDefinition(purl.getType(), provider, namespace, purl.getName(), purl.getVersion());
+        return client.getPackageDefinition(purl.getType(), provider, purl.getNamespace(), purl.getName(), purl.getVersion());
     }
 
     Optional<String> joinByAnd(List<String> licenses) {

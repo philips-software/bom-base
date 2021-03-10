@@ -5,7 +5,7 @@
 
 package com.philips.research.bombase.core.meta.registry;
 
-import com.philips.research.bombase.PackageUrl;
+import com.github.packageurl.PackageURL;
 import com.philips.research.bombase.core.UnknownPackageException;
 import com.philips.research.bombase.core.meta.MetaStore;
 import org.springframework.stereotype.Service;
@@ -37,18 +37,18 @@ public class MetaRegistry {
         listeners.add(listener);
     }
 
-    public void edit(PackageUrl purl, Consumer<PackageAttributeEditor> consumer) {
+    public void edit(PackageURL purl, Consumer<PackageAttributeEditor> consumer) {
         final var pkg = getOrCreatePackage(purl);
         final var editor = new PackageAttributeEditor(pkg);
         consumer.accept(editor);
         notifyValueListeners(pkg, editor.getModifiedFields(), valuesOf(pkg));
     }
 
-    private Package getOrCreatePackage(PackageUrl purl) {
+    private Package getOrCreatePackage(PackageURL purl) {
         return store.findPackage(purl).orElseGet(() -> store.createPackage(purl));
     }
 
-    private Package validPackage(PackageUrl purl) {
+    private Package validPackage(PackageURL purl) {
         return store.findPackage(purl)
                 .orElseThrow(() -> new UnknownPackageException(purl));
     }
@@ -76,6 +76,6 @@ public class MetaRegistry {
          * @param values  current package metadata
          * @return (optional) operation to queue for execution
          */
-        Optional<Consumer<PackageAttributeEditor>> onUpdated(PackageUrl purl, Set<Field> updated, Map<Field, ?> values);
+        Optional<Consumer<PackageAttributeEditor>> onUpdated(PackageURL purl, Set<Field> updated, Map<Field, ?> values);
     }
 }

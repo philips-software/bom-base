@@ -5,7 +5,7 @@
 
 package com.philips.research.bombase.core.meta.registry;
 
-import com.philips.research.bombase.PackageUrl;
+import com.github.packageurl.PackageURL;
 import com.philips.research.bombase.core.meta.MetaStore;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -31,7 +31,7 @@ public class QueuedTaskRunner {
     @Async("taskExecutor")
     public
     //@Transactional(propagation = Propagation.REQUIRES_NEW)
-    void execute(PackageUrl purl, Consumer<PackageAttributeEditor> task) {
+    void execute(PackageURL purl, Consumer<PackageAttributeEditor> task) {
         store.findPackage(purl).ifPresent(pkg -> {
             final var editor = new PackageAttributeEditor(pkg);
             task.accept(editor);

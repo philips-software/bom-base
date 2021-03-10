@@ -5,7 +5,7 @@
 
 package com.philips.research.bombase.core.meta.registry;
 
-import com.philips.research.bombase.PackageUrl;
+import com.github.packageurl.PackageURL;
 
 import java.util.HashSet;
 import java.util.Optional;
@@ -13,14 +13,14 @@ import java.util.Set;
 import java.util.stream.Stream;
 
 public class Package {
-    private final PackageUrl purl;
+    private final PackageURL purl;
     private final Set<Attribute> attributes = new HashSet<>();
 
-    public Package(PackageUrl purl) {
+    public Package(PackageURL purl) {
         this.purl = purl;
     }
 
-    public PackageUrl getPurl() {
+    public PackageURL getPurl() {
         return purl;
     }
 

@@ -5,7 +5,7 @@
 
 package com.philips.research.bombase.persistence;
 
-import com.philips.research.bombase.PackageUrl;
+import com.github.packageurl.PackageURL;
 import com.philips.research.bombase.core.meta.MetaStore;
 import com.philips.research.bombase.core.meta.registry.Attribute;
 import com.philips.research.bombase.core.meta.registry.Field;
@@ -20,20 +20,20 @@ import java.util.stream.Collectors;
 
 @Repository
 public class MemoryMetaStore implements MetaStore {
-    private final Map<PackageUrl, Package> packages = new HashMap<>();
+    private final Map<PackageURL, Package> packages = new HashMap<>();
 
     @Override
-    public Package createPackage(PackageUrl purl) {
+    public Package createPackage(PackageURL purl) {
         return packages.computeIfAbsent(purl, (key) -> new Package(purl));
     }
 
     @Override
-    public Optional<Package> findPackage(PackageUrl purl) {
+    public Optional<Package> findPackage(PackageURL purl) {
         return Optional.ofNullable(packages.get(purl));
     }
 
     @Override
-    public List<Package> findPackageVersions(PackageUrl purl) {
+    public List<Package> findPackageVersions(PackageURL purl) {
         return packages.values().stream()
                 //FIXME Could use a comparator in PackageUrl
                 .filter(p -> p.getPurl().getType().equals(purl.getType()) &&

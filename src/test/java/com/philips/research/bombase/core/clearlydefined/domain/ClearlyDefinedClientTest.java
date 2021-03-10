@@ -120,7 +120,7 @@ class ClearlyDefinedClientTest {
                 .put("scores", new JSONObject()
                         .put("effective", 100)).toString()));
 
-        client.getPackageDefinition(TYPE, PROVIDER, "", NAME, REVISION).orElseThrow();
+        client.getPackageDefinition(TYPE, PROVIDER, null, NAME, REVISION).orElseThrow();
 
         final var request = mockServer.takeRequest();
         assertThat(request.getPath()).contains(PROVIDER + "/-/" + NAME);

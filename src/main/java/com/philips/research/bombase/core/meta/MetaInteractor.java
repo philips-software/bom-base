@@ -5,7 +5,7 @@
 
 package com.philips.research.bombase.core.meta;
 
-import com.philips.research.bombase.PackageUrl;
+import com.github.packageurl.PackageURL;
 import com.philips.research.bombase.core.MetaService;
 import com.philips.research.bombase.core.clearlydefined.domain.ClearlyDefinedListener;
 import com.philips.research.bombase.core.meta.registry.MetaRegistry;
@@ -36,9 +36,13 @@ public class MetaInteractor implements MetaService {
     @Override
     public void update(URI purl, Map<String, Object> values) {
         //TODO Needs to be tested...
-        PackageUrl pkgUrl = new PackageUrl(purl);
-        registry.edit(pkgUrl, pkg -> {
-        });
+        try {
+            PackageURL pkgUrl = new PackageURL(purl.toASCIIString());
+            registry.edit(pkgUrl, pkg -> {
+            });
+        } catch (Exception e) {
+            throw new IllegalArgumentException("Not a valid package URL: " + purl);
+        }
     }
 
     @Override

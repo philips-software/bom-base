@@ -12,6 +12,7 @@ import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.PropertyNamingStrategy;
 import com.philips.research.bombase.core.clearlydefined.ClearlyDefinedException;
+import pl.tlinkowski.annotation.basic.NullOr;
 import retrofit2.Call;
 import retrofit2.Retrofit;
 import retrofit2.converter.jackson.JacksonConverterFactory;
@@ -40,8 +41,9 @@ public class ClearlyDefinedClient {
         rest = retrofit.create(ClearlyDefinedAPI.class);
     }
 
-    public Optional<PackageDefinition> getPackageDefinition(String type, String provider, String namespace, String name, String revision) {
-        return query(rest.getDefinition(type, provider, namespace.isEmpty() ? "-" : namespace, name, revision))
+    public Optional<PackageDefinition> getPackageDefinition(String type, String provider, @NullOr String namespace, String name, String revision) {
+        final var ns = (namespace == null || namespace.isEmpty()) ? "-" : namespace;
+        return query(rest.getDefinition(type, provider, ns, name, revision))
                 .map(def -> (PackageDefinition) def)
                 .filter(PackageDefinition::isValid);
     }

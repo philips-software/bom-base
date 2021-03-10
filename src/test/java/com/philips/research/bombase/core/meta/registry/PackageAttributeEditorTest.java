@@ -5,7 +5,8 @@
 
 package com.philips.research.bombase.core.meta.registry;
 
-import com.philips.research.bombase.PackageUrl;
+import com.github.packageurl.MalformedPackageURLException;
+import com.github.packageurl.PackageURL;
 import org.junit.jupiter.api.Test;
 
 import java.net.URI;
@@ -13,13 +14,21 @@ import java.net.URI;
 import static org.assertj.core.api.Assertions.assertThat;
 
 class PackageAttributeEditorTest {
-    private static final PackageUrl PURL = new PackageUrl("pkg:type/ns/name@version");
+    private static final PackageURL PURL = toPurl("pkg:type/ns/name@version");
     private static final String TITLE = "Title";
     private static final String DESCRIPTION = "Description";
     private static final int SCORE = 50;
 
     private final Package pkg = new Package(PURL);
     private final PackageAttributeEditor editor = new PackageAttributeEditor(pkg);
+
+    static PackageURL toPurl(String uri) {
+        try {
+            return new PackageURL(uri);
+        } catch (MalformedPackageURLException e) {
+            throw new IllegalArgumentException(e);
+        }
+    }
 
     @Test
     void tracksFieldValues() {

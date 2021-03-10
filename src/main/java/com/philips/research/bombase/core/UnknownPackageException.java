@@ -5,12 +5,12 @@
 
 package com.philips.research.bombase.core;
 
-import com.philips.research.bombase.PackageUrl;
+import com.github.packageurl.PackageURL;
 import com.philips.research.bombase.core.meta.MetaException;
 
 //TODO Not sure if this is a useful solution
 public class UnknownPackageException extends MetaException {
-    public UnknownPackageException(PackageUrl purl) {
+    public UnknownPackageException(PackageURL purl) {
         super("Package '" + purl + "' is unknown");
     }
 }
