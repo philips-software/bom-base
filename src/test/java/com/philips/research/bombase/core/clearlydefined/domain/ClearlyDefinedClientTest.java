@@ -70,7 +70,9 @@ class ClearlyDefinedClientTest {
                         .put("projectWebsite", HOMEPAGE)
                         .put("hashes", new JSONObject()
                                 .put("sha1", SHA1)
-                                .put("sha256", SHA256)))
+                                .put("sha256", SHA256))
+                        .put("score", new JSONObject()
+                                .put("total", 100)))
                 .put("licensed", new JSONObject()
                         .put("declared", DECLARED_LICENSE)
                         .put("facets", new JSONObject()
@@ -80,7 +82,9 @@ class ClearlyDefinedClientTest {
                                                         .put(ATTRIBUTION)))
                                         .put("discovered", new JSONObject()
                                                 .put("expressions", new JSONArray()
-                                                        .put(DETECTED_LICENSE))))))
+                                                        .put(DETECTED_LICENSE)))))
+                        .put("score", new JSONObject()
+                                .put("total", 100)))
                 .put("scores", new JSONObject()
                         .put("effective", 100)).toString()));
 

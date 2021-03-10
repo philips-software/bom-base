@@ -12,6 +12,9 @@ import java.util.Optional;
 public interface PackageDefinition {
     boolean isValid();
 
+    int getDescribedScore();
+    int getLicensedScore();
+
     Optional<URI> getDownloadLocation();
 
     Optional<URI> getSourceLocation();

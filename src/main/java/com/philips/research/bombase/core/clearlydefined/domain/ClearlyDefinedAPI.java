@@ -17,6 +17,8 @@ import java.util.Optional;
 import java.util.function.Function;
 
 public interface ClearlyDefinedAPI {
+    int MAX_SCORE = 70;
+
     @GET("definitions/{type}/{provider}/{namespace}/{name}/{revision}")
     Call<ResponseJson> getDefinition(@Path("type") String type, @Path("provider") String provider, @Path("namespace") String namespace,
                                      @Path("name") String name, @Path("revision") String revision);
@@ -30,6 +32,20 @@ public interface ClearlyDefinedAPI {
         @Override
         public boolean isValid() {
             return scores.effective > 0;
+        }
+
+        @Override
+        public int getDescribedScore() {
+            return relativeScore(described.score.total);
+        }
+
+        @Override
+        public int getLicensedScore() {
+            return relativeScore(licensed.score.total);
+        }
+
+        private int relativeScore(int score) {
+            return Math.round((score / 100f) * MAX_SCORE);
         }
 
         @Override
@@ -79,6 +95,7 @@ public interface ClearlyDefinedAPI {
         @NullOr UrlJson urls;
         @NullOr HashJson hashes;
         @NullOr URI projectWebsite;
+        ScoreJson score;
 
         Optional<URI> getDownloadLocation() {
             return Optional.ofNullable((urls != null && urls.download != null) ? urls.download : null);
@@ -117,6 +134,7 @@ public interface ClearlyDefinedAPI {
     class LicensedJson {
         @NullOr String declared;
         @NullOr FacetsJson facets;
+        ScoreJson score;
 
         Optional<String> getDeclaredLicense() {
             if ("NOASSERTION".equals(declared)) {
@@ -163,6 +181,10 @@ public interface ClearlyDefinedAPI {
 
     class DiscoveredJson {
         List<String> expressions = new ArrayList<>();
+    }
+
+    class ScoreJson {
+        int total;
     }
 
     class ScoresJson {

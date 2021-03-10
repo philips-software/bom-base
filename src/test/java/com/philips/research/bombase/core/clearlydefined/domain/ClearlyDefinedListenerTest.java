@@ -36,7 +36,8 @@ class ClearlyDefinedListenerTest {
     private static final String DETECTED_LICENSE = "Detected";
     private static final String SHA1 = "Sha1";
     private static final String SHA256 = "Sha256";
-    private static final int SCORE = 70;
+    private static final int META_SCORE = 70;
+    private static final int LICENSE_SCORE = 60;
 
     private final ClearlyDefinedClient client = mock(ClearlyDefinedClient.class);
     private final ClearlyDefinedListener listener = new ClearlyDefinedListener(client);
@@ -79,6 +80,8 @@ class ClearlyDefinedListenerTest {
 
         @Test
         void harvestsMetadata() {
+            when(response.getDescribedScore()).thenReturn(META_SCORE);
+            when(response.getLicensedScore()).thenReturn(LICENSE_SCORE);
             when(response.getSourceLocation()).thenReturn(Optional.of(SOURCE_LOCATION));
             when(response.getDownloadLocation()).thenReturn(Optional.of(DOWNLOAD_LOCATION));
             when(response.getHomepage()).thenReturn(Optional.of(HOMEPAGE));
@@ -90,23 +93,24 @@ class ClearlyDefinedListenerTest {
 
             task.accept(pkg);
 
-            verify(pkg).update(Field.SOURCE_LOCATION, SCORE, SOURCE_LOCATION);
-            verify(pkg).update(Field.DOWNLOAD_LOCATION, SCORE, DOWNLOAD_LOCATION);
-            verify(pkg).update(Field.HOME_PAGE, SCORE, HOMEPAGE);
-            verify(pkg).update(Field.ATTRIBUTION, SCORE, ATTRIBUTION);
-            verify(pkg).update(Field.DETECTED_LICENSE, SCORE, DETECTED_LICENSE);
-            verify(pkg).update(Field.DECLARED_LICENSE, SCORE, DECLARED_LICENSE);
-            verify(pkg).update(Field.SHA1, SCORE, SHA1);
-            verify(pkg).update(Field.SHA256, SCORE, SHA256);
+            verify(pkg).update(Field.SOURCE_LOCATION, META_SCORE, SOURCE_LOCATION);
+            verify(pkg).update(Field.DOWNLOAD_LOCATION, META_SCORE, DOWNLOAD_LOCATION);
+            verify(pkg).update(Field.HOME_PAGE, META_SCORE, HOMEPAGE);
+            verify(pkg).update(Field.ATTRIBUTION, META_SCORE, ATTRIBUTION);
+            verify(pkg).update(Field.DECLARED_LICENSE, META_SCORE, DECLARED_LICENSE);
+            verify(pkg).update(Field.DETECTED_LICENSE, LICENSE_SCORE, DETECTED_LICENSE);
+            verify(pkg).update(Field.SHA1, META_SCORE, SHA1);
+            verify(pkg).update(Field.SHA256, META_SCORE, SHA256);
         }
 
         @Test
         void concatenatesDetectedLicenses() {
+            when(response.getLicensedScore()).thenReturn(LICENSE_SCORE);
             when(response.getDetectedLicenses()).thenReturn(List.of(DECLARED_LICENSE, DETECTED_LICENSE));
 
             task.accept(pkg);
 
-            verify(pkg).update(Field.DETECTED_LICENSE, SCORE, String.format("%s AND %s", DECLARED_LICENSE, DETECTED_LICENSE));
+            verify(pkg).update(Field.DETECTED_LICENSE, LICENSE_SCORE, String.format("%s AND %s", DECLARED_LICENSE, DETECTED_LICENSE));
         }
     }
 }

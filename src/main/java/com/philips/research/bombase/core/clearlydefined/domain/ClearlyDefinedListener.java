@@ -24,8 +24,6 @@ import java.util.function.Consumer;
 public class ClearlyDefinedListener implements MetaRegistry.PackageListener {
     private static final Logger LOG = LoggerFactory.getLogger(ClearlyDefinedListener.class);
     private static final Map<String, String> PROVIDERS = Map.of("maven", "mavencentral", "npm", "npmjs");
-    //TODO Replace by score provided with data
-    private static final int SCORE = 70;
 
     private final ClearlyDefinedClient client;
 
@@ -51,19 +49,21 @@ public class ClearlyDefinedListener implements MetaRegistry.PackageListener {
     private void harvest(PackageURL purl, PackageAttributeEditor pkg) {
         readPackage(purl).ifPresentOrElse(def -> {
             LOG.info("Updating {} from ClearlyDefined", purl);
-            storeField(pkg, Field.SOURCE_LOCATION, def.getSourceLocation());
-            storeField(pkg, Field.DOWNLOAD_LOCATION, def.getDownloadLocation());
-            storeField(pkg, Field.HOME_PAGE, def.getHomepage());
-            storeField(pkg, Field.ATTRIBUTION, def.getAuthors());
-            storeField(pkg, Field.DECLARED_LICENSE, def.getDeclaredLicense());
-            storeField(pkg, Field.DETECTED_LICENSE, joinByAnd(def.getDetectedLicenses()));
-            storeField(pkg, Field.SHA1, def.getSha1());
-            storeField(pkg, Field.SHA256, def.getSha256());
+            int metaScore = def.getDescribedScore();
+            int licenseScore = def.getLicensedScore();
+            storeField(pkg, Field.SOURCE_LOCATION, metaScore, def.getSourceLocation());
+            storeField(pkg, Field.DOWNLOAD_LOCATION, metaScore, def.getDownloadLocation());
+            storeField(pkg, Field.HOME_PAGE, metaScore, def.getHomepage());
+            storeField(pkg, Field.ATTRIBUTION, metaScore, def.getAuthors());
+            storeField(pkg, Field.DECLARED_LICENSE, metaScore, def.getDeclaredLicense());
+            storeField(pkg, Field.DETECTED_LICENSE, licenseScore, joinByAnd(def.getDetectedLicenses()));
+            storeField(pkg, Field.SHA1, metaScore, def.getSha1());
+            storeField(pkg, Field.SHA256, metaScore, def.getSha256());
         }, () -> LOG.info("No metadata for {} from ClearlyDefined", purl));
     }
 
-    private <T> void storeField(PackageAttributeEditor pkg, Field field, Optional<T> value) {
-        value.ifPresent(v -> pkg.update(field, SCORE, v));
+    private <T> void storeField(PackageAttributeEditor pkg, Field field, int score, Optional<T> value) {
+        value.ifPresent(v -> pkg.update(field, score, v));
     }
 
     private Optional<PackageDefinition> readPackage(PackageURL purl) {
