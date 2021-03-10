@@ -18,7 +18,7 @@ public interface PackageDefinition {
 
     Optional<URI> getHomepage();
 
-    List<String> getAuthors();
+    Optional<List<String>> getAuthors();
 
     Optional<String> getDeclaredLicense();
 

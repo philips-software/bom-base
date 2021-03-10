@@ -42,7 +42,7 @@ class MetaRegistryTest {
 
     @Test
     void editsPackageFields() {
-        registry.edit(PURL, modifier -> modifier.update(FIELD, SCORE, VALUE));
+        registry.edit(PURL, editor -> editor.update(FIELD, SCORE, VALUE));
 
         assertThat(pkg.getAttributeFor(FIELD).orElseThrow().getValue()).contains(VALUE);
     }
@@ -76,10 +76,10 @@ class MetaRegistryTest {
             //noinspection unchecked
             when(listener.onUpdated(any(), any(), any())).thenReturn(Optional.of(task));
 
-            registry.edit(PURL, modifier -> modifier.update(FIELD, SCORE, VALUE));
+            registry.edit(PURL, editor -> editor.update(FIELD, SCORE, VALUE));
 
             //noinspection unchecked
-            verify(task).accept(any(PackageModifier.class));
+            verify(task).accept(any(PackageAttributeEditor.class));
         }
     }
 }

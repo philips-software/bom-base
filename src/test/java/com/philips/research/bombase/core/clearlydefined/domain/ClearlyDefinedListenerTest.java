@@ -7,7 +7,7 @@ package com.philips.research.bombase.core.clearlydefined.domain;
 
 import com.philips.research.bombase.PackageUrl;
 import com.philips.research.bombase.core.meta.registry.Field;
-import com.philips.research.bombase.core.meta.registry.PackageModifier;
+import com.philips.research.bombase.core.meta.registry.PackageAttributeEditor;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -36,7 +36,7 @@ class ClearlyDefinedListenerTest {
     private static final String DETECTED_LICENSE = "Detected";
     private static final String SHA1 = "Sha1";
     private static final String SHA256 = "Sha256";
-    private static final int SCORE = 50;
+    private static final int SCORE = 70;
 
     private final ClearlyDefinedClient client = mock(ClearlyDefinedClient.class);
     private final ClearlyDefinedListener listener = new ClearlyDefinedListener(client);
@@ -60,8 +60,8 @@ class ClearlyDefinedListenerTest {
 
     @Nested
     class MetadataTaskCreated {
-        private final PackageModifier modifier = mock(PackageModifier.class);
-        private final Consumer<PackageModifier> task = listener.onUpdated(PURL, Set.of(), Map.of()).orElseThrow();
+        private final PackageAttributeEditor pkg = mock(PackageAttributeEditor.class);
+        private final Consumer<PackageAttributeEditor> task = listener.onUpdated(PURL, Set.of(), Map.of()).orElseThrow();
         private final PackageDefinition response = mock(PackageDefinition.class);
 
         @BeforeEach
@@ -74,21 +74,31 @@ class ClearlyDefinedListenerTest {
             when(response.getSourceLocation()).thenReturn(Optional.of(SOURCE_LOCATION));
             when(response.getDownloadLocation()).thenReturn(Optional.of(DOWNLOAD_LOCATION));
             when(response.getHomepage()).thenReturn(Optional.of(HOMEPAGE));
-            when(response.getAuthors()).thenReturn(ATTRIBUTION);
+            when(response.getAuthors()).thenReturn(Optional.of(ATTRIBUTION));
             when(response.getDetectedLicenses()).thenReturn(List.of(DETECTED_LICENSE));
             when(response.getDeclaredLicense()).thenReturn(Optional.of(DECLARED_LICENSE));
+            when(response.getSha1()).thenReturn(Optional.of(SHA1));
+            when(response.getSha256()).thenReturn(Optional.of(SHA256));
 
-            task.accept(modifier);
+            task.accept(pkg);
 
-            verify(modifier).update(Field.SOURCE_LOCATION, SCORE, SOURCE_LOCATION);
-            verify(modifier).update(Field.DOWNLOAD_LOCATION, SCORE, DOWNLOAD_LOCATION);
-            verify(modifier).update(Field.HOME_PAGE, SCORE, HOMEPAGE);
-            //TODO Temporarily disabled until lists are properly handled by fields
-//            verify(modifier).update(Field.ATTRIBUTION, ATTRIBUTION);
-            verify(modifier).update(Field.DETECTED_LICENSE, SCORE, DETECTED_LICENSE);
-            verify(modifier).update(Field.DECLARED_LICENSE, SCORE, DECLARED_LICENSE);
+            verify(pkg).update(Field.SOURCE_LOCATION, SCORE, SOURCE_LOCATION);
+            verify(pkg).update(Field.DOWNLOAD_LOCATION, SCORE, DOWNLOAD_LOCATION);
+            verify(pkg).update(Field.HOME_PAGE, SCORE, HOMEPAGE);
+            verify(pkg).update(Field.ATTRIBUTION, SCORE, ATTRIBUTION);
+            verify(pkg).update(Field.DETECTED_LICENSE, SCORE, DETECTED_LICENSE);
+            verify(pkg).update(Field.DECLARED_LICENSE, SCORE, DECLARED_LICENSE);
+            verify(pkg).update(Field.SHA1, SCORE, SHA1);
+            verify(pkg).update(Field.SHA256, SCORE, SHA256);
         }
 
-        //TODO Concatenation of licenses
+        @Test
+        void concatenatesDetectedLicenses() {
+            when(response.getDetectedLicenses()).thenReturn(List.of(DECLARED_LICENSE, DETECTED_LICENSE));
+
+            task.accept(pkg);
+
+            verify(pkg).update(Field.DETECTED_LICENSE, SCORE, String.format("%s AND %s", DECLARED_LICENSE, DETECTED_LICENSE));
+        }
     }
 }

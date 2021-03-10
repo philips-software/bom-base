@@ -31,11 +31,11 @@ public class QueuedTaskRunner {
     @Async("taskExecutor")
     public
     //@Transactional(propagation = Propagation.REQUIRES_NEW)
-    void execute(PackageUrl purl, Consumer<PackageModifier> task) {
+    void execute(PackageUrl purl, Consumer<PackageAttributeEditor> task) {
         store.findPackage(purl).ifPresent(pkg -> {
-            final var modifier = new PackageModifier(pkg);
-            task.accept(modifier);
-            LOG.info("Updated {}", modifier.getModifiedFields());
+            final var editor = new PackageAttributeEditor(pkg);
+            task.accept(editor);
+            LOG.info("Updated {}", editor.getModifiedFields());
         });
     }
 }

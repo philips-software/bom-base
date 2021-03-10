@@ -8,7 +8,7 @@ package com.philips.research.bombase.core.clearlydefined.domain;
 import com.philips.research.bombase.PackageUrl;
 import com.philips.research.bombase.core.meta.registry.Field;
 import com.philips.research.bombase.core.meta.registry.MetaRegistry;
-import com.philips.research.bombase.core.meta.registry.PackageModifier;
+import com.philips.research.bombase.core.meta.registry.PackageAttributeEditor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -39,35 +39,31 @@ public class ClearlyDefinedListener implements MetaRegistry.PackageListener {
     }
 
     @Override
-    public Optional<Consumer<PackageModifier>> onUpdated(PackageUrl purl, Set<Field> fields, Map<Field, ?> values) {
+    public Optional<Consumer<PackageAttributeEditor>> onUpdated(PackageUrl purl, Set<Field> fields, Map<Field, ?> values) {
         if (!fields.isEmpty()) {
             return Optional.empty();
         }
 
         LOG.info("Created ClearlyDefined task for {}", purl);
-        return Optional.of(modifier -> harvest(purl, modifier));
+        return Optional.of(pkg -> harvest(purl, pkg));
     }
 
-    private void harvest(PackageUrl purl, PackageModifier modifier) {
+    private void harvest(PackageUrl purl, PackageAttributeEditor pkg) {
         readPackage(purl).ifPresentOrElse(def -> {
             LOG.info("Updating {} from ClearlyDefined", purl);
-            storeField(modifier, Field.SOURCE_LOCATION, def.getSourceLocation());
-            storeField(modifier, Field.DOWNLOAD_LOCATION, def.getDownloadLocation());
-            storeField(modifier, Field.HOME_PAGE, def.getHomepage());
-//            storeField(modifier, Field.ATTRIBUTION, def.getAuthors());
-            storeField(modifier, Field.DECLARED_LICENSE, def.getDeclaredLicense());
-            storeField(modifier, Field.DETECTED_LICENSE, joinByAnd(def.getDetectedLicenses()));
+            storeField(pkg, Field.SOURCE_LOCATION, def.getSourceLocation());
+            storeField(pkg, Field.DOWNLOAD_LOCATION, def.getDownloadLocation());
+            storeField(pkg, Field.HOME_PAGE, def.getHomepage());
+            storeField(pkg, Field.ATTRIBUTION, def.getAuthors());
+            storeField(pkg, Field.DECLARED_LICENSE, def.getDeclaredLicense());
+            storeField(pkg, Field.DETECTED_LICENSE, joinByAnd(def.getDetectedLicenses()));
+            storeField(pkg, Field.SHA1, def.getSha1());
+            storeField(pkg, Field.SHA256, def.getSha256());
         }, () -> LOG.info("No metadata for {} from ClearlyDefined", purl));
     }
 
-    private <T> void storeField(PackageModifier modifier, Field field, Optional<T> value) {
-        value.ifPresent(v -> modifier.update(field, SCORE, v));
-    }
-
-    private <T> void storeField(PackageModifier modifier, Field field, List<T> values) {
-        if (!values.isEmpty()) {
-            modifier.update(field, SCORE, values);
-        }
+    private <T> void storeField(PackageAttributeEditor pkg, Field field, Optional<T> value) {
+        value.ifPresent(v -> pkg.update(field, SCORE, v));
     }
 
     private Optional<PackageDefinition> readPackage(PackageUrl purl) {

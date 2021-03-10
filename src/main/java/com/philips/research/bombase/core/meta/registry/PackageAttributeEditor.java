@@ -12,30 +12,34 @@ import java.util.HashSet;
 import java.util.Optional;
 import java.util.Set;
 
-//TODO Rename to better reveal intention (FieldEditor?)
-public class PackageModifier {
+/**
+ * Tracks edits of package field values.
+ */
+public class PackageAttributeEditor {
     private final Package pkg;
     private final Set<Field> modifiedFields = new HashSet<>();
 
-    PackageModifier(Package pkg) {
+    PackageAttributeEditor(Package pkg) {
         this.pkg = pkg;
     }
 
-    Set<Field> getModifiedFields() {
-        return Collections.unmodifiableSet(modifiedFields);
-    }
-
+    /**
+     * @return current value of the indicated field
+     */
     public <T> Optional<T> get(Field field) {
         return pkg.getAttributeFor(field).flatMap(Attribute::getValue);
     }
 
-    public PackageModifier update(Field field, int score, @NullOr Object value) {
-        if (value == null) {
-            return this;
+    /**
+     * Updates the value of a field using the provided score as priority
+     *
+     * @param score percentage indicating how trustworthy the value is
+     */
+    public PackageAttributeEditor update(Field field, int score, @NullOr Object value) {
+        final var modified = getOrCreateAttr(field).setValue(score, value);
+        if (modified) {
+            modifiedFields.add(field);
         }
-        getOrCreateAttr(field).setValue(score, value);
-        //TODO Only track if it modified the value
-        modifiedFields.add(field);
         return this;
     }
 
@@ -43,7 +47,15 @@ public class PackageModifier {
         return pkg.getAttributeFor(field).orElseGet(() -> createAttribute(field));
     }
 
+    // Necessary to allow generation of a tracked persistence entity.
     protected Attribute createAttribute(Field field) {
         return pkg.add(new Attribute(field));
+    }
+
+    /**
+     * @return all fields of which the value has been modified
+     */
+    Set<Field> getModifiedFields() {
+        return Collections.unmodifiableSet(modifiedFields);
     }
 }

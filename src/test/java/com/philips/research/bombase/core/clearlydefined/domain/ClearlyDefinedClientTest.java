@@ -16,6 +16,7 @@ import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
 import java.net.URI;
+import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -95,7 +96,7 @@ class ClearlyDefinedClientTest {
         assertThat(definition.getSha256()).contains(SHA256);
         assertThat(definition.getDeclaredLicense()).contains(DECLARED_LICENSE);
         assertThat(definition.getDetectedLicenses()).contains(DETECTED_LICENSE);
-        assertThat(definition.getAuthors()).contains(ATTRIBUTION);
+        assertThat(definition.getAuthors()).contains(List.of(ATTRIBUTION));
     }
 
     @Test

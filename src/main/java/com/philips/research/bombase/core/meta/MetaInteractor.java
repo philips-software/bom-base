@@ -37,7 +37,7 @@ public class MetaInteractor implements MetaService {
     public void update(URI purl, Map<String, Object> values) {
         //TODO Needs to be tested...
         PackageUrl pkgUrl = new PackageUrl(purl);
-        registry.edit(pkgUrl, modifier -> {
+        registry.edit(pkgUrl, pkg -> {
         });
     }
 

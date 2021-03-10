@@ -48,8 +48,9 @@ public interface ClearlyDefinedAPI {
         }
 
         @Override
-        public List<String> getAuthors() {
-            return licensed.getAttribution();
+        public Optional<List<String>> getAuthors() {
+            final var list = licensed.getAttribution();
+            return list.isEmpty() ? Optional.empty() : Optional.of(list);
         }
 
         @Override

@@ -37,11 +37,11 @@ public class MetaRegistry {
         listeners.add(listener);
     }
 
-    public void edit(PackageUrl purl, Consumer<PackageModifier> consumer) {
+    public void edit(PackageUrl purl, Consumer<PackageAttributeEditor> consumer) {
         final var pkg = getOrCreatePackage(purl);
-        final var modifier = new PackageModifier(pkg);
-        consumer.accept(modifier);
-        notifyValueListeners(pkg, modifier.getModifiedFields(), valuesOf(pkg));
+        final var editor = new PackageAttributeEditor(pkg);
+        consumer.accept(editor);
+        notifyValueListeners(pkg, editor.getModifiedFields(), valuesOf(pkg));
     }
 
     private Package getOrCreatePackage(PackageUrl purl) {
@@ -76,6 +76,6 @@ public class MetaRegistry {
          * @param values  current package metadata
          * @return (optional) operation to queue for execution
          */
-        Optional<Consumer<PackageModifier>> onUpdated(PackageUrl purl, Set<Field> updated, Map<Field, ?> values);
+        Optional<Consumer<PackageAttributeEditor>> onUpdated(PackageUrl purl, Set<Field> updated, Map<Field, ?> values);
     }
 }
