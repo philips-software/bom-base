@@ -30,11 +30,12 @@ SPDX | "The Software Package Data Exchange" - An open standard for communicating
 
 ![UML context diagram](context.png "System context")
 
-A client (e.g. a bill-of-materials tool) requests metadata for a package from
-the system. The system harvests the attributes of this metadata from external
-sources (e.g. package management repositories and version control systems). A
-curator manually resolves conflicting attribute values and add values that could
-not be harvested automatically.
+A client application (e.g. a bill-of-materials tool) requests metadata for a
+package from the system. The system harvests the attributes of this metadata
+from external metadata sources (e.g. package management repositories and version
+control systems). A curator manually resolves conflicting attribute values and
+add values that could not be harvested automatically. An operator ensures the
+system is properly installed and keeps running efficiently.
 
 ## Goals and constraints
 
@@ -140,54 +141,66 @@ Packages are uniquely identified by:
 
 ![UML sequence diagram](harvesting.png "General operation overview")
 
-When a client requests metadata for a package, the package is looked up in the
-persistent metadata store. If the package is unknown, it is created. This
-creation triggers the creation of a one or more asynchronous tasks to harvest
-the initial metadata for the package. Because nothing is known about the
-package, the response to the client is empty.
+When a client application requests metadata for a package, the package is looked
+up in the persistent metadata store. If the package is unknown, it is created.
+This creation triggers the creation of one or more asynchronous tasks to
+"harvest" metadata for the package from external sources. Because initially
+nothing is known about the package, the synchronous response to the client is
+empty.
 
-When a harvesting is started, it queries metadata from its source and stores the
-harvested metadata in the appropriate fields of the package registration.
-Modification of a field value (like the source code location) can recursively
-create new harvesting tasks that asynchronously harvest additional metadata from
-another source (like a source code license scanner).
+After the asynchronous harvesting task is started, it queries metadata from an
+external metadata source and stores the harvested attributes in the appropriate
+fields of the package registration. Modification of an attribute (like the
+source code location) can recursively initiate new harvesting tasks that
+asynchronously harvest additional metadata from another source (like a source
+code license scanner).
 
-Upon the next request from a client for the same package, the collected metadata
-is returned synchronously to the client.
+Upon the next request from a client for the same package, the meanwhile
+collected metadata is returned synchronously to the client.
 
 ### Tracking metadata values
 
 Packages are uniquely identified by
-their [Package URL](https://github.com/package-url/purl-spec).
+a [Package URL](https://github.com/package-url/purl-spec) that includes
+information about its origin, name and version.
 
-The metadata for a package is stored in attribute fields of a predefined type.
-The value of an attribute is updated while providing a percentage to indicate
-the confidence of the value being correct. This confidence percentage only
-overwrites a prior value if the confidence in the new value is higher than the
-existing value. This allows asynchronous updates to stabilize on the "best"
-available value for each attribute.
+The metadata for a package is stored in attribute fields of predefined types.
+Attribute values are updated with a specified confidence of the value being
+correct. This confidence percentage overwrites a prior value only if the
+confidence in the new value is higher than the existing value. This allows
+updates by asynchronous harvesting tasks (and manual corrections) to stabilize
+on the "best" available value for each attribute.
 
-To identify occasions where human curation is required, also the next highest
-confidence value is kept to highlight the disagreement between sources. A human
-curator can use this information to manually investigate and decide on the
-absolute truth. The verdict of a human curator is stored with 100% confidence,
-automatically overriding the prior value and clearing any contesting value.
+To identify occasions where human curation is required, the next highest
+confidence value is also kept as indication of any disagreement between metadata
+sources. A human curator can use this information as a reason to investigate and
+manually provide corrections. The verdict of a human curator is stored with 100%
+confidence, automatically overriding the prior value and clearing any contesting
+value.
 
 ### Asynchronous harvesting
 
 Each harvester registers a listener with the metadata store. When a new package
-is created or any package attribute is updated, all listeners are polled with
-the package metadata. Based on the modified fields and the current values of
-other attributes, each listener can return a new harvesting task. The resulting
-tasks are all queued for asynchronous execution.
+is created or any package attributes are updated, all listeners are polled for
+new harvesting tasks. Based on the modified fields and current values of the
+other attributes, each listener can submit a new harvesting task. These tasks
+are queued for asynchronous execution.
 
-Upon starting a harvesting task, it receives the current package metadata which
+Upon starting a harvesting task, it receives the latest package metadata which
 it can use to collect new attribute values from its supported sources. After
 harvesting attribute values, it updates the package metadata using confidence
-scores based on the source.
+scores based on the reliability of the source providing the metadata.
 
-After completion of each task, all listeners are again polled for new harvesting
-tasks. This continues until no attributes were updated.
+After completion of a harvesting task that modified a attribute, all listeners
+are again polled for new harvesting tasks. This continues until no attributes
+are updated, resulting in a cascade of asynchronous harvesting tasks that
+collect all available attributes from the available sources.
+
+As (some) sources could be updated after harvesting of metadata for a package,
+it is important to periodically refresh the metadata from sources that are still
+in use. Upon reading a package, new harvesting tasks are triggered based on
+the completion timestamp of the most recent harvest task. (This
+mechanism has not been implemented yet.)
 
 ## Process view
 

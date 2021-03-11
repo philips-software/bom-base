@@ -2,7 +2,7 @@
 
 autoactivate on
 
-participant Client
+participant "Client\nApplication" as Client
 box BOM-base service
 participant API
 participant "Metadata\nStore" as Store
@@ -28,7 +28,7 @@ return nothing
 activate Task
 Task -> Source: getMetadata(PURL)
 return
-Task -> Store: store(PURL, fields)
+Task -> Store: store(attributes)
 deactivate
 destroy Task
 

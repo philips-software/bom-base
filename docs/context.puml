@@ -4,8 +4,8 @@ skinparam actorStyle hollow
 
 actor Curator
 actor Operator
-rectangle Client
-collections Sources
+rectangle "Client\nApplication" as Client
+collections "Metadata\nSources" as Sources
 
 usecase System
 
