@@ -16,8 +16,8 @@ import org.springframework.stereotype.Service;
 import pl.tlinkowski.annotation.basic.NullOr;
 
 import javax.annotation.PostConstruct;
+import java.util.HashMap;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 @Service
 public class MetaInteractor implements MetaService {
@@ -39,11 +39,13 @@ public class MetaInteractor implements MetaService {
 
     @Override
     public Map<String, Object> getAttributes(PackageURL purl) {
-        return store.findPackage(purl)
-                .map(pkg -> pkg.getAttributes()
-                        .filter(a -> a.getValue().isPresent())
-                        .collect(Collectors.toMap(a -> a.getField().name().toLowerCase(), a -> a.getValue().get())))
-                .orElse(Map.of());
+        final var values = new HashMap<String, Object>();
+        registry.edit(purl, pkg -> pkg.getValues().forEach((field, value) -> {
+            if (value != null) {
+                values.put(field.name().toLowerCase(), value);
+            }
+        }));
+        return values;
     }
 
     @Override

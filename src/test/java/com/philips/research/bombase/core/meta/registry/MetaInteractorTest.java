@@ -65,11 +65,11 @@ class MetaInteractorTest {
         }
 
         @Test
-        void noPackageValues_unknownPackage() {
+        void createsPackage_queryUnknownPackage() {
             when(store.findPackage(PURL)).thenReturn(Optional.empty());
+            when(store.createPackage(PURL)).thenReturn(pkg);
 
             assertThat(interactor.getAttributes(PURL)).isEmpty();
-            verify(store, never()).createPackage(PURL);
         }
     }
 

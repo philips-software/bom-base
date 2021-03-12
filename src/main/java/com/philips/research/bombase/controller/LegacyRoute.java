@@ -16,7 +16,8 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
 import pl.tlinkowski.annotation.basic.NullOr;
 
-import java.util.Map;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 
 @RestController
 @RequestMapping()
@@ -29,23 +30,31 @@ public class LegacyRoute {
 
     @PostMapping("/packages")
     LicenseJson getLicense(@RequestBody RequestJson body) {
-        //TODO Only query, and leave harvesting to core layer
         try {
-            if (body.purl != null) {
-                service.setAttributes(new PackageURL(body.purl), Map.of());
-            }
+            final var purl = new PackageURL(body.purl);
+            final @NullOr String license = (String) service.getAttributes(purl).get("detected_license");
+            return new LicenseJson(purl, license);
         } catch (MalformedPackageURLException e) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Not a valid Package URL");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Not a valid Package URL: " + body.purl);
         }
-        return new LicenseJson();
     }
 
+    @SuppressWarnings("NotNullFieldNotInitialized")
     static class RequestJson {
-        @NullOr String purl;
+        String purl;
     }
 
     static class LicenseJson {
         String id;
-        String license;
+        @NullOr String license;
+
+        public LicenseJson(PackageURL purl, @NullOr String license) {
+            this.id = encode(purl.canonicalize());
+            this.license = license;
+        }
+
+        private static String encode(String purl) {
+            return URLEncoder.encode(purl, StandardCharsets.UTF_8);
+        }
     }
 }
