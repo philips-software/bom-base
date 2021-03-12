@@ -6,6 +6,7 @@
 package com.philips.research.bombase.controller;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.PropertyAccessor;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.MapperFeature;
@@ -24,6 +25,7 @@ public class JacksonConfiguration {
     public ObjectMapper objectMapper() {
         return new ObjectMapper()
                 .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
+                .setSerializationInclusion(JsonInclude.Include.NON_NULL)
                 .configure(MapperFeature.DEFAULT_VIEW_INCLUSION, true)
                 .setVisibility(PropertyAccessor.FIELD, JsonAutoDetect.Visibility.NON_PRIVATE)
                 .setPropertyNamingStrategy(PropertyNamingStrategy.SNAKE_CASE)

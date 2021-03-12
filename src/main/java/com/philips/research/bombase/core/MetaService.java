@@ -7,7 +7,10 @@ package com.philips.research.bombase.core;
 
 import com.github.packageurl.PackageURL;
 
+import java.time.Instant;
+import java.util.List;
 import java.util.Map;
+import java.util.Scanner;
 
 /**
  * API for managing the storage of metadata.
@@ -32,4 +35,8 @@ public interface MetaService {
      */
     void setAttributes(PackageURL purl, Map<String, Object> values);
 
+    /**
+     * @return Most recent scans
+     */
+    List<PackageURL> latestScans();
 }

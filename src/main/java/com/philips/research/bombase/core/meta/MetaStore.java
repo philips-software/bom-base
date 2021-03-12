@@ -34,6 +34,14 @@ public interface MetaStore {
     Optional<Package> findPackage(PackageURL purl);
 
     /**
+     * Lists latest scanned packages in anti-chronological order.
+     *
+     * @param limit maximum number of packages to return
+     * @return list of packages, sorted on modification timestamp
+     */
+    List<Package> latestScans(int limit);
+
+    /**
      * Lists all versions of a package.
      *
      * @param purl package id

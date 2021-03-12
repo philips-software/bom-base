@@ -10,6 +10,7 @@ import com.philips.research.bombase.core.MetaService;
 import com.philips.research.bombase.core.clearlydefined.domain.ClearlyDefinedListener;
 import com.philips.research.bombase.core.meta.registry.Field;
 import com.philips.research.bombase.core.meta.registry.MetaRegistry;
+import com.philips.research.bombase.core.meta.registry.Package;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Service;
@@ -17,7 +18,9 @@ import pl.tlinkowski.annotation.basic.NullOr;
 
 import javax.annotation.PostConstruct;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @Service
 public class MetaInteractor implements MetaService {
@@ -54,5 +57,12 @@ public class MetaInteractor implements MetaService {
             final var field = Field.valueOf(Field.class, key.toUpperCase());
             pkg.update(field, 100, value);
         }));
+    }
+
+    @Override
+    public List<PackageURL> latestScans() {
+        return store.latestScans(100).stream()
+                .map(Package::getPurl)
+                .collect(Collectors.toList());
     }
 }

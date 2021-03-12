@@ -82,7 +82,11 @@ public class PackageAttributeEditor {
      * @return true if this editor modified the package
      */
     boolean isModified() {
-        return !modifiedFields.isEmpty();
+        final var modified = !modifiedFields.isEmpty();
+        if (modified) {
+            pkg.setUpdated();
+        }
+        return modified;
     }
 
 }

@@ -14,10 +14,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.*;
@@ -41,13 +38,22 @@ class MetaInteractorTest {
         }
     }
 
-    @BeforeEach
-    void beforeEach() {
-        when(store.findPackage(PURL)).thenReturn(Optional.of(pkg));
+    @Test
+    void getsLatestScans() {
+        when(store.latestScans(anyInt())).thenReturn(List.of(pkg));
+
+        final var latest = interactor.latestScans();
+
+        assertThat(latest).contains(PURL);
     }
 
     @Nested
     class ReadingPackageAttributes {
+        @BeforeEach
+        void beforeEach() {
+            when(store.findPackage(PURL)).thenReturn(Optional.of(pkg));
+        }
+
         @Test
         void queriesPackageDetails() {
             editor.update(Field.TITLE, 100, TITLE);
@@ -78,6 +84,7 @@ class MetaInteractorTest {
         @BeforeEach
         void beforeEach() {
             registry.addListener(listener);
+            when(store.findPackage(PURL)).thenReturn(Optional.of(pkg));
         }
 
         @Test

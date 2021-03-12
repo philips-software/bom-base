@@ -21,6 +21,7 @@ import org.springframework.test.web.servlet.MockMvc;
 
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
+import java.util.List;
 import java.util.Map;
 
 import static org.mockito.Mockito.when;
@@ -61,5 +62,16 @@ class PackagesRouteTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.purl").value(PURL))
                 .andExpect(jsonPath("$.attributes." + KEY).value(VALUE));
+    }
+
+    @Test
+    void listsLatestScans() throws Exception {
+        when(service.latestScans()).thenReturn(List.of(new PackageURL(PURL)));
+
+        mvc.perform(get(URL_PACKAGES).queryParam("latest", "yes"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.results[0].id").value(encode(PURL)))
+                .andExpect(jsonPath("$.results[0].purl").value(PURL))
+                .andExpect(jsonPath("$.results[0].attributes").doesNotExist());
     }
 }

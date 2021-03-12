@@ -7,6 +7,7 @@ package com.philips.research.bombase.core.meta.registry;
 
 import com.github.packageurl.PackageURL;
 
+import java.time.Instant;
 import java.util.HashSet;
 import java.util.Optional;
 import java.util.Set;
@@ -15,6 +16,7 @@ import java.util.stream.Stream;
 public class Package {
     private final PackageURL purl;
     private final Set<Attribute> attributes = new HashSet<>();
+    private Instant lastUpdated = Instant.now();
 
     public Package(PackageURL purl) {
         this.purl = purl;
@@ -22,6 +24,14 @@ public class Package {
 
     public PackageURL getPurl() {
         return purl;
+    }
+
+    public void setUpdated() {
+        this.lastUpdated = Instant.now();
+    }
+
+    public Instant getLastUpdated() {
+        return lastUpdated;
     }
 
     public Attribute add(Attribute attribute) {
@@ -41,4 +51,5 @@ public class Package {
     public Stream<Attribute> getAttributes() {
         return attributes.stream();
     }
+
 }

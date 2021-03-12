@@ -9,10 +9,7 @@ import com.github.packageurl.MalformedPackageURLException;
 import com.github.packageurl.PackageURL;
 import com.philips.research.bombase.core.MetaService;
 import org.springframework.http.HttpStatus;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.net.URLDecoder;
@@ -32,6 +29,12 @@ public class PackagesRoute {
         final var pkgUrl = packageUrl(purl);
         final var attributes = service.getAttributes(pkgUrl);
         return new PackageJson(pkgUrl, attributes);
+    }
+
+    @GetMapping()
+    ResultJson<PackageJson> findPackages(@RequestParam(required = false) boolean latest) {
+        final var purls = service.latestScans();
+        return new ResultJson<>(PackageJson.fromList(purls));
     }
 
     private PackageURL packageUrl(String purl) {

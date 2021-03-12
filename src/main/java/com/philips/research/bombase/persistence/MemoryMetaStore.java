@@ -12,10 +12,7 @@ import com.philips.research.bombase.core.meta.registry.Field;
 import com.philips.research.bombase.core.meta.registry.Package;
 import org.springframework.stereotype.Repository;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Repository
@@ -30,6 +27,14 @@ public class MemoryMetaStore implements MetaStore {
     @Override
     public Optional<Package> findPackage(PackageURL purl) {
         return Optional.ofNullable(packages.get(purl));
+    }
+
+    @Override
+    public List<Package> latestScans(int limit) {
+        final var scans = new ArrayList<>(packages.values());
+        scans.sort(Comparator.comparing(Package::getLastUpdated));
+        Collections.reverse(scans);
+        return scans.subList(0, Math.min(limit, scans.size()));
     }
 
     @Override
