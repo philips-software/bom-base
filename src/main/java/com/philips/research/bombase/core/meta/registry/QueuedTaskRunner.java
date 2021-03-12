@@ -29,7 +29,7 @@ public class QueuedTaskRunner {
      *
      * @param task execution unit
      */
-    @Async("taskExecutor")
+    @Async(RunnerConfig.NAME)
     public
     //@Transactional(propagation = Propagation.REQUIRES_NEW)
     void execute(PackageURL purl, Consumer<PackageAttributeEditor> task, Consumer<PackageAttributeEditor> callback) {

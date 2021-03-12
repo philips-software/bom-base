@@ -30,7 +30,7 @@ public class Attribute {
         return this.field;
     }
 
-    <T> Optional<T> getValue() {
+    public <T> Optional<T> getValue() {
         return Optional.ofNullable((T) value);
     }
 

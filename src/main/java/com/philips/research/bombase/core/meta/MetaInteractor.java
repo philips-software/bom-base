@@ -8,24 +8,28 @@ package com.philips.research.bombase.core.meta;
 import com.github.packageurl.PackageURL;
 import com.philips.research.bombase.core.MetaService;
 import com.philips.research.bombase.core.clearlydefined.domain.ClearlyDefinedListener;
+import com.philips.research.bombase.core.meta.registry.Field;
 import com.philips.research.bombase.core.meta.registry.MetaRegistry;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Service;
+import pl.tlinkowski.annotation.basic.NullOr;
 
 import javax.annotation.PostConstruct;
-import java.net.URI;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @Service
 public class MetaInteractor implements MetaService {
     private final MetaRegistry registry;
+    private final MetaStore store;
     @SuppressWarnings("SpringJavaAutowiredFieldsWarningInspection")
     @Autowired
     private ApplicationContext context;
 
-    public MetaInteractor(MetaRegistry registry) {
+    public MetaInteractor(MetaRegistry registry, MetaStore store) {
         this.registry = registry;
+        this.store = store;
     }
 
     @PostConstruct
@@ -34,19 +38,19 @@ public class MetaInteractor implements MetaService {
     }
 
     @Override
-    public void update(URI purl, Map<String, Object> values) {
-        //TODO Needs to be tested...
-        try {
-            PackageURL pkgUrl = new PackageURL(purl.toASCIIString());
-            registry.edit(pkgUrl, pkg -> {
-            });
-        } catch (Exception e) {
-            throw new IllegalArgumentException("Not a valid package URL: " + purl, e);
-        }
+    public Map<String, Object> getAttributes(PackageURL purl) {
+        return store.findPackage(purl)
+                .map(pkg -> pkg.getAttributes()
+                        .filter(a -> a.getValue().isPresent())
+                        .collect(Collectors.toMap(a -> a.getField().name().toLowerCase(), a -> a.getValue().get())))
+                .orElse(Map.of());
     }
 
     @Override
-    public Map<String, Object> valuesOf(URI purl) {
-        return null;
+    public void setAttributes(PackageURL purl, Map<String, @NullOr Object> values) {
+        registry.edit(purl, pkg -> values.forEach((key, value) -> {
+            final var field = Field.valueOf(Field.class, key.toUpperCase());
+            pkg.update(field, 100, value);
+        }));
     }
 }

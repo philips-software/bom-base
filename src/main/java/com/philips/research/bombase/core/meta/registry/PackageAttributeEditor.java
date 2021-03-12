@@ -51,6 +51,10 @@ public class PackageAttributeEditor {
      * @param score percentage indicating how trustworthy the value is
      */
     public PackageAttributeEditor update(Field field, int score, @NullOr Object value) {
+        if (value == null) {
+            return this;
+        }
+
         final var modified = getOrCreateAttr(field).setValue(score, value);
         if (modified) {
             modifiedFields.add(field);

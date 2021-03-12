@@ -67,6 +67,7 @@ class MetaRegistryTest {
 
         @Test
         void notifiesListeners_createPackage() {
+            when(store.findPackage(PURL)).thenReturn(Optional.empty());
             registry.edit(PURL, pkg -> pkg.get(FIELD));
 
             verify(listener).onUpdated(PURL, Set.of(), Map.of());
@@ -77,6 +78,13 @@ class MetaRegistryTest {
             registry.edit(PURL, pkg -> pkg.update(FIELD, SCORE, VALUE));
 
             verify(listener).onUpdated(PURL, Set.of(FIELD), Map.of(FIELD, VALUE));
+        }
+
+        @Test
+        void noNotifications_noModifications() {
+            registry.edit(PURL, pkg -> { /* Nothing */ });
+
+            verifyNoInteractions(listener);
         }
 
         @Test

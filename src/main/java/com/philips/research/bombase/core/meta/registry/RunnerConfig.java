@@ -7,20 +7,20 @@ package com.philips.research.bombase.core.meta.registry;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 
 import java.util.concurrent.Executor;
 
 @Configuration
-@Async
 public class RunnerConfig {
-    @Bean(name = "taskRunner")
+    public static final String NAME = "TaskRunner";
+
+    @Bean(name = NAME)
     public Executor threadPoolTaskExecutor() {
         final var executor = new ThreadPoolTaskExecutor();
-        executor.setMaxPoolSize(2);
-        executor.setThreadGroupName("taskRunner");
-        executor.setThreadNamePrefix("task");
+        executor.setMaxPoolSize(3);
+        executor.setThreadGroupName(NAME);
+        executor.setThreadNamePrefix("runner-");
         return executor;
     }
 }

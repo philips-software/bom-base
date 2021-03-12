@@ -5,7 +5,8 @@
 
 package com.philips.research.bombase.core;
 
-import java.net.URI;
+import com.github.packageurl.PackageURL;
+
 import java.util.Map;
 
 /**
@@ -19,15 +20,16 @@ public interface MetaService {
      * @return value per field
      * @throws UnknownPackageException if the package does not exist
      */
-    Map<String, Object> valuesOf(URI purl);
+    Map<String, Object> getAttributes(PackageURL purl);
 
     /**
-     * Updates selected fields of a package.
+     * Updates selected attributes of a package.
      * Listeners are automatically notified of changes.
      *
      * @param purl   package id
      * @param values new value per field
      * @Param origin source of the updated value(s)
      */
-    void update(URI purl, Map<String, Object> values);
+    void setAttributes(PackageURL purl, Map<String, Object> values);
+
 }

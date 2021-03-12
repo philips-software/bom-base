@@ -9,8 +9,6 @@ import com.github.packageurl.PackageURL;
 import com.philips.research.bombase.core.meta.registry.Field;
 import com.philips.research.bombase.core.meta.registry.MetaRegistry;
 import com.philips.research.bombase.core.meta.registry.PackageAttributeEditor;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -22,7 +20,6 @@ import java.util.function.Consumer;
 
 @Service
 public class ClearlyDefinedListener implements MetaRegistry.PackageListener {
-    private static final Logger LOG = LoggerFactory.getLogger(ClearlyDefinedListener.class);
     private static final Map<String, String> PROVIDERS = Map.of("maven", "mavencentral", "npm", "npmjs");
 
     private final ClearlyDefinedClient client;
@@ -42,13 +39,11 @@ public class ClearlyDefinedListener implements MetaRegistry.PackageListener {
             return Optional.empty();
         }
 
-        LOG.info("Created ClearlyDefined task for {}", purl);
         return Optional.of(pkg -> harvest(purl, pkg));
     }
 
     private void harvest(PackageURL purl, PackageAttributeEditor pkg) {
-        readPackage(purl).ifPresentOrElse(def -> {
-            LOG.info("Updating {} from ClearlyDefined", purl);
+        readPackage(purl).ifPresent(def -> {
             int metaScore = def.getDescribedScore();
             int licenseScore = def.getLicensedScore();
             storeField(pkg, Field.SOURCE_LOCATION, metaScore, def.getSourceLocation());
@@ -59,7 +54,7 @@ public class ClearlyDefinedListener implements MetaRegistry.PackageListener {
             storeField(pkg, Field.DETECTED_LICENSE, licenseScore, joinByAnd(def.getDetectedLicenses()));
             storeField(pkg, Field.SHA1, metaScore, def.getSha1());
             storeField(pkg, Field.SHA256, metaScore, def.getSha256());
-        }, () -> LOG.info("No metadata for {} from ClearlyDefined", purl));
+        });
     }
 
     private <T> void storeField(PackageAttributeEditor pkg, Field field, int score, Optional<T> value) {
