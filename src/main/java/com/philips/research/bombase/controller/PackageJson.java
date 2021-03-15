@@ -23,7 +23,7 @@ class PackageJson {
         this(purl, null);
     }
 
-    PackageJson(PackageURL purl, @NullOr  Map<String, Object> attributes) {
+    PackageJson(PackageURL purl, @NullOr Map<String, Object> attributes) {
         this.purl = purl.canonicalize();
         this.id = encode(this.purl);
         this.attributes = attributes;

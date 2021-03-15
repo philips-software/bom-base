@@ -7,10 +7,8 @@ package com.philips.research.bombase.core;
 
 import com.github.packageurl.PackageURL;
 
-import java.time.Instant;
 import java.util.List;
 import java.util.Map;
-import java.util.Scanner;
 
 /**
  * API for managing the storage of metadata.

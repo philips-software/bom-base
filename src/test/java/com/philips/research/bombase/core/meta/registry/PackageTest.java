@@ -18,7 +18,7 @@ class PackageTest {
     private static final Field FIELD = Field.TITLE;
 
     private final Package pkg = new Package(PURL);
-   private final Instant now = Instant.now();
+    private final Instant now = Instant.now();
 
     static PackageURL toPurl(String uri) {
         try {
