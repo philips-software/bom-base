@@ -27,11 +27,11 @@ public interface ClearlyDefinedAPI {
     class ResponseJson implements PackageDefinition {
         DescribedJson described;
         LicensedJson licensed;
-        ScoresJson scores;
+        @NullOr ScoresJson scores;
 
         @Override
         public boolean isValid() {
-            return scores.effective > 0;
+            return (scores != null) && scores.effective > 0;
         }
 
         @Override

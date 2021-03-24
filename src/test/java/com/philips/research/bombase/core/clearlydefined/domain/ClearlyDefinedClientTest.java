@@ -5,6 +5,8 @@
 
 package com.philips.research.bombase.core.clearlydefined.domain;
 
+import com.github.packageurl.MalformedPackageURLException;
+import com.github.packageurl.PackageURL;
 import com.philips.research.bombase.core.clearlydefined.ClearlyDefinedException;
 import okhttp3.mockwebserver.MockResponse;
 import okhttp3.mockwebserver.MockWebServer;
@@ -23,11 +25,11 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 class ClearlyDefinedClientTest {
     private static final int PORT = 1080;
-    private static final String TYPE = "Type";
-    private static final String PROVIDER = "Provider";
+    private static final String TYPE = "type";
     private static final String NAMESPACE = "Namespace";
     private static final String NAME = "Name";
-    private static final String REVISION = "Revision";
+    private static final String VERSION = "Revision";
+    private static final PackageURL PURL = createPurl(String.format("pkg:%s/%s/%s@%s", TYPE, NAMESPACE, NAME, VERSION));
     private static final String SOURCE_LOCATION = "https://example.com/source";
     private static final String DOWNLOAD_LOCATION = "https://example.com/download";
     private static final String HOMEPAGE = "https://example.com/home-page";
@@ -40,6 +42,14 @@ class ClearlyDefinedClientTest {
     private final ClearlyDefinedClient client = new ClearlyDefinedClient(URI.create("http://localhost:" + PORT));
     private final MockWebServer mockServer = new MockWebServer();
 
+    static PackageURL createPurl(String purl) {
+        try {
+            return new PackageURL(purl);
+        } catch (MalformedPackageURLException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
     @BeforeEach
     void setUp() throws IOException {
         mockServer.start(PORT);
@@ -51,12 +61,12 @@ class ClearlyDefinedClientTest {
     }
 
     @Test
-    void skipsUnknownPackage() throws Exception {
+    void skipsUndefinedPackage() throws Exception {
         mockServer.enqueue(new MockResponse().setBody(new JSONObject()
                 .put("scores", new JSONObject()
                         .put("effective", 0)).toString()));
 
-        assertThat(client.getPackageDefinition(TYPE, PROVIDER, NAMESPACE, NAME, REVISION)).isEmpty();
+        assertThat(client.getPackageDefinition(PURL)).isEmpty();
     }
 
     @Test
@@ -88,11 +98,11 @@ class ClearlyDefinedClientTest {
                 .put("scores", new JSONObject()
                         .put("effective", 100)).toString()));
 
-        final var definition = client.getPackageDefinition(TYPE, PROVIDER, NAMESPACE, NAME, REVISION).orElseThrow();
+        final var definition = client.getPackageDefinition(PURL).orElseThrow();
 
         final var request = mockServer.takeRequest();
         assertThat(request.getMethod()).isEqualTo("GET");
-        assertThat(request.getPath()).isEqualTo(String.format("/definitions/%s/%s/%s/%s/%s", TYPE, PROVIDER, NAMESPACE, NAME, REVISION));
+        assertThat(request.getPath()).isEqualTo(String.format("/definitions/%s/%s/%s/%s/%s", TYPE, TYPE, NAMESPACE, NAME, VERSION));
         assertThat(definition.getSourceLocation()).contains(URI.create(SOURCE_LOCATION));
         assertThat(definition.getDownloadLocation()).contains(URI.create(DOWNLOAD_LOCATION));
         assertThat(definition.getHomepage()).contains(URI.create(HOMEPAGE));
@@ -111,9 +121,18 @@ class ClearlyDefinedClientTest {
                 .put("scores", new JSONObject()
                         .put("effective", 100)).toString()));
 
-        final var metadata = client.getPackageDefinition(TYPE, PROVIDER, NAMESPACE, NAME, REVISION).orElseThrow();
+        final var metadata = client.getPackageDefinition(PURL).orElseThrow();
 
         assertThat(metadata).isInstanceOf(PackageDefinition.class);
+    }
+
+    @Test
+    void mapsPurlTypeToClearlyDefinedProvider() throws Exception {
+        mockServer.enqueue(new MockResponse().setBody("{}"));
+        client.getPackageDefinition(new PackageURL("cargo", NAMESPACE, NAME, VERSION, null, null));
+
+        final var request = mockServer.takeRequest();
+        assertThat(request.getPath()).contains("/crate/cratesio/");
     }
 
     @Test
@@ -124,17 +143,17 @@ class ClearlyDefinedClientTest {
                 .put("scores", new JSONObject()
                         .put("effective", 100)).toString()));
 
-        client.getPackageDefinition(TYPE, PROVIDER, null, NAME, REVISION).orElseThrow();
+        client.getPackageDefinition(new PackageURL(TYPE, null, NAME, VERSION, null, null)).orElseThrow();
 
         final var request = mockServer.takeRequest();
-        assertThat(request.getPath()).contains(PROVIDER + "/-/" + NAME);
+        assertThat(request.getPath()).contains(TYPE + "/-/" + NAME);
     }
 
     @Test
     void throws_serverNotReachable() {
         var serverlessClient = new ClearlyDefinedClient(URI.create("http://localhost:1234"));
 
-        assertThatThrownBy(() -> serverlessClient.getPackageDefinition(TYPE, PROVIDER, NAMESPACE, NAME, REVISION))
+        assertThatThrownBy(() -> serverlessClient.getPackageDefinition(PURL))
                 .isInstanceOf(ClearlyDefinedException.class)
                 .hasMessageContaining("not reachable");
     }
@@ -143,7 +162,7 @@ class ClearlyDefinedClientTest {
     void throws_unexpectedResponseFromServer() {
         mockServer.enqueue(new MockResponse().setResponseCode(404));
 
-        assertThatThrownBy(() -> client.getPackageDefinition(TYPE, PROVIDER, NAMESPACE, NAME, REVISION))
+        assertThatThrownBy(() -> client.getPackageDefinition(PURL))
                 .isInstanceOf(ClearlyDefinedException.class)
                 .hasMessageContaining("status 404");
     }

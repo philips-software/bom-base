@@ -20,7 +20,8 @@ import java.util.function.Consumer;
 
 @Service
 public class ClearlyDefinedListener implements MetaRegistry.PackageListener {
-    private static final Map<String, String> PROVIDERS = Map.of("maven", "mavencentral", "npm", "npmjs");
+    private static final Map<String, String> TYPES = Map.of("cargo", "crate");
+    private static final Map<String, String> PROVIDERS = Map.of("maven", "mavencentral", "npm", "npmjs", "cargo", "cratesio");
 
     private final ClearlyDefinedClient client;
 
@@ -43,7 +44,7 @@ public class ClearlyDefinedListener implements MetaRegistry.PackageListener {
     }
 
     private void harvest(PackageURL purl, PackageAttributeEditor pkg) {
-        readPackage(purl).ifPresent(def -> {
+        client.getPackageDefinition(purl).ifPresent(def -> {
             int metaScore = def.getDescribedScore();
             int licenseScore = def.getLicensedScore();
             storeField(pkg, Field.SOURCE_LOCATION, metaScore, def.getSourceLocation());
@@ -59,13 +60,6 @@ public class ClearlyDefinedListener implements MetaRegistry.PackageListener {
 
     private <T> void storeField(PackageAttributeEditor pkg, Field field, int score, Optional<T> value) {
         value.ifPresent(v -> pkg.update(field, score, v));
-    }
-
-    private Optional<PackageDefinition> readPackage(PackageURL purl) {
-        //TODO What about multiple provides for a single type?
-        final var provider = PROVIDERS.getOrDefault(purl.getType(), purl.getType());
-
-        return client.getPackageDefinition(purl.getType(), provider, purl.getNamespace(), purl.getName(), purl.getVersion());
     }
 
     Optional<String> joinByAnd(List<String> licenses) {

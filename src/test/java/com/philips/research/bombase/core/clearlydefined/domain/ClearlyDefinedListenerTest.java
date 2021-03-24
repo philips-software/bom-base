@@ -75,7 +75,7 @@ class ClearlyDefinedListenerTest {
 
         @BeforeEach
         void beforeEach() {
-            when(client.getPackageDefinition(TYPE, TYPE, NAMESPACE, NAME, VERSION)).thenReturn(Optional.of(response));
+            when(client.getPackageDefinition(PURL)).thenReturn(Optional.of(response));
         }
 
         @Test

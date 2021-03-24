@@ -28,6 +28,9 @@ public class PackagesRoute {
     PackageJson getPackage(@PathVariable String purl) {
         final var pkgUrl = packageUrl(purl);
         final var attributes = service.getAttributes(pkgUrl);
+        if (attributes.isEmpty()) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "No metadata (yet)");
+        }
         return new PackageJson(pkgUrl, attributes);
     }
 

@@ -20,6 +20,8 @@ public enum Field {
     HOME_PAGE(URI.class), // Project home page
     //TODO Is there a way around type-erasure?
     ATTRIBUTION(List.class), // Copyright owners
+    SUPPLIER(String.class), // Distributor of the package
+    ORIGINATOR(String.class), // Original supplier (if different from supplier)
     DOWNLOAD_LOCATION(URI.class), // URL for the distribution representation
     SHA1(String.class), // Hash of distribution artifact
     SHA256(String.class), // Hash of distribution artifact

@@ -65,6 +65,14 @@ class PackagesRouteTest {
     }
 
     @Test
+    void notFound_noMetadataForPackage() throws Exception {
+        when(service.getAttributes(new PackageURL(PURL))).thenReturn(Map.of());
+
+        mvc.perform(get(URL_PACKAGE, encode(PURL)))
+                .andExpect(status().isNotFound());
+    }
+
+    @Test
     void listsLatestScans() throws Exception {
         when(service.latestScans()).thenReturn(List.of(new PackageURL(PURL)));
 

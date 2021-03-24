@@ -11,14 +11,15 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.PropertyNamingStrategy;
+import com.github.packageurl.PackageURL;
 import com.philips.research.bombase.core.clearlydefined.ClearlyDefinedException;
-import pl.tlinkowski.annotation.basic.NullOr;
 import retrofit2.Call;
 import retrofit2.Retrofit;
 import retrofit2.converter.jackson.JacksonConverterFactory;
 
 import java.io.IOException;
 import java.net.URI;
+import java.util.Map;
 import java.util.Optional;
 
 public class ClearlyDefinedClient {
@@ -26,6 +27,16 @@ public class ClearlyDefinedClient {
             .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
             .setVisibility(PropertyAccessor.FIELD, JsonAutoDetect.Visibility.NON_PRIVATE)
             .setPropertyNamingStrategy(PropertyNamingStrategy.LOWER_CAMEL_CASE);
+    private static final Map<String, String> TYPE_MAPPING = Map.of( // Default is 1:1 mapping from type
+            "cocoapods", "pod",
+            "cargo", "crate",
+            "github", "git");
+    private static final Map<String, String> PROVIDER_MAPPING = Map.of( // Default is 1:1 mapping from ClearlyDefined type
+            "crate", "cratesio",
+            "git", "github",
+            "maven", "mavencentral",
+            "npm", "npmjs",
+            "gem", "rubygems");
 
     private final ClearlyDefinedAPI rest;
 
@@ -41,9 +52,12 @@ public class ClearlyDefinedClient {
         rest = retrofit.create(ClearlyDefinedAPI.class);
     }
 
-    public Optional<PackageDefinition> getPackageDefinition(String type, String provider, @NullOr String namespace, String name, String revision) {
+    public Optional<PackageDefinition> getPackageDefinition(PackageURL purl) {
+        final var type = TYPE_MAPPING.getOrDefault(purl.getType().toLowerCase(), purl.getType());
+        final var provider = PROVIDER_MAPPING.getOrDefault(type.toLowerCase(), type);
+        final var namespace = purl.getNamespace();
         final var ns = (namespace == null || namespace.isEmpty()) ? "-" : namespace;
-        return query(rest.getDefinition(type, provider, ns, name, revision))
+        return query(rest.getDefinition(type, provider, ns, purl.getName(), purl.getVersion()))
                 .map(def -> (PackageDefinition) def)
                 .filter(PackageDefinition::isValid);
     }
