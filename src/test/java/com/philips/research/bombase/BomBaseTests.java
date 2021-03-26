@@ -10,9 +10,8 @@ import org.springframework.boot.test.context.SpringBootTest;
 
 @SpringBootTest
 class BomBaseTests {
-
     @Test
     void contextLoads() {
+        // Checks loading of the full Spring Boot application context
     }
-
 }
