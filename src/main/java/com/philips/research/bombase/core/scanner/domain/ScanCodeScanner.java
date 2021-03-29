@@ -7,10 +7,8 @@ package com.philips.research.bombase.core.scanner.domain;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.philips.research.bombase.core.scanner.ScannerException;
-import com.philips.research.bombase.core.scanner.ScannerService;
 import com.philips.research.bombase.core.scanner.ScannerService.ScanResult;
 import com.philips.research.bombase.core.support.ShellCommand;
-import org.springframework.stereotype.Component;
 
 import java.io.File;
 import java.io.IOException;

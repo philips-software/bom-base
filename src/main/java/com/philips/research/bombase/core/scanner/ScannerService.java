@@ -7,7 +7,6 @@ package com.philips.research.bombase.core.scanner;
 
 import java.io.File;
 import java.nio.file.Path;
-import java.util.ArrayList;
 import java.util.List;
 
 public interface ScannerService {
@@ -20,14 +19,18 @@ public interface ScannerService {
     ScanResult scan(Path directory);
 
     interface ScanResult {
-       List<LicenseResult> getLicenses();
+        List<LicenseResult> getLicenses();
     }
 
     interface LicenseResult {
-       String getExpression();
-       int getConfirmations();
-       File getFile();
-       int getStartLine();
-       int getEndLine();
+        String getExpression();
+
+        int getConfirmations();
+
+        File getFile();
+
+        int getStartLine();
+
+        int getEndLine();
     }
 }

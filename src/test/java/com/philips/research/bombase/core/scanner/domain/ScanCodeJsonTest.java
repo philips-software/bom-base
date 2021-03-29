@@ -24,6 +24,16 @@ class ScanCodeJsonTest {
     private static final int START = 23;
     private static final int END = 42;
 
+    private static LicenseJson licenseJson(@NullOr String key, @NullOr String spdx, int score, int start, int end) {
+        final var json = new LicenseJson();
+        json.key = key;
+        json.spdx = spdx;
+        json.score = score;
+        json.startLine = start;
+        json.endLine = end;
+        return json;
+    }
+
     @Nested
     class ScanResults {
         @Test
@@ -39,11 +49,11 @@ class ScanCodeJsonTest {
 
         @Test
         void combinesLicenseExpressions() {
-            final var detection= new Detection(LICENSE, SCORE, new File(FILE), START, END);
+            final var detection = new Detection(LICENSE, SCORE, new File(FILE), START, END);
             final var scanResult = new ScanCodeJson();
             final var file = mock(FileJson.class);
             when(file.getDetections()).thenReturn(List.of(detection));
-            scanResult.files.addAll(List.of(file,file));
+            scanResult.files.addAll(List.of(file, file));
 
             final var licenses = scanResult.getLicenses();
 
@@ -134,15 +144,5 @@ class ScanCodeJsonTest {
             assertThat(dict.get(KEY)).isSameAs(longer);
         }
 
-    }
-
-    private static LicenseJson licenseJson(@NullOr String key, @NullOr String spdx, int score, int start, int end) {
-        final var json = new LicenseJson();
-        json.key = key;
-        json.spdx = spdx;
-        json.score = score;
-        json.startLine = start;
-        json.endLine = end;
-        return json;
     }
 }

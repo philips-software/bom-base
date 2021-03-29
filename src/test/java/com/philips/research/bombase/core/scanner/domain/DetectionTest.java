@@ -76,7 +76,7 @@ class DetectionTest {
         final var detection = new Detection(LICENSE, SCORE, FILE, START_LINE, END_LINE);
         final var incompatible = new Detection("Other", SCORE, FILE, START_LINE, END_LINE);
 
-        assertThatThrownBy(()-> detection.merge(incompatible))
+        assertThatThrownBy(() -> detection.merge(incompatible))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessageContaining("compatible");
     }

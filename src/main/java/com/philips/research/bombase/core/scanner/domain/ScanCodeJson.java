@@ -120,15 +120,6 @@ class LicenseJson {
     @JsonProperty("spdx_license_key")
     @NullOr String spdx;
 
-    String getIdentifier() {
-        assert spdx != null || key != null;
-        return (spdx != null) ? spdx : key;
-    }
-
-    public int lines() {
-        return endLine - startLine + 1;
-    }
-
     static Map<String, LicenseJson> buildDictionary(List<LicenseJson> licenses) {
         final var dictionary = new HashMap<String, LicenseJson>();
         for (var license : licenses) {
@@ -139,6 +130,15 @@ class LicenseJson {
             }
         }
         return dictionary;
+    }
+
+    String getIdentifier() {
+        assert spdx != null || key != null;
+        return (spdx != null) ? spdx : key;
+    }
+
+    public int lines() {
+        return endLine - startLine + 1;
     }
 }
 
