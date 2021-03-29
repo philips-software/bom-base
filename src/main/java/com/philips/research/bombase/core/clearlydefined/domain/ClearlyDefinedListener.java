@@ -20,9 +20,6 @@ import java.util.function.Consumer;
 
 @Service
 public class ClearlyDefinedListener implements MetaRegistry.PackageListener {
-    private static final Map<String, String> TYPES = Map.of("cargo", "crate");
-    private static final Map<String, String> PROVIDERS = Map.of("maven", "mavencentral", "npm", "npmjs", "cargo", "cratesio");
-
     private final ClearlyDefinedClient client;
 
     @Autowired
@@ -35,8 +32,8 @@ public class ClearlyDefinedListener implements MetaRegistry.PackageListener {
     }
 
     @Override
-    public Optional<Consumer<PackageAttributeEditor>> onUpdated(PackageURL purl, Set<Field> fields, Map<Field, ?> values) {
-        if (!fields.isEmpty()) {
+    public Optional<Consumer<PackageAttributeEditor>> onUpdated(PackageURL purl, Set<Field> updated, Map<Field, ?> values) {
+        if (!updated.isEmpty()) {
             return Optional.empty();
         }
 

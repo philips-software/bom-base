@@ -11,9 +11,19 @@ import org.springframework.stereotype.Service;
 import java.nio.file.Path;
 
 @Service
-public class Scannerinteractor implements ScannerService {
+public class ScannerInteractor implements ScannerService {
+    private final ScanCodeScanner scanner;
+
+    public ScannerInteractor() {
+        this(new ScanCodeScanner());
+    }
+
+    ScannerInteractor(ScanCodeScanner scanner) {
+        this.scanner = scanner;
+    }
+
     @Override
     public ScanResult scan(Path directory) {
-        return null;
+        return scanner.scan(directory);
     }
 }

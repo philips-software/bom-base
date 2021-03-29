@@ -60,7 +60,7 @@ class AnonymousVcsHandler implements VcsHandler {
             outChannel.transferFrom(inChannel, 0, Long.MAX_VALUE);
             inChannel.close();
         } catch (IOException e) {
-            throw new DownloadException("File transfer failed", e);
+            throw new DownloadException("File download failed from " + fromUri, e);
         }
     }
 

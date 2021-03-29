@@ -18,9 +18,10 @@ public class RunnerConfig {
     @Bean(name = NAME)
     public Executor threadPoolTaskExecutor() {
         final var executor = new ThreadPoolTaskExecutor();
-        executor.setMaxPoolSize(3);
+        executor.setMaxPoolSize(4);
+        executor.setCorePoolSize(2);
         executor.setThreadGroupName(NAME);
-        executor.setThreadNamePrefix("runner-");
+        executor.setThreadNamePrefix("pool-");
         return executor;
     }
 }

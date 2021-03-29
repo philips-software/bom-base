@@ -11,6 +11,7 @@ import com.philips.research.bombase.core.clearlydefined.domain.ClearlyDefinedLis
 import com.philips.research.bombase.core.meta.registry.Field;
 import com.philips.research.bombase.core.meta.registry.MetaRegistry;
 import com.philips.research.bombase.core.meta.registry.Package;
+import com.philips.research.bombase.core.source_scan.domain.SourceScanListener;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Service;
@@ -38,6 +39,7 @@ public class MetaInteractor implements MetaService {
     @PostConstruct
     void init() {
         registry.addListener(context.getBean(ClearlyDefinedListener.class));
+        registry.addListener(context.getBean(SourceScanListener.class));
     }
 
     @Override

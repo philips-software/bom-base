@@ -39,7 +39,7 @@ class AnonymousVcsHandlerTest extends VcsHandlerTestBase {
     void throws_nonExistingFile() {
         assertThatThrownBy(() -> handler.download(tempDir, Path.of("not_a_file").toUri()))
                 .isInstanceOf(DownloadException.class)
-                .hasMessageContaining("File transfer");
+                .hasMessageContaining("File download");
     }
 
     @Test

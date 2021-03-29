@@ -35,6 +35,6 @@ class DownloadInteractorTest {
         //noinspection ConstantConditions
         assertThatThrownBy(() -> interactor.download(Path.of("unknown.file").toUri(), null))
                 .isInstanceOf(DownloadException.class)
-                .hasMessageContaining("File transfer failed");
+                .hasMessageContaining("File download failed");
     }
 }
