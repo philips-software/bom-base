@@ -67,4 +67,10 @@ public class MetaInteractor implements MetaService {
                 .map(Package::getPurl)
                 .collect(Collectors.toList());
     }
+
+    @Override
+    public List<PackageURL> search(String type, String namespace, String name, String version) {
+        //TODO Implement me
+        throw new UnsupportedOperationException("Not implemented");
+    }
 }

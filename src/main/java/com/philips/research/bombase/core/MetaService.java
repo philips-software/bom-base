@@ -6,6 +6,7 @@
 package com.philips.research.bombase.core;
 
 import com.github.packageurl.PackageURL;
+import pl.tlinkowski.annotation.basic.NullOr;
 
 import java.util.List;
 import java.util.Map;
@@ -37,4 +38,14 @@ public interface MetaService {
      * @return Most recent scans
      */
     List<PackageURL> latestScans();
+
+    /**
+     * Searches for a package by its Package URL elements.
+     * @param type (part of) the type
+     * @param namespace (part of) the namespace
+     * @param name (part of) the name
+     * @param version (part of) the version
+     * @return top most recently modified matching packages
+     */
+    List<PackageURL> search(String type, String namespace, String name, String version);
 }
