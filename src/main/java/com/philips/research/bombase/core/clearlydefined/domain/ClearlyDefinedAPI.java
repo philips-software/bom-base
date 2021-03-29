@@ -17,6 +17,7 @@ import java.util.Optional;
 import java.util.function.Function;
 
 public interface ClearlyDefinedAPI {
+    //TODO Is this even a realistic score?
     int MAX_SCORE = 70;
 
     @GET("definitions/{type}/{provider}/{namespace}/{name}/{revision}")

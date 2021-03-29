@@ -69,6 +69,7 @@ public class Detection implements ScannerService.LicenseResult {
         return expression;
     }
 
+    @Override
     public int getScore() {
         return score;
     }

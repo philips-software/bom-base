@@ -25,6 +25,8 @@ public interface ScannerService {
     interface LicenseResult {
         String getExpression();
 
+        int getScore();
+
         int getConfirmations();
 
         File getFile();

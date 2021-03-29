@@ -24,6 +24,9 @@ import java.util.stream.Collectors;
 
 @Service
 public class SourceScanListener implements MetaRegistry.PackageListener {
+    //TODO Is this even a realistic maximum score?
+    static final int MAX_SCORE = 80;
+
     private final DownloadService downloader;
     private final ScannerService scanner;
 
@@ -44,11 +47,31 @@ public class SourceScanListener implements MetaRegistry.PackageListener {
     private void harvest(PackageURL purl, PackageAttributeEditor pkg) {
         pkg.<URI>get(Field.SOURCE_LOCATION)
                 .ifPresent(location -> downloader.download(location, directory -> {
-                    final var expression = licensesScannedIn(directory).stream()
-                            .map(ScannerService.LicenseResult::getExpression)
-                            .collect(Collectors.joining("\n"));
-                    pkg.update(Field.DETECTED_LICENSE, 100, expression);
+                    final var detections = licensesScannedIn(directory);
+                    final var score = score(detections);
+                    final var expression = toMultilineExpression(detections);
+                    pkg.update(Field.DETECTED_LICENSE, score, expression);
                 }));
+    }
+
+    /**
+     * Weights the detection score with the number of confirmations, and clips to the maximum score.
+     */
+    private int score(List<ScannerService.LicenseResult> detections) {
+        int count = 0;
+        int sum = 0;
+        for (var det : detections) {
+            final var qty = det.getConfirmations();
+            sum += qty * det.getScore();
+            count += qty;
+        }
+        return Math.round((sum / (100f * count)) * MAX_SCORE);
+    }
+
+    private String toMultilineExpression(List<ScannerService.LicenseResult> detections) {
+        return detections.stream()
+                .map(ScannerService.LicenseResult::getExpression)
+                .collect(Collectors.joining("\n"));
     }
 
     private List<ScannerService.LicenseResult> licensesScannedIn(Path directory) {
