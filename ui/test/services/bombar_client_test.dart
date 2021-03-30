@@ -47,7 +47,7 @@ main() {
             query.path,
             client.baseUri
                 .resolve(
-                    'packages?type=$type,ns=$namespace,name=$name,version=$version')
+                    'packages?type=$type&ns=$namespace&name=$name&version=$version')
                 .toString());
         expect(query.method, 'GET');
         expect(packages.length, 1);

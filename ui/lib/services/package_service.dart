@@ -3,8 +3,11 @@
  * SPDX-License-Identifier: MIT
  */
 import 'dart:async';
+import 'dart:developer';
 
 import 'package:bom_base_ui/services/bombar_client.dart';
+import 'package:flutter/cupertino.dart';
+import 'package:provider/provider.dart';
 
 import '../model/package.dart';
 
@@ -16,6 +19,9 @@ class PackageService {
 
   Stream get found => _foundStream.stream.asBroadcastStream();
 
+  factory PackageService.of(BuildContext context) =>
+      Provider.of(context, listen: false);
+
   /// Queries packages that match the provided [pattern] of
   /// 'type:namespace/name@version'.
   void find(String pattern) async {
@@ -26,7 +32,9 @@ class PackageService {
     final name = match?.group(5) ?? '';
     final version = match?.group(7) ?? '';
 
-    client.find(type, namespace, name, version);
+    client
+        .find(type, namespace, name, version)
+        .then((value) => log('Search results: $value'));
   }
 
   void dispose() {

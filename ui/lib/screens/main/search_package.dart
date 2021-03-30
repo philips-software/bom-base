@@ -5,6 +5,8 @@
 import 'package:flutter/material.dart';
 import 'package:material_floating_search_bar/material_floating_search_bar.dart';
 
+import '../../services/package_service.dart';
+
 class SearchPackage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
@@ -19,7 +21,7 @@ class SearchPackage extends StatelessWidget {
       width: 600,
       debounceDelay: const Duration(milliseconds: 500),
       onQueryChanged: (query) {
-        // Call your model, bloc, controller here.
+        PackageService.of(context).find(query);
       },
       // Specify a custom transition to be used for
       // animating between opened and closed stated.

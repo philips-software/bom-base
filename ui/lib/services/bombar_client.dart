@@ -18,8 +18,12 @@ class BomBarClient {
 
   Future<List<Package>> find(
       String type, String namespace, String name, String version) async {
-    final response = await dio.getUri(_packageUri
-        .resolve('?type=$type,ns=$namespace,name=$name,version=$version'));
+    final response = await dio.getUri(_packageUri.replace(queryParameters: {
+      'type': type,
+      'ns': namespace,
+      'name': name,
+      'version': version
+    }));
 
     return toPackageList(response.data['results']);
   }
