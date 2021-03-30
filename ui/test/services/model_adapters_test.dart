@@ -32,15 +32,15 @@ main() {
       expect(list.first, isInstanceOf<Package>());
     });
 
-    test('trows for missing id', () {
+    test('throws for missing id', () {
       expect(() => toPackage({}), throwsFormatException);
     });
 
-    test('trows for missing package URL', () {
+    test('throws for missing package URL', () {
       expect(() => toPackage({'id': id}), throwsFormatException);
     });
 
-    test('trows for missing timestamp', () {
+    test('throws for missing timestamp', () {
       expect(() => toPackage({'id': id, 'purl': purl.toString()}),
           throwsFormatException);
     });

@@ -62,15 +62,16 @@ public class MetaInteractor implements MetaService {
     }
 
     @Override
-    public List<PackageURL> latestScans() {
+    public List<PackageDto> latestScans() {
         return store.latestScans(100).stream()
-                .map(Package::getPurl)
+                .map(DtoMapper::toBaseDto)
                 .collect(Collectors.toList());
     }
 
     @Override
-    public List<PackageURL> search(String type, String namespace, String name, String version) {
-        //TODO Implement me
-        throw new UnsupportedOperationException("Not implemented");
+    public List<PackageDto> search(String type, String namespace, String name, String version) {
+        return store.findPackages(type, namespace, name, version).stream()
+                .map(DtoMapper::toBaseDto)
+                .collect(Collectors.toList());
     }
 }

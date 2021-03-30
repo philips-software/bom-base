@@ -57,4 +57,10 @@ public interface MetaStore {
      * @return persistent field instance
      */
     Attribute createField(Package pkg, Field field);
+
+    /**
+     * Find packages matching provided (parts of) parameters.
+     * @return search results
+     */
+    List<Package> findPackages(String type, String namespace, String name, String version);
 }

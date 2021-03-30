@@ -49,4 +49,19 @@ public class MemoryMetaStore implements MetaStore {
     public Attribute createField(Package pkg, Field field) {
         throw new UnsupportedOperationException("Not implemented");
     }
+
+    @Override
+    public List<Package> findPackages(String type, String namespace, String name, String version) {
+        return packages.values().stream()
+                .filter(pkg -> {
+                    final var purl = pkg.getPurl();
+                    return purl.getType().contains(type)
+                            && purl.getNamespace().contains(namespace)
+                            && purl.getName().contains(name)
+                            && purl.getVersion().contains(version);
+                })
+                .sorted((l, r) -> r.getLastUpdated().compareTo(l.getLastUpdated()))
+                .limit(100)
+                .collect(Collectors.toList());
+    }
 }

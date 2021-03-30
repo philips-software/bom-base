@@ -20,6 +20,10 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.*;
 
 class MetaInteractorTest {
+    private static final String TYPE = "type";
+    private static final String NAMESPACE = "namespace";
+    private static final String NAME = "name";
+    private static final String VERSION = "version";
     private static final PackageURL PURL = toPurl("pkg:Type/Group/Name@Version");
     private static final String TITLE = "Title";
 
@@ -44,7 +48,16 @@ class MetaInteractorTest {
 
         final var latest = interactor.latestScans();
 
-        assertThat(latest).contains(PURL);
+        assertThat(latest.get(0).purl).isEqualTo(PURL);
+    }
+
+    @Test
+    void searchesForPackages() {
+        when(store.findPackages(TYPE, NAMESPACE, NAME, VERSION)).thenReturn(List.of(pkg));
+
+        final var found = interactor.search(TYPE, NAMESPACE, NAME, VERSION);
+
+        assertThat(found.get(0).purl).isEqualTo(PURL);
     }
 
     @Nested

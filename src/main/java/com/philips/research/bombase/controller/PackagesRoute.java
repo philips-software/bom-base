@@ -11,6 +11,7 @@ import com.philips.research.bombase.core.MetaService;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
+import pl.tlinkowski.annotation.basic.NullOr;
 
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
@@ -35,9 +36,18 @@ public class PackagesRoute {
     }
 
     @GetMapping()
-    ResultJson<PackageJson> findPackages(@RequestParam(required = false) boolean latest) {
-        final var purls = service.latestScans();
-        return new ResultJson<>(PackageJson.fromList(purls));
+    ResultJson<PackageJson> findPackages(@RequestParam (required = false) @NullOr String type,
+                                         @RequestParam (required = false) @NullOr String ns,
+                                         @RequestParam (required = false ) @NullOr String name,
+                                         @RequestParam (required = false) @NullOr String version) {
+        final var found = (type == null && ns == null && name == null && version ==null)
+                ? service.latestScans()
+                : service.search(orEmpty(type), orEmpty(ns), orEmpty(name), orEmpty(version));
+        return new ResultJson<>(PackageJson.fromDtoList(found));
+    }
+
+    private String orEmpty(@NullOr String string) {
+        return (string != null) ? string : "";
     }
 
     private PackageURL packageUrl(String purl) {
