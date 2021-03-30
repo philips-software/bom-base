@@ -3,6 +3,7 @@
  * SPDX-License-Identifier: MIT
  */
 
+import 'package:bom_base_ui/screens/main/search_package.dart';
 import 'package:flutter/material.dart';
 
 class SearchScreen extends StatelessWidget {
@@ -12,7 +13,12 @@ class SearchScreen extends StatelessWidget {
       appBar: AppBar(
         title: Text('BOM-Base'),
       ),
-      body: Center(child: Text('Running!')),
+      body: Stack(
+        children: [
+          Center(child: Text('Running!')),
+          SearchPackage(),
+        ],
+      ),
     );
   }
 }

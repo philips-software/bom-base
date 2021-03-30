@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import 'screens/search/search_screen.dart';
+import 'screens/main/main_screen.dart';
 
 void main() {
   runApp(MyApp());
