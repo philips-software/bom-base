@@ -7,14 +7,12 @@ package com.philips.research.bombase.controller;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.github.packageurl.PackageURL;
-import com.philips.research.bombase.core.MetaService;
 import com.philips.research.bombase.core.MetaService.PackageDto;
 import pl.tlinkowski.annotation.basic.NullOr;
 
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.time.Instant;
-import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -51,6 +49,7 @@ class PackageJson {
     public static List<PackageJson> fromPurlList(List<PackageURL> purls) {
         return purls.stream().map(PackageJson::new).collect(Collectors.toList());
     }
+
     public static List<PackageJson> fromDtoList(List<PackageDto> dtoList) {
         return dtoList.stream().map(PackageJson::new).collect(Collectors.toList());
     }

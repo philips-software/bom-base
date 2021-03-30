@@ -44,14 +44,11 @@ class PackagesRouteTest {
     private static final String KEY = "Key";
     private static final String VALUE = "Value";
     private static final Instant TIMESTAMP = Instant.now();
-
+    private final MetaService.PackageDto packageDto = new MetaService.PackageDto();
     @Autowired
     private MockMvc mvc;
-
     @MockBean
     private MetaService service;
-
-    private final MetaService.PackageDto packageDto = new MetaService.PackageDto();
 
     private static String encode(String string) {
         return URLEncoder.encode(string, StandardCharsets.UTF_8);

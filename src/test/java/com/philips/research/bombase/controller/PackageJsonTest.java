@@ -17,8 +17,6 @@ import java.time.ZoneId;
 import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
 
-import static org.junit.jupiter.api.Assertions.*;
-
 class PackageJsonTest {
     private static final ObjectMapper MAPPER = new JacksonConfiguration().objectMapper();
     private static final String PURL = "pkg:type/namespace/name@version";
@@ -28,20 +26,20 @@ class PackageJsonTest {
     @Test
     void createsFromPurl() throws Exception {
         final var expected = new JSONObject()
-                .put("id",ID)
-                .put("purl",PURL);
+                .put("id", ID)
+                .put("purl", PURL);
         final var purl = new PackageURL(PURL);
 
         final var json = new PackageJson(purl);
 
-        JSONAssert.assertEquals(expected.toString(), MAPPER.writeValueAsString(json), true );
+        JSONAssert.assertEquals(expected.toString(), MAPPER.writeValueAsString(json), true);
     }
 
     @Test
     void createsFromDto() throws Exception {
         final var expected = new JSONObject()
-                .put("id",ID)
-                .put("purl",PURL)
+                .put("id", ID)
+                .put("purl", PURL)
                 .put("updated", TIMESTAMP);
         final var dto = new MetaService.PackageDto();
         dto.purl = new PackageURL(PURL);
@@ -49,6 +47,6 @@ class PackageJsonTest {
 
         final var json = new PackageJson(dto);
 
-        JSONAssert.assertEquals(expected.toString(), MAPPER.writeValueAsString(json), true );
+        JSONAssert.assertEquals(expected.toString(), MAPPER.writeValueAsString(json), true);
     }
 }

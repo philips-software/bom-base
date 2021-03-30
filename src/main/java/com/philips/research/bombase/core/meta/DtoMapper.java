@@ -9,10 +9,10 @@ import com.philips.research.bombase.core.MetaService;
 import com.philips.research.bombase.core.meta.registry.Package;
 
 public abstract class DtoMapper {
-   static MetaService.PackageDto toBaseDto(Package pkg) {
-      final var dto = new MetaService.PackageDto();
-      dto.purl = pkg.getPurl();
-      dto.updated = pkg.getLastUpdated();
-      return dto;
-   }
+    static MetaService.PackageDto toBaseDto(Package pkg) {
+        final var dto = new MetaService.PackageDto();
+        dto.purl = pkg.getPurl();
+        dto.updated = pkg.getLastUpdated();
+        return dto;
+    }
 }

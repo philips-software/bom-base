@@ -36,11 +36,11 @@ public class PackagesRoute {
     }
 
     @GetMapping()
-    ResultJson<PackageJson> findPackages(@RequestParam (required = false) @NullOr String type,
-                                         @RequestParam (required = false) @NullOr String ns,
-                                         @RequestParam (required = false ) @NullOr String name,
-                                         @RequestParam (required = false) @NullOr String version) {
-        final var found = (type == null && ns == null && name == null && version ==null)
+    ResultJson<PackageJson> findPackages(@RequestParam(required = false) @NullOr String type,
+                                         @RequestParam(required = false) @NullOr String ns,
+                                         @RequestParam(required = false) @NullOr String name,
+                                         @RequestParam(required = false) @NullOr String version) {
+        final var found = (type == null && ns == null && name == null && version == null)
                 ? service.latestScans()
                 : service.search(orEmpty(type), orEmpty(ns), orEmpty(name), orEmpty(version));
         return new ResultJson<>(PackageJson.fromDtoList(found));
