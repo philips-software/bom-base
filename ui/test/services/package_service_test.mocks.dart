@@ -2,28 +2,41 @@
 // in bom_base_ui/test/services/package_service_test.dart.
 // Do not manually edit this file.
 
-import 'dart:async' as _i3;
+import 'dart:async' as _i4;
 
-import 'package:bom_base_ui/model/package.dart' as _i4;
-import 'package:bom_base_ui/services/bombar_client.dart' as _i2;
+import 'package:bom_base_ui/model/package.dart' as _i5;
+import 'package:bom_base_ui/services/bombar_client.dart' as _i3;
+import 'package:dio/src/dio.dart' as _i2;
 import 'package:mockito/mockito.dart' as _i1;
 
 // ignore_for_file: comment_references
 // ignore_for_file: unnecessary_parenthesis
 
+class _FakeDio extends _i1.Fake implements _i2.Dio {}
+
+class _FakeUri extends _i1.Fake implements Uri {}
+
 /// A class which mocks [BomBarClient].
 ///
 /// See the documentation for Mockito's code generation for more information.
-class MockBomBarClient extends _i1.Mock implements _i2.BomBarClient {
+class MockBomBarClient extends _i1.Mock implements _i3.BomBarClient {
   MockBomBarClient() {
     _i1.throwOnMissingStub(this);
   }
 
   @override
-  _i3.Future<List<_i4.Package>> find(
+  _i2.Dio get dio =>
+      (super.noSuchMethod(Invocation.getter(#dio), returnValue: _FakeDio())
+          as _i2.Dio);
+  @override
+  Uri get baseUri =>
+      (super.noSuchMethod(Invocation.getter(#baseUri), returnValue: _FakeUri())
+          as Uri);
+  @override
+  _i4.Future<List<_i5.Package>> find(
           String? type, String? namespace, String? name, String? version) =>
       (super.noSuchMethod(
               Invocation.method(#find, [type, namespace, name, version]),
-              returnValue: Future.value(<_i4.Package>[]))
-          as _i3.Future<List<_i4.Package>>);
+              returnValue: Future.value(<_i5.Package>[]))
+          as _i4.Future<List<_i5.Package>>);
 }
