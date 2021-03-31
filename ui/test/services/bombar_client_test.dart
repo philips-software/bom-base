@@ -4,8 +4,8 @@
  */
 
 import 'package:bom_base_ui/services/bombar_client.dart';
-import 'package:flutter_test/flutter_test.dart';
 import 'package:mockito/annotations.dart';
+import 'package:test/test.dart';
 
 import 'dio_mock_server.dart';
 
@@ -68,6 +68,23 @@ main() {
         expect(pkg.id, id);
         expect(pkg.purl, purl);
         expect(pkg.updated, timestamp);
+      });
+    });
+
+    group('get package', () {
+      test('gets package by id', () async {
+        const title = 'Title';
+        mockServer.respondJson({
+          'updated': timestamp.toIso8601String(),
+          'attributes': {'title': title},
+        });
+
+        final pkg = await client.getPackage(id);
+
+        final query = mockServer.requests.first;
+        expect(query.path, client.baseUri.resolve('packages/$id').toString());
+        expect(query.method, 'GET');
+        expect(pkg.title, title);
       });
     });
   });

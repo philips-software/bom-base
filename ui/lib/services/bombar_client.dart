@@ -15,19 +15,26 @@ class BomBarClient {
   final Dio dio = Dio();
   final Uri baseUri =
       kIsWeb ? Uri.parse('') : Uri.parse('http://localhost:8080');
-  late final Uri _packageUri = baseUri.resolve('packages');
+  late final Uri _packagesUri = baseUri.resolve('packages/');
 
   Future<List<Package>> find(
       String type, String namespace, String name, String version) async {
-    final response = await _exec(() => dio.getUri(_packageUri.replace(
-            queryParameters: {
-              'type': type,
-              'ns': namespace,
-              'name': name,
-              'version': version
-            })));
+    final response = await _exec(() => dio.getUri(baseUri
+            .resolve('packages')
+            .replace(queryParameters: {
+          'type': type,
+          'ns': namespace,
+          'name': name,
+          'version': version
+        })));
 
     return toPackageList(response.data['results']);
+  }
+
+  Future<Package> getPackage(String id) async {
+    final response = await _exec(() => dio.getUri(_packagesUri.resolve(id)));
+
+    return toPackage(response.data);
   }
 
   Future<T> _exec<T>(Future<T> Function() request) async {

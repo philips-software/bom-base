@@ -6,9 +6,9 @@
 import 'package:bom_base_ui/model/package.dart';
 import 'package:bom_base_ui/services/bombar_client.dart';
 import 'package:bom_base_ui/services/package_service.dart';
-import 'package:flutter_test/flutter_test.dart';
 import 'package:mockito/annotations.dart';
 import 'package:mockito/mockito.dart';
+import 'package:test/test.dart';
 
 import 'package_service_test.mocks.dart';
 

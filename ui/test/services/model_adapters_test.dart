@@ -5,7 +5,7 @@
 
 import 'package:bom_base_ui/model/package.dart';
 import 'package:bom_base_ui/services/model_adapters.dart';
-import 'package:flutter_test/flutter_test.dart';
+import 'package:test/test.dart';
 
 main() {
   group('parsing $Package from JSON', () {

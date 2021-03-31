@@ -5,11 +5,20 @@
 
 import '../model/package.dart';
 
-Package toPackage(Map<String, dynamic> json) => Package(
-      id: _toString(json['id']),
-      purl: _toPurl(json['purl']),
-      updated: _toLocalTimestamp(json['updated']),
-    );
+Package toPackage(Map<String, dynamic> json) {
+  final attrs = json['attributes'];
+  return Package(
+    id: _toString(json['id']),
+    purl: _toPurl(json['purl']),
+    updated: _toLocalTimestamp(json['updated']),
+  )
+    ..title = _toOptionalString(attrs?['title'])
+    ..description = _toOptionalString(attrs?['description'])
+    ..downloadLocation = _toOptionalUri(attrs?['download_location'])
+    ..sourceLocation = _toOptionalUri(attrs?['source_location'])
+    ..declaredLicense = _toOptionalString(attrs?['declared_license'])
+    ..detectedLicenses = _toOptionalStringList(attrs?['detected_license']);
+}
 
 List<Package> toPackageList(List<dynamic>? list) =>
     list
@@ -26,11 +35,26 @@ String _toString(dynamic obj) {
   }
 }
 
+String? _toOptionalString(dynamic obj) => obj != null ? _toString(obj) : null;
+
+List<String>? _toOptionalStringList(dynamic obj) {
+  final string = _toOptionalString(obj);
+  return string != null ? string.split('\n') : null;
+}
+
 Uri _toPurl(dynamic obj) {
   try {
     return Uri.parse(obj.toString());
   } on Exception {
     throw FormatException('Not a valid Package URL: $obj');
+  }
+}
+
+Uri? _toOptionalUri(dynamic obj) {
+  try {
+    return obj != null ? Uri.parse(obj.toString()) : null;
+  } on Exception {
+    throw FormatException('Not a valid URL: $obj');
   }
 }
 
