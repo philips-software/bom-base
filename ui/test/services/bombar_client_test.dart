@@ -73,10 +73,11 @@ main() {
 
     group('get package', () {
       test('gets package by id', () async {
-        const title = 'Title';
+        const attr = 'title';
+
         mockServer.respondJson({
           'updated': timestamp.toIso8601String(),
-          'attributes': {'title': title},
+          'attributes': {attr: attr},
         });
 
         final pkg = await client.getPackage(id);
@@ -84,7 +85,7 @@ main() {
         final query = mockServer.requests.first;
         expect(query.path, client.baseUri.resolve('packages/$id').toString());
         expect(query.method, 'GET');
-        expect(pkg.title, title);
+        expect(pkg.attributes[attr], attr);
       });
     });
   });

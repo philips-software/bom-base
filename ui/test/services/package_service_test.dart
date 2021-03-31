@@ -76,7 +76,7 @@ main() {
       });
 
       test('publishes search results as stream', () {
-        var package = Package(
+        final package = Package(
           id: 'id',
           purl: Uri.parse('pkg:purl'),
           updated: DateTime.now(),
@@ -87,6 +87,28 @@ main() {
         service.find(queryString);
 
         expect(service.found, emits([package]));
+      });
+    });
+
+    group('select package', () {
+      const id = 'id';
+      late Package package;
+
+      setUp(() {
+        package = Package(
+          id: 'id',
+          purl: Uri.parse('pkg:purl'),
+          updated: DateTime.now(),
+        );
+      });
+
+      test('selects package by id', () async {
+        when(client.getPackage(id)).thenAnswer((_) => Future.value(package));
+
+        final pkg = await service.select(id);
+
+        expect(pkg, package);
+        expect(service.current, package);
       });
     });
   });

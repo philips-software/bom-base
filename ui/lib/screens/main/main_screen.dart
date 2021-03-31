@@ -3,8 +3,9 @@
  * SPDX-License-Identifier: MIT
  */
 
-import 'package:bom_base_ui/screens/main/search_package.dart';
 import 'package:flutter/material.dart';
+
+import 'search_package.dart';
 
 class SearchScreen extends StatelessWidget {
   @override

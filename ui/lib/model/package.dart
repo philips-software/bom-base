@@ -9,10 +9,5 @@ class Package {
   final String id;
   final Uri purl;
   final DateTime updated;
-  String? title;
-  String? description;
-  Uri? sourceLocation;
-  Uri? downloadLocation;
-  String? declaredLicense;
-  List<String>? detectedLicenses;
+  final Map<String, dynamic> attributes = {};
 }

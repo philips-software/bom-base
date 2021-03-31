@@ -21,7 +21,7 @@ class PackageJson {
     final String id;
     final String purl;
     @JsonFormat(shape = JsonFormat.Shape.STRING)
-    final @NullOr Instant updated;
+    final Instant updated;
     final @NullOr Map<String, Object> attributes;
 
     PackageJson(PackageURL purl) {
@@ -29,17 +29,18 @@ class PackageJson {
     }
 
     PackageJson(PackageURL purl, @NullOr Map<String, Object> attributes) {
-        this.purl = purl.canonicalize();
-        this.id = encode(this.purl);
-        this.attributes = attributes;
-        this.updated = null;
+        this(purl, Instant.now(), attributes);
     }
 
     PackageJson(PackageDto dto) {
-        this.purl = dto.purl.canonicalize();
-        this.id = encode(this.purl);
-        this.updated = dto.updated;
-        attributes = null;
+        this(dto.purl, dto.updated, null);
+    }
+
+    PackageJson(PackageURL purl, Instant updated, @NullOr Map<String,Object> attributes) {
+        this.purl = purl.canonicalize();
+        this.id = encode(encode(this.purl));
+        this.updated = updated;
+        this.attributes = attributes;
     }
 
     private static String encode(String purl) {

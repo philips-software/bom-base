@@ -15,6 +15,7 @@ class PackageService {
 
   final BomBarClient client;
   final _foundStream = StreamController<List<Package>>.broadcast();
+  Package? current;
 
   Stream<List<Package>> get found => _foundStream.stream;
 
@@ -34,6 +35,12 @@ class PackageService {
     client
         .find(type, namespace, name, version)
         .then((packages) => _foundStream.sink.add(packages));
+  }
+
+  /// Picks a package by [id].
+  Future<Package> select(String id) async {
+    current = await client.getPackage(id);
+    return current!;
   }
 
   void dispose() {

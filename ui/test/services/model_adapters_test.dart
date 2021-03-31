@@ -29,20 +29,15 @@ main() {
     test('converts list', () {
       final list = toPackageList([packageJson]);
 
-      expect(list.first, isInstanceOf<Package>());
+      expect(list.first, isA<Package>());
     });
 
-    test('throws for missing id', () {
-      expect(() => toPackage({}), throwsFormatException);
-    });
+    test('fixes missing fields', () {
+      final pkg = toPackage({});
 
-    test('throws for missing package URL', () {
-      expect(() => toPackage({'id': id}), throwsFormatException);
-    });
-
-    test('throws for missing timestamp', () {
-      expect(() => toPackage({'id': id, 'purl': purl.toString()}),
-          throwsFormatException);
+      expect(pkg.id, "?");
+      expect(pkg.purl, Uri.parse("undefined"));
+      expect(pkg.updated, DateTime(2000));
     });
   });
 }
