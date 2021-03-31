@@ -7,6 +7,7 @@ import 'package:flutter/material.dart';
 
 import '../../model/package.dart';
 import '../../services/package_service.dart';
+import '../shared/snapshot_builder.dart';
 import 'attributes_list.dart';
 
 class PackageDetailsScreen extends StatelessWidget {
@@ -24,15 +25,10 @@ class PackageDetailsScreen extends StatelessWidget {
       ),
       body: FutureBuilder<Package>(
         future: service.select(id),
-        builder: (context, snapshot) {
-          if (snapshot.hasError) return Text(snapshot.error.toString());
-
-          if (!snapshot.hasData)
-            return Center(child: CircularProgressIndicator.adaptive());
-
-          final attributes = snapshot.data!.attributes;
-          return AttributesList(attributes);
-        },
+        builder: (context, snapshot) => SnapshotBuilder<Package>(
+          snapshot: snapshot,
+          builder: (context, data) => AttributesList(data?.attributes ?? {}),
+        ),
       ),
     );
   }
