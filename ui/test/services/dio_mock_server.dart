@@ -14,18 +14,29 @@ class DioMockServer {
 
   final adapter = _HttpAdapter();
 
+  /// Defines [times] status responses.
+  void respondStatus(int status,
+      {String? statusMessage,
+      Map<String, List<String>> headers = const {},
+      int times = 1}) {
+    adapter.enqueue(ResponseBody(Stream.empty(), status,
+        headers: headers, statusMessage: statusMessage));
+  }
+
   /// Defines [times] JSON responses returning JSON encoded [data].
   void respondJson(dynamic data,
       {int statusCode = 200, String? statusMessage, int times = 1}) {
-    respondText(
-      json.encode(data),
-      statusCode: statusCode,
-      statusMessage: statusMessage,
-      headers: {
-        Headers.contentTypeHeader: [Headers.jsonContentType]
-      },
-      times: times,
-    );
+    for (var i = 0; i < times; i++) {
+      respondText(
+        json.encode(data),
+        statusCode: statusCode,
+        statusMessage: statusMessage,
+        headers: {
+          Headers.contentTypeHeader: [Headers.jsonContentType]
+        },
+        times: times,
+      );
+    }
   }
 
   /// Defines [times] plain text responses returning [text].

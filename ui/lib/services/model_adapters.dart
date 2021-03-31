@@ -8,7 +8,7 @@ import '../model/package.dart';
 Package toPackage(Map<String, dynamic> json) => Package(
       id: _toString(json['id']),
       purl: _toPurl(json['purl']),
-      updated: _toTimestamp(json['updated']),
+      updated: _toLocalTimestamp(json['updated']),
     );
 
 List<Package> toPackageList(List<dynamic>? list) =>
@@ -34,9 +34,9 @@ Uri _toPurl(dynamic obj) {
   }
 }
 
-DateTime _toTimestamp(dynamic obj) {
+DateTime _toLocalTimestamp(dynamic obj) {
   try {
-    return DateTime.parse(obj.toString());
+    return DateTime.parse(obj.toString()).toLocal();
   } on Exception {
     throw FormatException('Not a valid ISO timestamp: $obj');
   }

@@ -28,6 +28,19 @@ main() {
       mockServer = DioMockServer(client.dio);
     });
 
+    group('error handling', () {
+      test('throws on error response', () {
+        const message = 'Message';
+
+        mockServer.respondStatus(404, statusMessage: message);
+
+        expect(
+            () => client.find(type, namespace, name, version),
+            throwsA(predicate<BackendException>(
+                (e) => e.message.contains("status error [404]"))));
+      });
+    });
+
     group('find packages', () {
       test('query packages', () async {
         mockServer.respondJson({

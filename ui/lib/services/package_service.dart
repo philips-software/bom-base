@@ -3,7 +3,6 @@
  * SPDX-License-Identifier: MIT
  */
 import 'dart:async';
-import 'dart:developer';
 
 import 'package:bom_base_ui/services/bombar_client.dart';
 import 'package:flutter/cupertino.dart';
@@ -15,16 +14,16 @@ class PackageService {
   PackageService({required this.client});
 
   final BomBarClient client;
-  final _foundStream = StreamController<List<Package>>();
+  final _foundStream = StreamController<List<Package>>.broadcast();
 
-  Stream get found => _foundStream.stream.asBroadcastStream();
+  Stream<List<Package>> get found => _foundStream.stream;
 
   factory PackageService.of(BuildContext context) =>
       Provider.of(context, listen: false);
 
   /// Queries packages that match the provided [pattern] of
   /// 'type:namespace/name@version'.
-  void find(String pattern) async {
+  void find(String pattern) {
     final match = RegExp(r'(([^:/@]*):)?(([^/@]*)/)?([^@]*)(@(.*))?')
         .firstMatch(pattern.replaceAll(RegExp(r'\s+'), ''));
     final type = match?.group(2) ?? '';
@@ -34,7 +33,7 @@ class PackageService {
 
     client
         .find(type, namespace, name, version)
-        .then((value) => log('Search results: $value'));
+        .then((packages) => _foundStream.sink.add(packages));
   }
 
   void dispose() {

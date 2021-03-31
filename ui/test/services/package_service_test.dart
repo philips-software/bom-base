@@ -3,6 +3,7 @@
  * SPDX-License-Identifier: MIT
  */
 
+import 'package:bom_base_ui/model/package.dart';
 import 'package:bom_base_ui/services/bombar_client.dart';
 import 'package:bom_base_ui/services/package_service.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -15,9 +16,15 @@ import 'package_service_test.mocks.dart';
 main() {
   group('$PackageService', () {
     late MockBomBarClient client;
+    late PackageService service;
 
     setUp(() {
       client = MockBomBarClient();
+      service = PackageService(client: client);
+    });
+
+    tearDown(() {
+      service.dispose();
     });
 
     group('find packages', () {
@@ -25,49 +32,61 @@ main() {
       const namespace = 'namespace';
       const name = 'name';
       const version = 'version';
-
-      late PackageService service;
+      const queryString = '$type:$namespace/$name@$version';
 
       setUp(() {
-        service = PackageService(client: client);
         when(client.find(any, any, any, any))
             .thenAnswer((_) => Future.value([]));
       });
 
-      test('extracts parts from query', () {
-        service.find('$type:$namespace/$name@$version');
+      test('extracts parts from query string', () {
+        service.find(queryString);
 
         verify(client.find(type, namespace, name, version));
       });
 
-      test('removes all spaces from query', () {
+      test('removes all spaces from query string', () {
         service.find('$type :\t$namespace\n/ $name @ $version');
 
         verify(client.find(type, namespace, name, version));
       });
 
-      test('extracts type from query', () {
+      test('extracts type from query string', () {
         service.find('$type:');
 
         verify(client.find(type, '', '', ''));
       });
 
-      test('extracts name from query', () {
+      test('extracts name from query string', () {
         service.find('$name');
 
         verify(client.find('', '', name, ''));
       });
 
-      test('extracts namespace from query', () {
+      test('extracts namespace from query string', () {
         service.find('$namespace/$name');
 
         verify(client.find('', namespace, name, ''));
       });
 
-      test('extracts version from query', () {
+      test('extracts version from query string', () {
         service.find('@$version');
 
         verify(client.find('', '', '', version));
+      });
+
+      test('publishes search results as stream', () {
+        var package = Package(
+          id: 'id',
+          purl: Uri.parse('pkg:purl'),
+          updated: DateTime.now(),
+        );
+        when(client.find(type, namespace, name, version))
+            .thenAnswer((_) => Future.value([package]));
+
+        service.find(queryString);
+
+        expect(service.found, emits([package]));
       });
     });
   });
