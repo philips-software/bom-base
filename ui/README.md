@@ -17,6 +17,13 @@ samples, guidance on mobile development, and a full API reference.
 
 ## Build and test
 
+### Quick & easy
+
+Use the `install_ui` script to test, build and copy the web application into the
+server as a static resource.
+
+### Individual steps
+
 Mockito mocking requires generated stubs. To update the stubs, run:
 
 ```shell
