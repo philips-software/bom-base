@@ -11,6 +11,7 @@ import com.philips.research.bombase.core.meta.registry.Attribute;
 import com.philips.research.bombase.core.meta.registry.Field;
 import com.philips.research.bombase.core.meta.registry.Package;
 import org.springframework.stereotype.Repository;
+import pl.tlinkowski.annotation.basic.NullOr;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -55,13 +56,17 @@ public class MemoryMetaStore implements MetaStore {
         return packages.values().stream()
                 .filter(pkg -> {
                     final var purl = pkg.getPurl();
-                    return purl.getType().contains(type)
-                            && purl.getNamespace().contains(namespace)
-                            && purl.getName().contains(name)
-                            && purl.getVersion().contains(version);
+                    return notNull(purl.getType()).contains(type)
+                            && notNull(purl.getNamespace()).contains(namespace)
+                            && notNull(purl.getName()).contains(name)
+                            && notNull(purl.getVersion()).contains(version);
                 })
                 .sorted((l, r) -> r.getLastUpdated().compareTo(l.getLastUpdated()))
                 .limit(100)
                 .collect(Collectors.toList());
+    }
+
+    private String notNull(@NullOr String string) {
+        return string != null ? string : "";
     }
 }

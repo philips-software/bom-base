@@ -20,7 +20,7 @@ import java.time.format.DateTimeFormatter;
 class PackageJsonTest {
     private static final ObjectMapper MAPPER = new JacksonConfiguration().objectMapper();
     private static final String PURL = "pkg:type/namespace/name@version";
-    private static final String ID = "pkg%3Atype%2Fnamespace%2Fname%40version";
+    private static final String ID = "pkg%253Atype%252Fnamespace%252Fname%2540version";
     private static final String TIMESTAMP = DateTimeFormatter.ISO_DATE_TIME.withZone(ZoneId.from(ZoneOffset.UTC)).format(Instant.now());
 
     @Test
@@ -32,7 +32,7 @@ class PackageJsonTest {
 
         final var json = new PackageJson(purl);
 
-        JSONAssert.assertEquals(expected.toString(), MAPPER.writeValueAsString(json), true);
+        JSONAssert.assertEquals(expected.toString(), MAPPER.writeValueAsString(json), false);
     }
 
     @Test

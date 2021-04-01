@@ -17,6 +17,7 @@ import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
 
 @RestController
+@CrossOrigin(origins = "*")
 @RequestMapping("/packages")
 public class PackagesRoute {
     private final MetaService service;

@@ -44,7 +44,9 @@ class PackagesRouteTest {
     private static final String KEY = "Key";
     private static final String VALUE = "Value";
     private static final Instant TIMESTAMP = Instant.now();
+
     private final MetaService.PackageDto packageDto = new MetaService.PackageDto();
+
     @Autowired
     private MockMvc mvc;
     @MockBean
@@ -83,9 +85,9 @@ class PackagesRouteTest {
     void listsLatestScans() throws Exception {
         when(service.latestScans()).thenReturn(List.of(packageDto));
 
-        mvc.perform(get(URL_PACKAGES).queryParam("latest", "yes"))
+        mvc.perform(get(URL_PACKAGES))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.results[0].id").value(encode(PURL)))
+                .andExpect(jsonPath("$.results[0].id").value(encode(encode(PURL))))
                 .andExpect(jsonPath("$.results[0].purl").value(PURL))
                 .andExpect(jsonPath("$.results[0].attributes").doesNotExist());
     }

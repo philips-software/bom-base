@@ -17,7 +17,7 @@ class AttributesList extends StatelessWidget {
       separatorBuilder: (_, __) => Divider(),
       itemBuilder: (_, index) => ListTile(
         title: Text(keys[index]),
-        subtitle: Text(attributes[keys[index]]),
+        subtitle: Text(attributes[keys[index]].toString()),
       ),
     );
   }

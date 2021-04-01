@@ -18,8 +18,10 @@ class PackageTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final purl = pkg.purl.toString();
     return ListTile(
-      title: Text(pkg.purl.toString()),
+      key: Key(purl),
+      title: Text(purl),
       subtitle: Text('Last updated: ${dateTimeFormat.format(pkg.updated)}'),
       onTap: () => Navigator.of(context).push(
         MaterialPageRoute(

@@ -35,4 +35,3 @@ The unit tests are run by invoking:
 ```shell
 flutter test
 ```
-

@@ -11,10 +11,10 @@ import 'package:flutter/foundation.dart';
 
 import '../model/package.dart';
 
-class BomBarClient {
+class BomBaseClient {
   final Dio dio = Dio();
   final Uri baseUri =
-      kIsWeb ? Uri.parse('') : Uri.parse('http://localhost:8080');
+      Uri.http(kIsWeb && !kDebugMode ? '' : 'localhost:8080', '/');
   late final Uri _packagesUri = baseUri.resolve('packages/');
 
   Future<List<Package>> find(

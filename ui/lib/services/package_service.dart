@@ -4,7 +4,7 @@
  */
 import 'dart:async';
 
-import 'package:bom_base_ui/services/bombar_client.dart';
+import 'package:bom_base_ui/services/bombase_client.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:provider/provider.dart';
 
@@ -13,7 +13,7 @@ import '../model/package.dart';
 class PackageService {
   PackageService({required this.client});
 
-  final BomBarClient client;
+  final BomBaseClient client;
   final _foundStream = StreamController<List<Package>>.broadcast();
   Package? current;
 

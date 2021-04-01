@@ -5,7 +5,7 @@
 import 'dart:async' as _i5;
 
 import 'package:bom_base_ui/model/package.dart' as _i3;
-import 'package:bom_base_ui/services/bombar_client.dart' as _i4;
+import 'package:bom_base_ui/services/bombase_client.dart' as _i4;
 import 'package:dio/src/dio.dart' as _i2;
 import 'package:mockito/mockito.dart' as _i1;
 
@@ -21,7 +21,7 @@ class _FakePackage extends _i1.Fake implements _i3.Package {}
 /// A class which mocks [BomBarClient].
 ///
 /// See the documentation for Mockito's code generation for more information.
-class MockBomBarClient extends _i1.Mock implements _i4.BomBarClient {
+class MockBomBarClient extends _i1.Mock implements _i4.BomBaseClient {
   MockBomBarClient() {
     _i1.throwOnMissingStub(this);
   }

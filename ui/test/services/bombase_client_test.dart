@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: MIT
  */
 
-import 'package:bom_base_ui/services/bombar_client.dart';
+import 'package:bom_base_ui/services/bombase_client.dart';
 import 'package:mockito/annotations.dart';
 import 'package:test/test.dart';
 
@@ -11,7 +11,7 @@ import 'dio_mock_server.dart';
 
 @GenerateMocks([])
 main() {
-  group('$BomBarClient', () {
+  group('$BomBaseClient', () {
     const id = 'id';
     const type = 'type';
     const namespace = 'namespace';
@@ -20,11 +20,11 @@ main() {
     final purl = Uri.parse('pkg:$type/$namespace/$name@$version');
     final timestamp = DateTime.now();
 
-    late BomBarClient client;
+    late BomBaseClient client;
     late DioMockServer mockServer;
 
     setUp(() {
-      client = BomBarClient();
+      client = BomBaseClient();
       mockServer = DioMockServer(client.dio);
     });
 
