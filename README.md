@@ -77,14 +77,21 @@ The software is not suited for production use.
 These are the most important topics that are to be addressed:
 (A marked checkbox means the topic is in progress.)
 
-- [x] Basic service infrastructure
-- [ ] Harvest metadata from ClearlyDefined
-- [ ] Migrate [License Scanner service](https://github.com/philips-software/license-scanner)
-- [ ] Add manual curation user interface
+- [x] Add manual curation user interface
+- [ ] Retry failed harvesting attempts (e.g. when source offline)
+- [ ] Handle false information (e.g. non-existing source location)
+- [ ] Harvesting metadata from inner source repositories
+- [ ] Add harvester for Maven
+- [ ] Add harvester for PyPi 
+- [ ] Add harvester for NPM
+- [ ] Add harvester for APK
+- [ ] Add harvester for Debian 
+- [ ] Add harvester for NuGet
+- [ ] Add harvester for Cargo
 - [ ] Persist metadata in database
 
 ## Disclaimer
-BOM-base is an _experimental_ tool and not a production tool.
+BOM-base is an _experimental_ tool, and not suited for production.
 
 ## Contact / Getting help
 
