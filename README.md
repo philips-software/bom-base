@@ -1,6 +1,16 @@
-# BOM-base
+<div align="center">
+
+# BOM-base 
+
+[![Release](https://img.shields.io/github/release/philips-software/bom-base.svg)](https://github.com/philips-software/bom-base/releases)
 
 **Description**: BOM-base is a caching repository for bill-of-materials metadata.
+
+**Status**: Experimental research prototype
+
+_Powered by Philips SWAT Eindhoven_
+
+</div>
 
 (See the [architecture document](docs/architecture.md) for a detailed technical
 description.)
