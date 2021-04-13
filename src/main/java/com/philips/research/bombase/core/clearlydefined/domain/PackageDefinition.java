@@ -9,7 +9,7 @@ import java.net.URI;
 import java.util.List;
 import java.util.Optional;
 
-public interface PackageDefinition {
+interface PackageDefinition {
     boolean isValid();
 
     int getDescribedScore();

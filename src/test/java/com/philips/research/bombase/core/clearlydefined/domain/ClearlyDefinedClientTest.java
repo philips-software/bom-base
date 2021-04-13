@@ -36,7 +36,7 @@ class ClearlyDefinedClientTest {
     private static final String SHA1 = "Sha1";
     private static final String SHA256 = "Sha256";
     private static final String DECLARED_LICENSE = "Declared";
-    private static final String DETECTED_LICENSE = "Declared";
+    private static final String DETECTED_LICENSE = "Detected";
     private static final String ATTRIBUTION = "Attribution";
 
     private final ClearlyDefinedClient client = new ClearlyDefinedClient(URI.create("http://localhost:" + PORT));

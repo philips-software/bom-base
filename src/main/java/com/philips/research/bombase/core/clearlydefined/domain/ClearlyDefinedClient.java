@@ -22,7 +22,7 @@ import java.net.URI;
 import java.util.Map;
 import java.util.Optional;
 
-public class ClearlyDefinedClient {
+class ClearlyDefinedClient {
     private static final ObjectMapper MAPPER = new ObjectMapper()
             .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
             .setVisibility(PropertyAccessor.FIELD, JsonAutoDetect.Visibility.NON_PRIVATE)
@@ -40,7 +40,7 @@ public class ClearlyDefinedClient {
 
     private final ClearlyDefinedAPI rest;
 
-    public ClearlyDefinedClient() {
+    ClearlyDefinedClient() {
         this(URI.create("https://api.clearlydefined.io"));
     }
 
@@ -52,7 +52,7 @@ public class ClearlyDefinedClient {
         rest = retrofit.create(ClearlyDefinedAPI.class);
     }
 
-    public Optional<PackageDefinition> getPackageDefinition(PackageURL purl) {
+    Optional<PackageDefinition> getPackageDefinition(PackageURL purl) {
         final var type = TYPE_MAPPING.getOrDefault(purl.getType().toLowerCase(), purl.getType());
         final var provider = PROVIDER_MAPPING.getOrDefault(type.toLowerCase(), type);
         final var namespace = purl.getNamespace();
