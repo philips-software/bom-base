@@ -3,12 +3,12 @@
  * SPDX-License-Identifier: MIT
  */
 
-package com.philips.research.bombase.core.meta.registry;
+package com.philips.research.bombase.core.meta;
 
 import com.github.packageurl.PackageURL;
 import com.philips.research.bombase.core.MetaService;
-import com.philips.research.bombase.core.meta.MetaInteractor;
-import com.philips.research.bombase.core.meta.MetaStore;
+import com.philips.research.bombase.core.meta.registry.*;
+import com.philips.research.bombase.core.meta.registry.Package;
 import com.philips.research.bombase.core.meta.registry.MetaRegistry.PackageListener;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;

@@ -51,7 +51,7 @@ class DownloaderTest {
 
     @Test
     void downloadsForToolFromLocationToDirectory() {
-        final var location = LOCATION.toString() + "#path/to/whatever";
+        final var location = LOCATION + "#path/to/whatever";
         final var destinationDir = testDirectory.resolve("whatever");
         when(mockHandler.download(testDirectory, URI.create(location))).thenReturn(destinationDir);
 

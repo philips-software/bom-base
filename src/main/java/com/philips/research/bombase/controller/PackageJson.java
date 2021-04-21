@@ -36,7 +36,7 @@ class PackageJson {
         this(dto.purl, dto.updated, null);
     }
 
-    PackageJson(PackageURL purl, Instant updated, @NullOr Map<String,Object> attributes) {
+    PackageJson(PackageURL purl, Instant updated, @NullOr Map<String, Object> attributes) {
         this.purl = purl.canonicalize();
         this.id = encode(encode(this.purl));
         this.updated = updated;

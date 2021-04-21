@@ -29,7 +29,7 @@ class PyPiClientTest {
     private static final String NAME = "Name";
     private static final String VERSION = "Release";
     private static final PackageURL PURL = createPurl(String.format("pkg:%s/%s/%s@%s", TYPE, NAMESPACE, NAME, VERSION));
-    private static final String DESCRIPTION = "Description";
+    private static final String SUMMARY = "Summary";
     private static final String SOURCE_LOCATION = "https://example.com/source";
     private static final String HOMEPAGE = "https://example.com/home-page";
     private static final String DECLARED_LICENSE = "Declared";
@@ -66,7 +66,7 @@ class PyPiClientTest {
     void getsMetadataFromServer() throws Exception {
         mockServer.enqueue(new MockResponse().setBody(new JSONObject()
                 .put("info", new JSONObject()
-                        .put("description", DESCRIPTION)
+                        .put("summary", SUMMARY)
                         .put("home_page", HOMEPAGE)
                         .put("license", DECLARED_LICENSE))
                 .put("releases", new JSONObject()
@@ -83,7 +83,7 @@ class PyPiClientTest {
         final var request = mockServer.takeRequest();
         assertThat(request.getMethod()).isEqualTo("GET");
         assertThat(request.getPath()).isEqualTo(String.format("/pypi/%s/%s/json", NAME, VERSION));
-        assertThat(release.getDescription()).contains(DESCRIPTION);
+        assertThat(release.getSummary()).contains(SUMMARY);
         assertThat(release.getHomepage()).contains(URI.create(HOMEPAGE));
         assertThat(release.getLicense()).contains(DECLARED_LICENSE);
         assertThat(release.getSourceUrl()).contains(URI.create(SOURCE_LOCATION));

@@ -22,7 +22,7 @@ public class Attribute {
     private int altScore;
     private @NullOr Object altValue;
 
-    Attribute(Field field) {
+    public Attribute(Field field) {
         this.field = field;
     }
 

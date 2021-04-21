@@ -18,7 +18,7 @@ public class PackageAttributeEditor {
     private final Package pkg;
     private final Set<Field> modifiedFields = new HashSet<>();
 
-    PackageAttributeEditor(Package pkg) {
+    public PackageAttributeEditor(Package pkg) {
         this.pkg = pkg;
     }
 
