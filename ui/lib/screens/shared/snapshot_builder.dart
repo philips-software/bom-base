@@ -21,7 +21,16 @@ class SnapshotBuilder<T> extends StatelessWidget {
       return ErrorWidget(snapshot.error ?? 'Oops!?');
     }
     if (!snapshot.hasData) {
-      return Center(child: CircularProgressIndicator.adaptive());
+      return Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Text('Loading ...'),
+            SizedBox(height: 10),
+            CircularProgressIndicator.adaptive(),
+          ],
+        ),
+      );
     }
     return builder.call(context, snapshot.data);
   }

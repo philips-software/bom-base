@@ -10,7 +10,7 @@ import 'package:test/test.dart';
 import 'dio_mock_server.dart';
 
 @GenerateMocks([])
-main() {
+void main() {
   group('$BomBaseClient', () {
     const id = 'id';
     const type = 'type';
@@ -37,7 +37,7 @@ main() {
         expect(
             () => client.find(type, namespace, name, version),
             throwsA(predicate<BackendException>(
-                (e) => e.message.contains("status error [404]"))));
+                (e) => e.message.contains('status error [404]'))));
       });
     });
 

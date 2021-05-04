@@ -1,5 +1,4 @@
-#!/bin/bash
-set -e
+@echo off
 
 echo "(1/5) Generate mocks"
 flutter pub get
@@ -15,7 +14,7 @@ echo "(4/5) Build release executable"
 flutter build web
 
 echo "(5/5) Install resources in server"
-rm -rf ../src/main/resources/static
-cp -R build/web/. ../src/main/resources/static
+rmdir ..\src\main\resources\static\* /s /q
+xcopy build\web\. ..\src\main\resources\static /s /q
 
 echo "Done!"

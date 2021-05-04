@@ -1,19 +1,17 @@
 <div align="center">
 
-# BOM-base 
+# BOM-Base 
 
 [![Release](https://img.shields.io/github/release/philips-software/bom-base.svg)](https://github.com/philips-software/bom-base/releases)
 
-**Description**: BOM-base is a caching repository for bill-of-materials metadata.
+**Description**: BOM-Base is an _experimental_ caching repository for
+bill-of-materials metadata.
 
 **Status**: Experimental research prototype
 
 _Powered by Philips SWAT Eindhoven_
 
 </div>
-
-(See the [architecture document](docs/architecture.md) for a detailed technical
-description.)
 
 This is an _experimental_ tool for evaluating various aspects of the Software
 Bill-of-Materials (SBOM) for projects.
@@ -43,19 +41,26 @@ A user interface will be provided to allow human curation of contested
 information and resolution of incorrect or missing metadata. A manual change of
 such metadata can in turn trigger other processes to complete additional fields.
 
+(See the [architecture document](docs/architecture.md) for a detailed technical
+description.)
+
 ## Dependencies
 
-The service requires Java 11.
+The service requires at least Java 11.
 
 ## Installation
 
-The software is built by the Maven `mvn clean install` command.
+The Flutter web user interface is built by the `install_ui` script from
+the `/ui` directory. This script builds the web application and installs it into
+the `/src/main/resources/static` directory of the backend.
 
-The server is started as a standard Java executable using `java -jar <application-name>.jar`.
+The backend is built by the Maven `mvn clean install` command.
+
+The backend server is started as a standard Java executable using `java -jar <application-name>.jar`.
 
 ## Configuration
 
-(No configuration supported.)
+(Empty)
 
 ## Usage
 
@@ -91,8 +96,8 @@ These are the most important topics that are to be addressed:
 - [ ] Retry failed harvesting attempts (e.g. when source offline)
 - [ ] Handle false information (e.g. non-existing source location)
 - [ ] Harvesting metadata from inner source repositories
+- [ ] Add auto-converter for obvious (but formally wrong) SPDX license names
 - [ ] Add harvester for Maven
-- [ ] Add harvester for PyPi 
 - [ ] Add harvester for NPM
 - [ ] Add harvester for APK
 - [ ] Add harvester for Debian 
@@ -101,7 +106,7 @@ These are the most important topics that are to be addressed:
 - [ ] Persist metadata in database
 
 ## Disclaimer
-BOM-base is an _experimental_ tool, and not suited for production.
+BOM-Base is an _experimental_ tool, and not suited for production.
 
 ## Contact / Getting help
 
