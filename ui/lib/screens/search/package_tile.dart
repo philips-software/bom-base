@@ -5,9 +5,9 @@
 
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:yeet/yeet.dart';
 
 import '../../model/package.dart';
-import '../package_details/package_details_screen.dart';
 
 class PackageTile extends StatelessWidget {
   static final dateTimeFormat = DateFormat.yMd().add_jms();
@@ -22,12 +22,8 @@ class PackageTile extends StatelessWidget {
     return ListTile(
       key: Key(purl),
       title: Text(purl),
-      subtitle: Text('Last updated: ${dateTimeFormat.format(pkg.updated)}'),
-      onTap: () => Navigator.of(context).push(
-        MaterialPageRoute(
-          builder: (context) => PackageDetailsScreen(id: pkg.id),
-        ),
-      ),
+      subtitle: Text('Last update: ${dateTimeFormat.format(pkg.updated)}'),
+      onTap: () => context.yeet('/packages/${pkg.id}'),
     );
   }
 }

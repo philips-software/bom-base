@@ -4,6 +4,7 @@
  */
 
 import 'package:flutter/material.dart';
+import 'package:yeet/yeet.dart';
 
 import '../../model/package.dart';
 import '../../services/package_service.dart';
@@ -22,12 +23,18 @@ class PackageDetailsScreen extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         title: Text('Package details'),
+        actions: [
+          IconButton(
+            icon: Icon(Icons.search),
+            onPressed: () => context.yeet('/packages'),
+          ),
+        ],
       ),
       body: FutureBuilder<Package>(
         future: service.select(id),
         builder: (context, snapshot) => SnapshotBuilder<Package>(
           snapshot: snapshot,
-          builder: (context, data) => AttributesList(data?.attributes ?? {}),
+          builder: (context, package) => AttributesList(package!.attributes),
         ),
       ),
     );
