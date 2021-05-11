@@ -14,4 +14,3 @@ projects:
       - "annotation*"
       - "archives"
   - id: "Pub::ui/pubspec.yaml:"
-    purl: "pkg:pub/ui/pubspec@v0.0.1"
