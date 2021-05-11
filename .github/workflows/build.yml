@@ -56,7 +56,7 @@ jobs:
           python-version: '3.8' 
 
       - name: Install scancode 
-        run: pip install scancode-toolkit extractcode
+        run: pip install scancode-toolkit==21.3.3
 
       - name: Build with Maven
         run: mvn install -DskipTests
