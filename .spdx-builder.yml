@@ -1,0 +1,16 @@
+document:
+  title: "Bom-Base"
+  organization: "Philips Research"
+  comment:
+  key:
+  namespace: "https://research.philips.com/bom-base"
+projects:
+  - id: "Maven:com.philips.research:BOM-base:0.0.1"
+    purl: "pkg:maven/philips/BOM-base@v0.0.1"
+    excluded:
+      - "test*"
+      - "development*"
+      - "runtime*"
+      - "annotation*"
+      - "archives"
+  - id: "Pub::ui/pubspec.yaml:"
