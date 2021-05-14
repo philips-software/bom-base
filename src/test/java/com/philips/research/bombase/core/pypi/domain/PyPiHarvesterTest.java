@@ -21,7 +21,7 @@ import java.util.function.Consumer;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.*;
 
-class PyPiListenerTest {
+class PyPiHarvesterTest {
     private static final String TYPE = "type";
     private static final String NAMESPACE = "namespace";
     private static final String NAME = "name";
@@ -34,7 +34,7 @@ class PyPiListenerTest {
     private static final int META_SCORE = 80;
 
     private final PyPiClient client = mock(PyPiClient.class);
-    private final PyPiListener listener = new PyPiListener(client);
+    private final PyPiHarvester listener = new PyPiHarvester(client);
 
     static PackageURL toPurl(String uri) {
         try {

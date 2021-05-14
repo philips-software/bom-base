@@ -18,17 +18,17 @@ import java.util.Set;
 import java.util.function.Consumer;
 
 @Service
-public class PyPiListener implements MetaRegistry.PackageListener {
+public class PyPiHarvester implements MetaRegistry.PackageListener {
     private static final int PYPI_SCORE = 80;
 
     private final PyPiClient client;
 
     @Autowired
-    public PyPiListener() {
+    public PyPiHarvester() {
         this(new PyPiClient());
     }
 
-    PyPiListener(PyPiClient client) {
+    PyPiHarvester(PyPiClient client) {
         this.client = client;
     }
 

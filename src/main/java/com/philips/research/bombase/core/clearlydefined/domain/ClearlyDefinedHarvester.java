@@ -19,15 +19,15 @@ import java.util.Set;
 import java.util.function.Consumer;
 
 @Service
-public class ClearlyDefinedListener implements MetaRegistry.PackageListener {
+public class ClearlyDefinedHarvester implements MetaRegistry.PackageListener {
     private final ClearlyDefinedClient client;
 
     @Autowired
-    public ClearlyDefinedListener() {
+    public ClearlyDefinedHarvester() {
         this(new ClearlyDefinedClient());
     }
 
-    ClearlyDefinedListener(ClearlyDefinedClient client) {
+    ClearlyDefinedHarvester(ClearlyDefinedClient client) {
         this.client = client;
     }
 

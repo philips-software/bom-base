@@ -32,13 +32,13 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
-class SourceScanListenerTest {
+class SourceLicensesHarvesterTest {
     private static final PackageURL PURL = createPurl("pkg:type/ns/name@version");
     private static final URI SOURCE_LOCATION = URI.create("https://example.com/sources");
 
     private final DownloadService downloader = mock(DownloadService.class);
     private final ScannerService scanner = mock(ScannerService.class);
-    private final MetaRegistry.PackageListener listener = new SourceScanListener(downloader, scanner);
+    private final MetaRegistry.PackageListener listener = new SourceLicensesHarvester(downloader, scanner);
 
     private static PackageURL createPurl(String purl) {
         try {
@@ -101,7 +101,7 @@ class SourceScanListenerTest {
 
             task.accept(pkg);
 
-            verify(pkg).update(Field.DETECTED_LICENSE, SourceScanListener.MAX_SCORE, LICENSE1 + '\n' + LICENSE2);
+            verify(pkg).update(Field.DETECTED_LICENSE, SourceLicensesHarvester.MAX_SCORE, LICENSE1 + '\n' + LICENSE2);
         }
 
         @Test
@@ -116,7 +116,7 @@ class SourceScanListenerTest {
 
             task.accept(pkg);
 
-            final var expected = Math.round((50f * 400 + 80f * 200) / ((400 + 200) * 100) * SourceScanListener.MAX_SCORE);
+            final var expected = Math.round((50f * 400 + 80f * 200) / ((400 + 200) * 100) * SourceLicensesHarvester.MAX_SCORE);
             verify(pkg).update(eq(Field.DETECTED_LICENSE), eq(expected), anyString());
         }
     }

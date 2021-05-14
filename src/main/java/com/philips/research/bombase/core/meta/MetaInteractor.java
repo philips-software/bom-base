@@ -6,12 +6,15 @@
 package com.philips.research.bombase.core.meta;
 
 import com.github.packageurl.PackageURL;
+import com.philips.research.bombase.ConfigProperties;
 import com.philips.research.bombase.core.MetaService;
-import com.philips.research.bombase.core.clearlydefined.domain.ClearlyDefinedListener;
+import com.philips.research.bombase.core.clearlydefined.domain.ClearlyDefinedHarvester;
 import com.philips.research.bombase.core.meta.registry.Field;
 import com.philips.research.bombase.core.meta.registry.MetaRegistry;
-import com.philips.research.bombase.core.pypi.domain.PyPiListener;
-import com.philips.research.bombase.core.source_scan.domain.SourceScanListener;
+import com.philips.research.bombase.core.pypi.domain.PyPiHarvester;
+import com.philips.research.bombase.core.source_scan.domain.SourceLicensesHarvester;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Service;
@@ -25,6 +28,8 @@ import java.util.stream.Collectors;
 
 @Service
 public class MetaInteractor implements MetaService {
+    private static final Logger LOG = LoggerFactory.getLogger(MetaInteractor.class);
+
     private final MetaRegistry registry;
     private final MetaStore store;
     @SuppressWarnings("SpringJavaAutowiredFieldsWarningInspection")
@@ -38,9 +43,17 @@ public class MetaInteractor implements MetaService {
 
     @PostConstruct
     void init() {
-        registry.addListener(context.getBean(ClearlyDefinedListener.class));
-        registry.addListener(context.getBean(SourceScanListener.class));
-        registry.addListener(context.getBean(PyPiListener.class));
+        final var properties = context.getBean(ConfigProperties.class);
+
+        installListener(ClearlyDefinedHarvester.class);
+        installListener(PyPiHarvester.class);
+        if (properties.isScanLicenses()) {
+            installListener(SourceLicensesHarvester.class);
+        }
+    }
+
+    private void installListener(Class<? extends MetaRegistry.PackageListener> listener) {
+        registry.addListener(context.getBean(listener));
     }
 
     @Override

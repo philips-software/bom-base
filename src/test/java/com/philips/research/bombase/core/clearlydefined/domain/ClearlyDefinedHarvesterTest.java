@@ -22,7 +22,7 @@ import java.util.function.Consumer;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.*;
 
-class ClearlyDefinedListenerTest {
+class ClearlyDefinedHarvesterTest {
     private static final String TYPE = "type";
     private static final String NAMESPACE = "namespace";
     private static final String NAME = "name";
@@ -40,7 +40,7 @@ class ClearlyDefinedListenerTest {
     private static final int LICENSE_SCORE = 60;
 
     private final ClearlyDefinedClient client = mock(ClearlyDefinedClient.class);
-    private final ClearlyDefinedListener listener = new ClearlyDefinedListener(client);
+    private final ClearlyDefinedHarvester listener = new ClearlyDefinedHarvester(client);
 
     static PackageURL toPurl(String uri) {
         try {

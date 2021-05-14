@@ -23,14 +23,14 @@ import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 @Service
-public class SourceScanListener implements MetaRegistry.PackageListener {
+public class SourceLicensesHarvester implements MetaRegistry.PackageListener {
     //TODO Is this even a realistic maximum score?
     static final int MAX_SCORE = 80;
 
     private final DownloadService downloader;
     private final ScannerService scanner;
 
-    public SourceScanListener(DownloadService downloader, ScannerService scanner) {
+    public SourceLicensesHarvester(DownloadService downloader, ScannerService scanner) {
         this.downloader = downloader;
         this.scanner = scanner;
     }
