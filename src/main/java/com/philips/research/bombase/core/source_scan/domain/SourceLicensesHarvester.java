@@ -49,8 +49,8 @@ public class SourceLicensesHarvester implements MetaRegistry.PackageListener {
                 .ifPresent(location -> downloader.download(location, directory -> {
                     final var detections = licensesScannedIn(directory);
                     final var score = score(detections);
-                    final var expression = toMultilineExpression(detections);
-                    pkg.update(Field.DETECTED_LICENSE, score, expression);
+                    final var expressions = licensesIn(detections);
+                    pkg.update(Field.DETECTED_LICENSES, score, expressions);
                 }));
     }
 
@@ -68,10 +68,10 @@ public class SourceLicensesHarvester implements MetaRegistry.PackageListener {
         return Math.round((sum / (100f * count)) * MAX_SCORE);
     }
 
-    private String toMultilineExpression(List<ScannerService.LicenseResult> detections) {
+    private List<String> licensesIn(List<ScannerService.LicenseResult> detections) {
         return detections.stream()
                 .map(ScannerService.LicenseResult::getExpression)
-                .collect(Collectors.joining("\n"));
+                .collect(Collectors.toList());
     }
 
     private List<ScannerService.LicenseResult> licensesScannedIn(Path directory) {

@@ -83,34 +83,26 @@ class ClearlyDefinedHarvesterTest {
             when(response.getDescribedScore()).thenReturn(META_SCORE);
             when(response.getLicensedScore()).thenReturn(LICENSE_SCORE);
             when(response.getSourceLocation()).thenReturn(Optional.of(SOURCE_LOCATION));
+            when(response.getTitle()).thenReturn(Optional.of(NAME));
             when(response.getDownloadLocation()).thenReturn(Optional.of(DOWNLOAD_LOCATION));
             when(response.getHomepage()).thenReturn(Optional.of(HOMEPAGE));
             when(response.getAuthors()).thenReturn(Optional.of(ATTRIBUTION));
-            when(response.getDetectedLicenses()).thenReturn(List.of(DETECTED_LICENSE));
+            when(response.getDetectedLicenses()).thenReturn(Optional.of(List.of(DETECTED_LICENSE)));
             when(response.getDeclaredLicense()).thenReturn(Optional.of(DECLARED_LICENSE));
             when(response.getSha1()).thenReturn(Optional.of(SHA1));
             when(response.getSha256()).thenReturn(Optional.of(SHA256));
 
             task.accept(pkg);
 
+            verify(pkg).update(Field.TITLE, META_SCORE, NAME);
             verify(pkg).update(Field.SOURCE_LOCATION, META_SCORE, SOURCE_LOCATION);
             verify(pkg).update(Field.DOWNLOAD_LOCATION, META_SCORE, DOWNLOAD_LOCATION);
             verify(pkg).update(Field.HOME_PAGE, META_SCORE, HOMEPAGE);
             verify(pkg).update(Field.ATTRIBUTION, META_SCORE, ATTRIBUTION);
             verify(pkg).update(Field.DECLARED_LICENSE, META_SCORE, DECLARED_LICENSE);
-            verify(pkg).update(Field.DETECTED_LICENSE, LICENSE_SCORE, DETECTED_LICENSE);
+            verify(pkg).update(Field.DETECTED_LICENSES, LICENSE_SCORE, List.of(DETECTED_LICENSE));
             verify(pkg).update(Field.SHA1, META_SCORE, SHA1);
             verify(pkg).update(Field.SHA256, META_SCORE, SHA256);
-        }
-
-        @Test
-        void concatenatesDetectedLicenses() {
-            when(response.getLicensedScore()).thenReturn(LICENSE_SCORE);
-            when(response.getDetectedLicenses()).thenReturn(List.of(DECLARED_LICENSE, DETECTED_LICENSE));
-
-            task.accept(pkg);
-
-            verify(pkg).update(Field.DETECTED_LICENSE, LICENSE_SCORE, String.format("%s AND %s", DECLARED_LICENSE, DETECTED_LICENSE));
         }
     }
 }

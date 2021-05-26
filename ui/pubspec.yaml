@@ -11,7 +11,6 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-  pedantic: ^1.11.0
   cupertino_icons: ^1.0.3
   material_floating_search_bar: ^0.3.4
   dio: ^4.0.0
@@ -22,9 +21,10 @@ dependencies:
 dev_dependencies:
   flutter_test:
     sdk: flutter
-  test: ^1.16.5
-  mockito: ^5.0.7
-  build_runner: ^2.0.2
+  pedantic: ^1.11.0
+  test: ^1.16.8
+  mockito: ^5.0.9
+  build_runner: ^2.0.4
 
 flutter:
   uses-material-design: true

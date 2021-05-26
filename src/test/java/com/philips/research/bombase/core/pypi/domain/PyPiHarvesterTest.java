@@ -22,11 +22,10 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.*;
 
 class PyPiHarvesterTest {
-    private static final String TYPE = "type";
     private static final String NAMESPACE = "namespace";
     private static final String NAME = "name";
     private static final String VERSION = "version";
-    private static final PackageURL PURL = toPurl(String.format("pkg:%s/%s/%s@%s", TYPE, NAMESPACE, NAME, VERSION));
+    private static final PackageURL PURL = toPurl(String.format("pkg:pypi/%s/%s@%s", NAMESPACE, NAME, VERSION));
     private static final String DESCRIPTION = "Description";
     private static final URI HOMEPAGE = URI.create("https://example.com/home");
     private static final String DECLARED_LICENSE = "Declared";
@@ -59,6 +58,13 @@ class PyPiHarvesterTest {
 
             assertThat(task).isEmpty();
         }
+
+        @Test
+        void returnsNothing_notPythonPurl() {
+            final var task = listener.onUpdated(toPurl("pkg:npm/name@1.0"), Set.of(), Map.of());
+
+            assertThat(task).isEmpty();
+        }
     }
 
     @Nested
@@ -74,6 +80,7 @@ class PyPiHarvesterTest {
 
         @Test
         void harvestsMetadata() {
+            when(response.getName()).thenReturn(Optional.of(NAME));
             when(response.getSummary()).thenReturn(Optional.of(DESCRIPTION));
             when(response.getHomepage()).thenReturn(Optional.of(HOMEPAGE));
             when(response.getLicense()).thenReturn(Optional.of(DECLARED_LICENSE));
@@ -81,6 +88,7 @@ class PyPiHarvesterTest {
 
             task.accept(pkg);
 
+            verify(pkg).update(Field.TITLE, META_SCORE, NAME);
             verify(pkg).update(Field.DESCRIPTION, META_SCORE, DESCRIPTION);
             verify(pkg).update(Field.HOME_PAGE, META_SCORE, HOMEPAGE);
             verify(pkg).update(Field.DECLARED_LICENSE, META_SCORE, DECLARED_LICENSE);

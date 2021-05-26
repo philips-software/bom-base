@@ -101,7 +101,7 @@ class SourceLicensesHarvesterTest {
 
             task.accept(pkg);
 
-            verify(pkg).update(Field.DETECTED_LICENSE, SourceLicensesHarvester.MAX_SCORE, LICENSE1 + '\n' + LICENSE2);
+            verify(pkg).update(Field.DETECTED_LICENSES, SourceLicensesHarvester.MAX_SCORE, List.of(LICENSE1, LICENSE2));
         }
 
         @Test
@@ -117,7 +117,7 @@ class SourceLicensesHarvesterTest {
             task.accept(pkg);
 
             final var expected = Math.round((50f * 400 + 80f * 200) / ((400 + 200) * 100) * SourceLicensesHarvester.MAX_SCORE);
-            verify(pkg).update(eq(Field.DETECTED_LICENSE), eq(expected), anyString());
+            verify(pkg).update(eq(Field.DETECTED_LICENSES), eq(expected), anyList());
         }
     }
 }

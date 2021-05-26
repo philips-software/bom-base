@@ -3,10 +3,10 @@
  * SPDX-License-Identifier: MIT
  */
 
-import 'package:bom_base_ui/screens/package_details/package_details_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:yeet/yeet.dart';
 
+import 'package/package_screen.dart';
 import 'search/search_screen.dart';
 
 final routes = Yeet(
@@ -21,7 +21,7 @@ final routes = Yeet(
     ),
     Yeet(
       path: r'/packages/:id(\S*)',
-      builder: (context) => PackageDetailsScreen(id: context.params['id']!),
+      builder: (context) => PackageScreen(packageId: context.params['id']!),
     ),
     Yeet(
       path: ':path(.*)',

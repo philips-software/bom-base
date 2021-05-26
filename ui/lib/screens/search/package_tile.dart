@@ -22,7 +22,7 @@ class PackageTile extends StatelessWidget {
     return ListTile(
       key: Key(purl),
       title: Text(purl),
-      subtitle: Text('Last update: ${dateTimeFormat.format(pkg.updated)}'),
+      subtitle: Text('Last update: ${dateTimeFormat.format(pkg.updated!)}'),
       onTap: () => context.yeet('/packages/${pkg.id}'),
     );
   }

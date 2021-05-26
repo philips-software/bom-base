@@ -34,7 +34,7 @@ public class PyPiHarvester implements MetaRegistry.PackageListener {
 
     @Override
     public Optional<Consumer<PackageAttributeEditor>> onUpdated(PackageURL purl, Set<Field> updated, Map<Field, ?> values) {
-        if (!updated.isEmpty()) {
+        if (!purl.getType().equals("pypi") || !updated.isEmpty()) {
             return Optional.empty();
         }
 
@@ -43,6 +43,7 @@ public class PyPiHarvester implements MetaRegistry.PackageListener {
 
     private void harvest(PackageURL purl, PackageAttributeEditor pkg) {
         client.getRelease(purl).ifPresent(release -> {
+            storeField(pkg, Field.TITLE, release.getName());
             storeField(pkg, Field.DESCRIPTION, release.getSummary());
             storeField(pkg, Field.HOME_PAGE, release.getHomepage());
             storeField(pkg, Field.DECLARED_LICENSE, release.getLicense());

@@ -34,7 +34,7 @@ class PackageDetailsScreen extends StatelessWidget {
         future: service.select(id),
         builder: (context, snapshot) => SnapshotBuilder<Package>(
           snapshot: snapshot,
-          builder: (context, package) => AttributesList(package!.attributes),
+          builder: (context, package) => AttributesList(package.attributes),
         ),
       ),
     );

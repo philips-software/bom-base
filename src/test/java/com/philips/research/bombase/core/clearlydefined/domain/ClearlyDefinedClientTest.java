@@ -74,6 +74,7 @@ class ClearlyDefinedClientTest {
         mockServer.enqueue(new MockResponse().setBody(new JSONObject()
                 .put("described", new JSONObject()
                         .put("sourceLocation", new JSONObject()
+                                .put("name", NAME)
                                 .put("url", SOURCE_LOCATION))
                         .put("urls", new JSONObject()
                                 .put("download", DOWNLOAD_LOCATION))
@@ -103,13 +104,14 @@ class ClearlyDefinedClientTest {
         final var request = mockServer.takeRequest();
         assertThat(request.getMethod()).isEqualTo("GET");
         assertThat(request.getPath()).isEqualTo(String.format("/definitions/%s/%s/%s/%s/%s", TYPE, TYPE, NAMESPACE, NAME, VERSION));
+        assertThat(definition.getTitle()).contains(NAME);
         assertThat(definition.getSourceLocation()).contains(URI.create(SOURCE_LOCATION));
         assertThat(definition.getDownloadLocation()).contains(URI.create(DOWNLOAD_LOCATION));
         assertThat(definition.getHomepage()).contains(URI.create(HOMEPAGE));
         assertThat(definition.getSha1()).contains(SHA1);
         assertThat(definition.getSha256()).contains(SHA256);
         assertThat(definition.getDeclaredLicense()).contains(DECLARED_LICENSE);
-        assertThat(definition.getDetectedLicenses()).contains(DETECTED_LICENSE);
+        assertThat(definition.getDetectedLicenses()).contains(List.of(DETECTED_LICENSE));
         assertThat(definition.getAuthors()).contains(List.of(ATTRIBUTION));
     }
 

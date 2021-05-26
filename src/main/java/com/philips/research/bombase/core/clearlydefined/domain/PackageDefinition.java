@@ -16,6 +16,8 @@ interface PackageDefinition {
 
     int getLicensedScore();
 
+    Optional<String> getTitle();
+
     Optional<URI> getDownloadLocation();
 
     Optional<URI> getSourceLocation();
@@ -26,7 +28,7 @@ interface PackageDefinition {
 
     Optional<String> getDeclaredLicense();
 
-    List<String> getDetectedLicenses();
+    Optional<List<String>> getDetectedLicenses();
 
     Optional<String> getSha1();
 
