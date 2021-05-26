@@ -57,13 +57,5 @@ void main() {
       expect(logic.error.value, isNotNull);
       expect(logic.isLoading.value, isFalse);
     });
-
-    test('formats last update', () {
-      expect(logic.lastUpdated, isEmpty);
-
-      logic.package.value = package;
-
-      expect(logic.lastUpdated, isNotEmpty);
-    });
   });
 }

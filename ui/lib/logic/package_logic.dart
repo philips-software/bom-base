@@ -8,13 +8,10 @@ import 'dart:developer';
 import 'package:bom_base_ui/model/package.dart';
 import 'package:bom_base_ui/services/bombase_client.dart';
 import 'package:flutter/foundation.dart';
-import 'package:intl/intl.dart';
 
 import 'logic.dart';
 
 class PackageLogic extends Logic {
-  static final dateTimeFormat = DateFormat.yMd().add_jms();
-
   PackageLogic(this.id, {BomBaseClient? client})
       : client = client ?? BomBaseClient.instance;
 
@@ -24,10 +21,6 @@ class PackageLogic extends Logic {
   final isLoading = ValueNotifier<bool>(false);
   final error = ValueNotifier<String?>(null);
   late final package = ValueNotifier<Package>(Package(id: id));
-
-  String get lastUpdated => package.value.updated != null
-      ? dateTimeFormat.format(package.value.updated!)
-      : '';
 
   @override
   Future<void> init() async {

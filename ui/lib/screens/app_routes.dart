@@ -15,14 +15,12 @@ final routes = Yeet(
       path: '/',
       builder: (_) => SearchScreen(),
     ),
-    Yeet(
-      path: r'/packages',
-      builder: (_) => SearchScreen(),
-    ),
-    Yeet(
-      path: r'/packages/:id(\S*)',
-      builder: (context) => PackageScreen(packageId: context.params['id']!),
-    ),
+    Yeet(path: r'/packages', builder: (_) => SearchScreen(), children: [
+      Yeet(
+        path: r':id(\S*)',
+        builder: (context) => PackageScreen(packageId: context.params['id']!),
+      ),
+    ]),
     Yeet(
       path: ':path(.*)',
       builder: (context) => NotFoundView(context.params['path']!),

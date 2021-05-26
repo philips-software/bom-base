@@ -16,8 +16,15 @@ class Package {
 
   String get description => attributes['description'] ?? '';
 
-  List<String> get authors =>
+  Iterable<String> get authors =>
       (attributes['attribution'] as List<dynamic>? ?? [])
-          .map((value) => value as String)
-          .toList(growable: false);
+          .map((value) => value as String);
+
+  String get declaredLicense =>
+      attributes['declared_license'] ?? '(Unlicensed)';
+
+  Iterable<String> get detectedLicenses =>
+      (attributes['detected_licenses'] as List<dynamic>? ?? [])
+          .map((lic) => lic as String)
+          .where((lic) => lic.isNotEmpty);
 }
