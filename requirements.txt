@@ -8,7 +8,7 @@ boolean.py==3.8
 certifi==2020.12.5
 cffi==1.14.5
 chardet==4.0.0
-click==7.1.2
+click==8.0.1
 colorama==0.4.4
 commoncode==21.5.25
 cryptography==3.4.7
