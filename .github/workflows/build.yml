@@ -62,10 +62,10 @@ jobs:
           extractcode --version
 
       - name: Build with Maven
-        run: mvn install -DskipTests
+        run: mvn --no-transfer-progress install -DskipTests
 
       - name: Test with Maven
-        run: mvn test
+        run: mvn --no-transfer-progress test
 
   create-docker-image:
     name: "Create docker image"
