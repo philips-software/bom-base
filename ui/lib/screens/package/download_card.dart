@@ -22,7 +22,7 @@ class DownloadCard extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          Text('Download', style: style.headline5),
+          Text('Download', style: style.headline6),
           if (package.downloadLocation != null)
             LinkText(package.downloadLocation!),
           SizedBox(height: 8),

@@ -3,8 +3,8 @@
  * SPDX-License-Identifier: MIT
  */
 
+import 'package:bom_base_ui/screens/widgets/link_text.dart';
 import 'package:flutter/material.dart';
-import 'package:url_launcher/url_launcher.dart';
 
 import '../../model/package.dart';
 
@@ -36,16 +36,7 @@ class LicenseCard extends StatelessWidget {
             if (package.sourceLocation != null)
               Padding(
                 padding: const EdgeInsets.only(top: 8.0),
-                child: GestureDetector(
-                  onTap: () => _open(package.sourceLocation!),
-                  child: MouseRegion(
-                    cursor: SystemMouseCursors.click,
-                    child: Text(
-                      '${package.sourceLocation}',
-                      style: TextStyle(decoration: TextDecoration.underline),
-                    ),
-                  ),
-                ),
+                child: LinkText(package.sourceLocation!),
               ),
           ],
         ),
@@ -63,9 +54,5 @@ class LicenseCard extends StatelessWidget {
         Flexible(child: Text(license)),
       ],
     );
-  }
-
-  void _open(Uri location) {
-    launch(location.toString());
   }
 }

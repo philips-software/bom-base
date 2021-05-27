@@ -24,19 +24,21 @@ class PackageScreen extends StatelessWidget {
       appBar: AppBar(
         title: Text('Package'),
       ),
-      body: ValueListenableBuilder<Package>(
-        valueListenable: logic.package,
-        builder: (context, package, _) {
-          return Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              PackageCard(package),
-              LicenseCard(package),
-              if (package.downloadLocation != null) DownloadCard(package),
-            ],
-          );
-        },
+      body: SingleChildScrollView(
+        child: ValueListenableBuilder<Package>(
+          valueListenable: logic.package,
+          builder: (context, package, _) {
+            return Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                PackageCard(package),
+                LicenseCard(package),
+                if (package.downloadLocation != null) DownloadCard(package),
+              ],
+            );
+          },
+        ),
       ),
     );
   }
