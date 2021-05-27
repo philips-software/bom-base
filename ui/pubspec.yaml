@@ -25,6 +25,8 @@ dev_dependencies:
   test: ^1.16.8
   mockito: ^5.0.9
   build_runner: ^2.0.4
+  # https://stackoverflow.com/questions/67700083/error-on-flutter-pub-run-build-runner-build/67702879#67702879
+  analyzer: 1.5.0 # Versions beyond 1.5.0 currently break build_runner
 
 flutter:
   uses-material-design: true
