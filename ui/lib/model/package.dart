@@ -27,4 +27,12 @@ class Package {
       (attributes['detected_licenses'] as List<dynamic>? ?? [])
           .map((lic) => lic as String)
           .where((lic) => lic.isNotEmpty);
+
+  Uri? get sourceLocation => Uri.tryParse(attributes['source_location']);
+
+  Uri? get downloadLocation => Uri.tryParse(attributes['download_location']);
+
+  String? get sha1 => attributes['sha1'];
+
+  String? get sha256 => attributes['sha256'];
 }

@@ -4,6 +4,7 @@
  */
 
 import 'package:flutter/material.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import '../../model/package.dart';
 
@@ -32,6 +33,20 @@ class LicenseCard extends StatelessWidget {
                 child: Text('Found in sources:', style: style.subtitle2),
               ),
             ...package.detectedLicenses.map((lic) => _license(lic)),
+            if (package.sourceLocation != null)
+              Padding(
+                padding: const EdgeInsets.only(top: 8.0),
+                child: GestureDetector(
+                  onTap: () => _open(package.sourceLocation!),
+                  child: MouseRegion(
+                    cursor: SystemMouseCursors.click,
+                    child: Text(
+                      '${package.sourceLocation}',
+                      style: TextStyle(decoration: TextDecoration.underline),
+                    ),
+                  ),
+                ),
+              ),
           ],
         ),
       ),
@@ -48,5 +63,9 @@ class LicenseCard extends StatelessWidget {
         Flexible(child: Text(license)),
       ],
     );
+  }
+
+  void _open(Uri location) {
+    launch(location.toString());
   }
 }

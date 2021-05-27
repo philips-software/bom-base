@@ -7,6 +7,7 @@ import 'package:bom_base_ui/logic/package_logic.dart';
 import 'package:bom_base_ui/model/package.dart';
 import 'package:flutter/material.dart';
 
+import 'download_card.dart';
 import 'license_card.dart';
 import 'package_card.dart';
 
@@ -32,6 +33,7 @@ class PackageScreen extends StatelessWidget {
             children: [
               PackageCard(package),
               LicenseCard(package),
+              if (package.downloadLocation != null) DownloadCard(package),
             ],
           );
         },
