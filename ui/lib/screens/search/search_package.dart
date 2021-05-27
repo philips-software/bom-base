@@ -7,7 +7,7 @@ import 'package:material_floating_search_bar/material_floating_search_bar.dart';
 
 import '../../model/package.dart';
 import '../../services/package_service.dart';
-import '../shared/snapshot_builder.dart';
+import '../widgets/snapshot_builder.dart';
 import 'package_tile.dart';
 
 class SearchPackage extends StatelessWidget {

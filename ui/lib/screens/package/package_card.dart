@@ -3,6 +3,7 @@
  * SPDX-License-Identifier: MIT
  */
 
+import 'package:bom_base_ui/screens/widgets/link_text.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
@@ -30,6 +31,11 @@ class PackageCard extends StatelessWidget {
               Text(
                 'Updated: ${dateTimeFormat.format(package.updated!)}',
                 style: style.caption,
+              ),
+            if (package.homePage != null)
+              Padding(
+                padding: const EdgeInsets.only(top: 8.0),
+                child: LinkText(package.homePage!),
               ),
             if (package.description.isNotEmpty)
               Padding(

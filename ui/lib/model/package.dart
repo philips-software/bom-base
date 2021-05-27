@@ -16,6 +16,8 @@ class Package {
 
   String get description => attributes['description'] ?? '';
 
+  Uri? get homePage => Uri.tryParse(attributes['home_page'] ?? ':');
+
   Iterable<String> get authors =>
       (attributes['attribution'] as List<dynamic>? ?? [])
           .map((value) => value as String);
@@ -27,4 +29,13 @@ class Package {
       (attributes['detected_licenses'] as List<dynamic>? ?? [])
           .map((lic) => lic as String)
           .where((lic) => lic.isNotEmpty);
+
+  Uri? get sourceLocation => Uri.tryParse(attributes['source_location'] ?? ':');
+
+  Uri? get downloadLocation =>
+      Uri.tryParse(attributes['download_location'] ?? ':');
+
+  String? get sha1 => attributes['sha1'];
+
+  String? get sha256 => attributes['sha256'];
 }

@@ -3,6 +3,7 @@
  * SPDX-License-Identifier: MIT
  */
 
+import 'package:bom_base_ui/screens/widgets/link_text.dart';
 import 'package:flutter/material.dart';
 
 import '../../model/package.dart';
@@ -32,6 +33,11 @@ class LicenseCard extends StatelessWidget {
                 child: Text('Found in sources:', style: style.subtitle2),
               ),
             ...package.detectedLicenses.map((lic) => _license(lic)),
+            if (package.sourceLocation != null)
+              Padding(
+                padding: const EdgeInsets.only(top: 8.0),
+                child: LinkText(package.sourceLocation!),
+              ),
           ],
         ),
       ),
