@@ -12,7 +12,7 @@ class SnapshotBuilder<T> extends StatelessWidget {
   SnapshotBuilder({required this.snapshot, required this.builder});
 
   final AsyncSnapshot<T> snapshot;
-  final Widget Function(BuildContext context, T? data) builder;
+  final Widget Function(BuildContext context, T data) builder;
 
   @override
   Widget build(BuildContext context) {
@@ -32,6 +32,6 @@ class SnapshotBuilder<T> extends StatelessWidget {
         ),
       );
     }
-    return builder.call(context, snapshot.data);
+    return builder.call(context, snapshot.data!);
   }
 }

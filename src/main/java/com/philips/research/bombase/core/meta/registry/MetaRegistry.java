@@ -65,8 +65,10 @@ public class MetaRegistry {
     private void cascadeListeners(PackageAttributeEditor editor) {
         if (editor.isModified()) {
             final var modifiedFields = editor.getModifiedFields();
-            LOG.info("Updated {} for {}", modifiedFields, editor.getPurl());
+            LOG.info("Updated {}: {}", editor.getPurl(), modifiedFields);
             notifyListeners(editor.getPurl(), modifiedFields, editor.getValues());
+        } else {
+            LOG.info("No update of {}", editor.getPurl());
         }
     }
 

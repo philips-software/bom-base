@@ -26,6 +26,11 @@ public interface PyPiAPI {
         Map<String, List<FileJson>> releases = new HashMap<>();
 
         @Override
+        public Optional<String> getName() {
+            return Optional.ofNullable(info.name);
+        }
+
+        @Override
         public Optional<String> getSummary() {
             return Optional.ofNullable(info.summary);
         }
@@ -50,6 +55,7 @@ public interface PyPiAPI {
     }
 
     class InfoJson {
+        @NullOr String name;
         @NullOr String summary;
         @NullOr URI homePage;
         @NullOr String license;

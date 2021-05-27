@@ -12,7 +12,6 @@ import com.philips.research.bombase.core.meta.registry.PackageAttributeEditor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
@@ -44,12 +43,13 @@ public class ClearlyDefinedHarvester implements MetaRegistry.PackageListener {
         client.getPackageDefinition(purl).ifPresent(def -> {
             int metaScore = def.getDescribedScore();
             int licenseScore = def.getLicensedScore();
+            storeField(pkg, Field.TITLE, metaScore, def.getTitle());
             storeField(pkg, Field.SOURCE_LOCATION, metaScore, def.getSourceLocation());
             storeField(pkg, Field.DOWNLOAD_LOCATION, metaScore, def.getDownloadLocation());
             storeField(pkg, Field.HOME_PAGE, metaScore, def.getHomepage());
             storeField(pkg, Field.ATTRIBUTION, metaScore, def.getAuthors());
             storeField(pkg, Field.DECLARED_LICENSE, metaScore, def.getDeclaredLicense());
-            storeField(pkg, Field.DETECTED_LICENSE, licenseScore, joinByAnd(def.getDetectedLicenses()));
+            storeField(pkg, Field.DETECTED_LICENSES, licenseScore, def.getDetectedLicenses());
             storeField(pkg, Field.SHA1, metaScore, def.getSha1());
             storeField(pkg, Field.SHA256, metaScore, def.getSha256());
         });
@@ -57,13 +57,5 @@ public class ClearlyDefinedHarvester implements MetaRegistry.PackageListener {
 
     private <T> void storeField(PackageAttributeEditor pkg, Field field, int score, Optional<T> value) {
         value.ifPresent(v -> pkg.update(field, score, v));
-    }
-
-    Optional<String> joinByAnd(List<String> licenses) {
-        if (licenses.isEmpty()) {
-            return Optional.empty();
-        }
-
-        return Optional.of(String.join(" AND ", licenses));
     }
 }

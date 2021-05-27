@@ -50,6 +50,11 @@ public interface ClearlyDefinedAPI {
         }
 
         @Override
+        public Optional<String> getTitle() {
+            return described.getName();
+        }
+
+        @Override
         public Optional<URI> getDownloadLocation() {
             return described.getDownloadLocation();
         }
@@ -76,8 +81,9 @@ public interface ClearlyDefinedAPI {
         }
 
         @Override
-        public List<String> getDetectedLicenses() {
-            return licensed.getDetectedLicenses();
+        public Optional<List<String>> getDetectedLicenses() {
+            final var list = licensed.getDetectedLicenses();
+            return list.isEmpty() ? Optional.empty() : Optional.of(list);
         }
 
         @Override
@@ -97,6 +103,10 @@ public interface ClearlyDefinedAPI {
         @NullOr HashJson hashes;
         @NullOr URI projectWebsite;
         ScoreJson score;
+
+        Optional<String> getName() {
+            return Optional.ofNullable((sourceLocation != null && sourceLocation.name != null) ? sourceLocation.name : null);
+        }
 
         Optional<URI> getDownloadLocation() {
             return Optional.ofNullable((urls != null && urls.download != null) ? urls.download : null);
@@ -120,6 +130,7 @@ public interface ClearlyDefinedAPI {
     }
 
     class SourceLocationJson {
+        @NullOr String name;
         @NullOr URI url;
     }
 

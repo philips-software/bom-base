@@ -13,6 +13,7 @@ import org.junit.jupiter.api.Test;
 import org.skyscreamer.jsonassert.JSONAssert;
 
 import java.time.Instant;
+import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
@@ -21,7 +22,8 @@ class PackageJsonTest {
     private static final ObjectMapper MAPPER = new JacksonConfiguration().objectMapper();
     private static final String PURL = "pkg:type/namespace/name@version";
     private static final String ID = "pkg%253Atype%252Fnamespace%252Fname%2540version";
-    private static final String TIMESTAMP = DateTimeFormatter.ISO_DATE_TIME.withZone(ZoneId.from(ZoneOffset.UTC)).format(Instant.now());
+    private static final String TIMESTAMP = DateTimeFormatter.ISO_DATE_TIME.withZone(ZoneId.from(ZoneOffset.UTC))
+            .format(Instant.ofEpochSecond(12345678));
 
     @Test
     void createsFromPurl() throws Exception {
