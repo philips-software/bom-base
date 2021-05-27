@@ -29,7 +29,7 @@ class LicenseCard extends StatelessWidget {
             if (package.detectedLicenses.isNotEmpty)
               Padding(
                 padding: const EdgeInsets.only(top: 8.0),
-                child: Text('Detected:'),
+                child: Text('Found in sources:', style: style.subtitle2),
               ),
             ...package.detectedLicenses.map((lic) => _license(lic)),
           ],
@@ -44,7 +44,7 @@ class LicenseCard extends StatelessWidget {
         if (license == package.declaredLicense)
           Icon(Icons.check, color: Colors.green)
         else
-          Icon(Icons.warning, color: Colors.red),
+          Icon(Icons.warning, color: Colors.orange),
         Flexible(child: Text(license)),
       ],
     );
