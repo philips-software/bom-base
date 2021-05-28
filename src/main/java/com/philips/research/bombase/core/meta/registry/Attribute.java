@@ -13,14 +13,14 @@ import java.util.Optional;
 /**
  * Current value for a field.
  */
-public class Attribute {
+public class Attribute<T> implements AttributeValue<T> {
     private static final int TRUTH = 100;
 
     private final Field field;
     private int score;
-    private @NullOr Object value;
+    private @NullOr T value;
     private int altScore;
-    private @NullOr Object altValue;
+    private @NullOr T altValue;
 
     public Attribute(Field field) {
         this.field = field;
@@ -30,11 +30,16 @@ public class Attribute {
         return this.field;
     }
 
-    public <T> Optional<T> getValue() {
-        return Optional.ofNullable((T) value);
+    public Optional<T> getValue() {
+        return Optional.ofNullable(value);
     }
 
-    boolean setValue(int score, @NullOr Object value) {
+    @Override
+    public int getScore() {
+        return score;
+    }
+
+    boolean setValue(int score, @NullOr T value) {
         if (value == null || score <= 0 || (this.score == TRUTH && score < TRUTH)) {
             return false;
         }
@@ -51,21 +56,31 @@ public class Attribute {
         }
     }
 
-    private void updateTruth(Object value) {
+    private void updateTruth(@NullOr T value) {
         this.score = TRUTH;
         this.value = value;
         this.altScore = 0;
         this.altValue = null;
     }
 
-    private void updateAltValue(int score, Object value) {
+    @Override
+    public Optional<T> getAltValue() {
+        return Optional.ofNullable((altScore > 0) ? altValue : null);
+    }
+
+    @Override
+    public int getAltScore() {
+        return altScore;
+    }
+
+    private void updateAltValue(int score, @NullOr T value) {
         if (score > this.altScore) {
             this.altScore = score;
             this.altValue = value;
         }
     }
 
-    private boolean updateValue(int score, Object value) {
+    private boolean updateValue(int score, @NullOr T value) {
         if (!value.equals(this.value)) {
             replaceValue(score, value);
             return true;
@@ -75,22 +90,18 @@ public class Attribute {
         }
     }
 
-    private void replaceValue(int score, Object value) {
+    private void replaceValue(int score, @NullOr T value) {
         this.altScore = this.score;
         this.altValue = this.value;
         this.value = value;
         this.score = score;
     }
 
-    public Optional<Object> getContested() {
-        return Optional.ofNullable((altScore > 0) ? altValue : null);
-    }
-
     @Override
-    public final boolean equals(Object o) {
+    public final boolean equals(@NullOr Object o) {
         if (this == o) return true;
         if (!(o instanceof Attribute)) return false;
-        Attribute attribute = (Attribute) o;
+        Attribute<?> attribute = (Attribute<?>) o;
         return field == attribute.field;
     }
 

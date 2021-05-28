@@ -6,6 +6,7 @@
 package com.philips.research.bombase.core;
 
 import com.github.packageurl.PackageURL;
+import pl.tlinkowski.annotation.basic.NullOr;
 
 import java.time.Instant;
 import java.util.List;
@@ -16,13 +17,20 @@ import java.util.Map;
  */
 public interface MetaService {
     /**
+     * Creates a new package.
+     *
+     * @param purl package id
+     */
+    void createPackage(PackageURL purl);
+
+    /**
      * Reads all stored metadata for a package.
      *
      * @param purl package id
      * @return value per field
      * @throws UnknownPackageException if the package does not exist
      */
-    Map<String, Object> getAttributes(PackageURL purl);
+    Map<String, AttributeDto> getAttributes(PackageURL purl);
 
     /**
      * Updates selected attributes of a package.
@@ -30,9 +38,10 @@ public interface MetaService {
      *
      * @param purl   package id
      * @param values new value per field
+     * @return all stored metadata for the package.
      * @Param origin source of the updated value(s)
      */
-    void setAttributes(PackageURL purl, Map<String, Object> values);
+    Map<String, AttributeDto> setAttributes(PackageURL purl, Map<String, Object> values);
 
     /**
      * @return Most recent scans
@@ -53,5 +62,12 @@ public interface MetaService {
     class PackageDto {
         public PackageURL purl;
         public Instant updated;
+    }
+
+    class AttributeDto {
+        public @NullOr Object value;
+        public int score;
+        public @NullOr Object altValue;
+        public int altScore;
     }
 }

@@ -8,6 +8,7 @@ package com.philips.research.bombase.controller;
 import com.github.packageurl.MalformedPackageURLException;
 import com.github.packageurl.PackageURL;
 import com.philips.research.bombase.core.MetaService;
+import com.philips.research.bombase.core.UnknownPackageException;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
@@ -15,6 +16,7 @@ import pl.tlinkowski.annotation.basic.NullOr;
 
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
+import java.util.Map;
 
 @RestController
 @CrossOrigin(origins = "*")
@@ -29,11 +31,13 @@ public class PackagesRoute {
     @GetMapping("{purl}")
     PackageJson getPackage(@PathVariable String purl) {
         final var pkgUrl = packageUrl(purl);
-        final var attributes = service.getAttributes(pkgUrl);
-        if (attributes.isEmpty()) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "No metadata (yet)");
+        try {
+            final var attributes = service.getAttributes(pkgUrl);
+            return new PackageJson(pkgUrl, attributes);
+        } catch (UnknownPackageException e) {
+            service.createPackage(pkgUrl);
+            throw e;
         }
-        return new PackageJson(pkgUrl, attributes);
     }
 
     @GetMapping()
@@ -49,6 +53,20 @@ public class PackagesRoute {
 
     private String orEmpty(@NullOr String string) {
         return (string != null) ? string : "";
+    }
+
+    @GetMapping("{purl}/details")
+    AttributesJson getPackageDetails(@PathVariable String purl) {
+        final var pkgUrl = packageUrl(purl);
+        final var attributes = service.getAttributes(pkgUrl);
+        return new AttributesJson(attributes);
+    }
+
+    @PostMapping("{purl}/details")
+    AttributesJson setPackageDetails(@PathVariable String purl, @RequestBody Map<String, Object> body) {
+        final var pkgUrl = packageUrl(purl);
+        final var attributes = service.setAttributes(pkgUrl, body);
+        return new AttributesJson(attributes);
     }
 
     private PackageURL packageUrl(String purl) {
