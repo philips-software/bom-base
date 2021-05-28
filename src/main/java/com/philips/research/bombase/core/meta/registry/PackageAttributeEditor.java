@@ -33,7 +33,10 @@ public class PackageAttributeEditor {
      * @return current value of the indicated field
      */
     public <T> Optional<T> get(Field field) {
-        return pkg.getAttributeFor(field).flatMap(Attribute::getValue);
+        //noinspection unchecked
+        return pkg.getAttributeFor(field)
+                .flatMap(Attribute::getValue)
+                .map(a -> (T) a);
     }
 
     /**

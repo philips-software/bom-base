@@ -29,7 +29,7 @@ class AttributeTest {
     void createsInstance() {
         assertThat(field.getField()).isEqualTo(FIELD);
         assertThat(field.getValue()).isEmpty();
-        assertThat(field.getContested()).isEmpty();
+        assertThat(field.getAltValue()).isEmpty();
     }
 
     @Test
@@ -38,7 +38,7 @@ class AttributeTest {
 
         assertThat(modified).isTrue();
         assertThat(field.getValue()).contains(VALUE);
-        assertThat(field.getContested()).isEmpty();
+        assertThat(field.getAltValue()).isEmpty();
     }
 
     @Test
@@ -48,7 +48,7 @@ class AttributeTest {
 
         assertThat(modified).isTrue();
         assertThat(field.getValue()).contains(OTHER_VALUE);
-        assertThat(field.getContested()).contains(VALUE);
+        assertThat(field.getAltValue()).contains(VALUE);
     }
 
     @Test
@@ -57,7 +57,7 @@ class AttributeTest {
         final var modified = field.setValue(HIGHER_SCORE, VALUE);
 
         assertThat(modified).isFalse();
-        assertThat(field.getContested()).isEmpty();
+        assertThat(field.getAltValue()).isEmpty();
     }
 
     @Test
@@ -83,7 +83,7 @@ class AttributeTest {
 
         assertThat(modified).isFalse();
         assertThat(field.getValue()).contains(VALUE);
-        assertThat(field.getContested()).contains(OTHER_VALUE);
+        assertThat(field.getAltValue()).contains(OTHER_VALUE);
     }
 
     @Test
@@ -94,7 +94,7 @@ class AttributeTest {
 
         assertThat(modified).isTrue();
         assertThat(field.getValue()).contains(OTHER_VALUE);
-        assertThat(field.getContested()).contains(VALUE);
+        assertThat(field.getAltValue()).contains(VALUE);
     }
 
     @Test
@@ -105,7 +105,7 @@ class AttributeTest {
 
         assertThat(modified).isFalse();
         assertThat(field.getValue()).contains(VALUE);
-        assertThat(field.getContested()).contains(OTHER_VALUE);
+        assertThat(field.getAltValue()).contains(OTHER_VALUE);
     }
 
     @Test
@@ -116,7 +116,7 @@ class AttributeTest {
 
         assertThat(modified).isTrue();
         assertThat(field.getValue()).contains(VALUE);
-        assertThat(field.getContested()).contains(OTHER_VALUE);
+        assertThat(field.getAltValue()).contains(OTHER_VALUE);
     }
 
     @Test
@@ -127,7 +127,7 @@ class AttributeTest {
 
         assertThat(modified).isFalse();
         assertThat(field.getValue()).contains(VALUE);
-        assertThat(field.getContested()).isEmpty();
+        assertThat(field.getAltValue()).isEmpty();
     }
 
     @Test

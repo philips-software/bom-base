@@ -8,6 +8,7 @@ package com.philips.research.bombase.core.meta;
 import com.github.packageurl.PackageURL;
 import com.philips.research.bombase.ConfigProperties;
 import com.philips.research.bombase.core.MetaService;
+import com.philips.research.bombase.core.UnknownPackageException;
 import com.philips.research.bombase.core.clearlydefined.domain.ClearlyDefinedHarvester;
 import com.philips.research.bombase.core.meta.registry.Field;
 import com.philips.research.bombase.core.meta.registry.MetaRegistry;
@@ -57,22 +58,27 @@ public class MetaInteractor implements MetaService {
     }
 
     @Override
-    public Map<String, Object> getAttributes(PackageURL purl) {
-        final var values = new HashMap<String, Object>();
-        registry.edit(purl, pkg -> pkg.getValues().forEach((field, value) -> {
-            if (value != null) {
-                values.put(field.name().toLowerCase(), value);
-            }
-        }));
+    public void createPackage(PackageURL purl) {
+        registry.edit(purl, pkg -> {
+        });
+    }
+
+    @Override
+    public Map<String, AttributeDto> getAttributes(PackageURL purl) {
+        final var values = new HashMap<String, AttributeDto>();
+        registry.getAttributeValues(purl)
+                .orElseThrow(() -> new UnknownPackageException(purl))
+                .forEach((field, attribute) -> values.put(field.name().toLowerCase(), DtoMapper.toDto(attribute)));
         return values;
     }
 
     @Override
-    public void setAttributes(PackageURL purl, Map<String, @NullOr Object> values) {
+    public Map<String, AttributeDto> setAttributes(PackageURL purl, Map<String, @NullOr Object> values) {
         registry.edit(purl, pkg -> values.forEach((key, value) -> {
             final var field = Field.valueOf(Field.class, key.toUpperCase());
             pkg.update(field, 100, value);
         }));
+        return getAttributes(purl);
     }
 
     @Override

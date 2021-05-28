@@ -7,6 +7,7 @@ package com.philips.research.bombase.controller;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.github.packageurl.PackageURL;
+import com.philips.research.bombase.core.MetaService.AttributeDto;
 import com.philips.research.bombase.core.MetaService.PackageDto;
 import pl.tlinkowski.annotation.basic.NullOr;
 
@@ -28,7 +29,7 @@ class PackageJson {
         this(purl, null);
     }
 
-    PackageJson(PackageURL purl, @NullOr Map<String, Object> attributes) {
+    PackageJson(PackageURL purl, @NullOr Map<String, AttributeDto> attributes) {
         this(purl, Instant.now(), attributes);
     }
 
@@ -36,11 +37,15 @@ class PackageJson {
         this(dto.purl, dto.updated, null);
     }
 
-    PackageJson(PackageURL purl, Instant updated, @NullOr Map<String, Object> attributes) {
+    PackageJson(PackageURL purl, Instant updated, @NullOr Map<String, AttributeDto> attributes) {
         this.purl = purl.canonicalize();
         this.id = encode(encode(this.purl));
         this.updated = updated;
-        this.attributes = attributes;
+        this.attributes = (attributes != null)
+                ? attributes.entrySet().stream()
+                .filter(e -> e.getValue().value != null)
+                .collect(Collectors.toMap(Map.Entry::getKey, e -> e.getValue().value))
+                : null;
     }
 
     private static String encode(String purl) {

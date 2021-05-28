@@ -7,6 +7,7 @@ package com.philips.research.bombase.core.meta;
 
 import com.github.packageurl.PackageURL;
 import com.philips.research.bombase.core.MetaService;
+import com.philips.research.bombase.core.UnknownPackageException;
 import com.philips.research.bombase.core.meta.registry.*;
 import com.philips.research.bombase.core.meta.registry.Package;
 import com.philips.research.bombase.core.meta.registry.MetaRegistry.PackageListener;
@@ -17,6 +18,7 @@ import org.junit.jupiter.api.Test;
 import java.util.*;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.*;
 
 class MetaInteractorTest {
@@ -40,6 +42,15 @@ class MetaInteractorTest {
         } catch (Exception e) {
             throw new IllegalArgumentException(e);
         }
+    }
+
+    @Test
+    void createsNewPackage() {
+        when(store.createPackage(PURL)).thenReturn(pkg);
+
+        interactor.createPackage(PURL);
+
+        verify(store).createPackage(PURL);
     }
 
     @Test
@@ -73,22 +84,18 @@ class MetaInteractorTest {
 
             final var values = interactor.getAttributes(PURL);
 
-            assertThat(values).hasSize(1).containsEntry("title", TITLE);
+            final var attr = values.get(Field.TITLE.name().toLowerCase());
+            assert attr.value != null;
+            assertThat(attr.value).isEqualTo(TITLE);
         }
 
         @Test
-        void queriesOnlyPackageAttributesHoldingValues() {
-            pkg.add(new Attribute(Field.SHA1));
-
-            assertThat(interactor.getAttributes(PURL)).isEmpty();
-        }
-
-        @Test
-        void createsPackage_queryUnknownPackage() {
+        void throws_queryUnknownPackage() {
             when(store.findPackage(PURL)).thenReturn(Optional.empty());
             when(store.createPackage(PURL)).thenReturn(pkg);
 
-            assertThat(interactor.getAttributes(PURL)).isEmpty();
+            assertThatThrownBy(() -> interactor.getAttributes(PURL))
+                    .isInstanceOf(UnknownPackageException.class);
         }
     }
 
