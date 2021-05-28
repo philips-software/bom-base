@@ -9,6 +9,8 @@ import java.net.URI;
 import java.util.Optional;
 
 interface ReleaseDefinition {
+    Optional<String> getName();
+
     Optional<String> getSummary();
 
     Optional<URI> getHomepage();

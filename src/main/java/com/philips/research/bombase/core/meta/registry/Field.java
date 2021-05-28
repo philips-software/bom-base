@@ -27,7 +27,8 @@ public enum Field {
     SHA256(String.class), // Hash of distribution artifact
     SOURCE_LOCATION(URI.class), // URL for the source code
     DECLARED_LICENSE(String.class), // License string according to the distributor
-    DETECTED_LICENSE(String.class); // License strings in source code
+    //TODO Is there a way around type-erasure?
+    DETECTED_LICENSES(List.class); // License strings in source code
 
     private final Class<?> typeClass;
 

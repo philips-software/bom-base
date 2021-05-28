@@ -13,13 +13,13 @@ import 'package:test/test.dart';
 import 'package_service_test.mocks.dart';
 
 @GenerateMocks([BomBaseClient])
-main() {
+void main() {
   group('$PackageService', () {
-    late MockBomBarClient client;
+    late MockBomBaseClient client;
     late PackageService service;
 
     setUp(() {
-      client = MockBomBarClient();
+      client = MockBomBaseClient();
       service = PackageService(client: client);
     });
 

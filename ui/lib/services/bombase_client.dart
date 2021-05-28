@@ -12,10 +12,27 @@ import 'package:flutter/foundation.dart';
 import '../model/package.dart';
 
 class BomBaseClient {
+  static late final instance = BomBaseClient();
+
+  BomBaseClient() {
+    if (kDebugMode) {
+      _enableHttpLogging();
+    }
+  }
+
   final Dio dio = Dio();
   final Uri baseUri =
       Uri.http(kIsWeb && !kDebugMode ? '' : 'localhost:8080', '/');
   late final Uri _packagesUri = baseUri.resolve('packages/');
+
+  void _enableHttpLogging() {
+    dio.interceptors.add(LogInterceptor(
+      responseBody: false,
+      requestHeader: false,
+      responseHeader: false,
+      logPrint: (o) => log(o as String),
+    ));
+  }
 
   Future<List<Package>> find(
       String type, String namespace, String name, String version) async {

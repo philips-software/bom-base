@@ -11,7 +11,8 @@ import 'package:provider/provider.dart';
 import '../model/package.dart';
 
 class PackageService {
-  PackageService({required this.client});
+  PackageService({BomBaseClient? client})
+      : client = client ?? BomBaseClient.instance;
 
   final BomBaseClient client;
   final _foundStream = StreamController<List<Package>>.broadcast();

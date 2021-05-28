@@ -1,13 +1,20 @@
 #!/bin/bash
 set -e
 
-echo "(1/3) Run unit tests"
+echo "(1/5) Generate mocks"
+flutter pub get
+flutter pub run build_runner build --delete-conflicting-outputs
+
+echo "(2/5) Static code check"
+flutter analyze
+
+echo "(3/5) Run unit tests"
 flutter test
 
-echo "(2/3) Build release executable"
+echo "(4/5) Build release executable"
 flutter build web
 
-echo "(3/3) Install resources in server"
+echo "(5/5) Install resources in server"
 rm -rf ../src/main/resources/static
 cp -R build/web/. ../src/main/resources/static
 

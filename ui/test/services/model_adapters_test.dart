@@ -7,7 +7,7 @@ import 'package:bom_base_ui/model/package.dart';
 import 'package:bom_base_ui/services/model_adapters.dart';
 import 'package:test/test.dart';
 
-main() {
+void main() {
   group('parsing $Package from JSON', () {
     const id = 'id';
     final purl = Uri.parse('pkg:purl');
@@ -35,8 +35,8 @@ main() {
     test('fixes missing fields', () {
       final pkg = toPackage({});
 
-      expect(pkg.id, "?");
-      expect(pkg.purl, Uri.parse("undefined"));
+      expect(pkg.id, '?');
+      expect(pkg.purl, Uri.parse('undefined'));
       expect(pkg.updated, DateTime(2000));
     });
   });

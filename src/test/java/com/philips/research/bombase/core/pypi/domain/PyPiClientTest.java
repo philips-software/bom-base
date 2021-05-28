@@ -66,6 +66,7 @@ class PyPiClientTest {
     void getsMetadataFromServer() throws Exception {
         mockServer.enqueue(new MockResponse().setBody(new JSONObject()
                 .put("info", new JSONObject()
+                        .put("name", NAME)
                         .put("summary", SUMMARY)
                         .put("home_page", HOMEPAGE)
                         .put("license", DECLARED_LICENSE))
@@ -83,6 +84,7 @@ class PyPiClientTest {
         final var request = mockServer.takeRequest();
         assertThat(request.getMethod()).isEqualTo("GET");
         assertThat(request.getPath()).isEqualTo(String.format("/pypi/%s/%s/json", NAME, VERSION));
+        assertThat(release.getName()).contains(NAME);
         assertThat(release.getSummary()).contains(SUMMARY);
         assertThat(release.getHomepage()).contains(URI.create(HOMEPAGE));
         assertThat(release.getLicense()).contains(DECLARED_LICENSE);
