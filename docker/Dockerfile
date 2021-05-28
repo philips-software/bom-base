@@ -10,4 +10,6 @@ COPY docker/start.sh /app/start.sh
 
 EXPOSE 8080
 
+RUN scancode --version
+
 ENTRYPOINT ["/app/start.sh"]
