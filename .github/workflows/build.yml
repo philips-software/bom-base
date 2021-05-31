@@ -63,7 +63,6 @@ jobs:
           rm -rf src/main/resources/static
           mkdir -p src/main/resources/static
           cp -R frontend/* src/main/resources/static/
-          ls -lah src/main/resources/static
 
       - name: Build with Maven
         run: mvn --no-transfer-progress install -DskipTests
