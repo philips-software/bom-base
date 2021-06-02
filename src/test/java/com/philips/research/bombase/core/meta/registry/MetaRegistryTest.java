@@ -50,6 +50,16 @@ class MetaRegistryTest {
     }
 
     @Test
+    void readsPackageFieldValues() {
+        registry.edit(PURL, pkg -> pkg.update(FIELD, SCORE, VALUE));
+
+        final var values = registry.getAttributeValues(PURL).orElseThrow();
+
+        assertThat(values.get(FIELD).getScore()).isEqualTo(SCORE);
+        assertThat(values.get(FIELD).getValue()).isEqualTo(Optional.of(VALUE));
+    }
+
+    @Test
     void editsPackageFields() {
         registry.edit(PURL, editor -> editor.update(FIELD, SCORE, VALUE));
 

@@ -15,7 +15,7 @@ import java.util.stream.Stream;
 
 public class Package {
     private final PackageURL purl;
-    private final Set<Attribute> attributes = new HashSet<>();
+    private final Set<Attribute<?>> attributes = new HashSet<>();
     private Instant lastUpdated = Instant.now();
 
     public Package(PackageURL purl) {
@@ -34,7 +34,7 @@ public class Package {
         return lastUpdated;
     }
 
-    public Attribute add(Attribute attribute) {
+    public Attribute<?> add(Attribute<?> attribute) {
         if (attributes.contains(attribute)) {
             throw new IllegalArgumentException("The " + attribute.getField().name() + " attribute already exists in package " + purl);
         }
@@ -42,14 +42,15 @@ public class Package {
         return attribute;
     }
 
-    public Optional<Attribute> getAttributeFor(Field field) {
+    public <T> Optional<Attribute<T>> getAttributeFor(Field field) {
+        //noinspection unchecked
         return attributes.stream()
+                .map(attr -> (Attribute<T>) attr)
                 .filter(attr -> attr.getField() == field)
                 .findFirst();
     }
 
-    public Stream<Attribute> getAttributes() {
+    public Stream<Attribute<?>> getAttributes() {
         return attributes.stream();
     }
-
 }

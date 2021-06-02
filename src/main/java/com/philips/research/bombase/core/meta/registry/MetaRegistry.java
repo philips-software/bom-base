@@ -16,6 +16,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.function.Consumer;
+import java.util.stream.Collectors;
 
 @Service
 public class MetaRegistry {
@@ -42,6 +43,12 @@ public class MetaRegistry {
     public void addListener(PackageListener listener) {
         LOG.info("Registered {} listener", nameFor(listener));
         listeners.add(listener);
+    }
+
+    public Optional<Map<Field, AttributeValue<?>>> getAttributeValues(PackageURL purl) {
+        return store.findPackage(purl)
+                .map(pkg -> pkg.getAttributes()
+                        .collect(Collectors.toMap(Attribute::getField, a -> a)));
     }
 
     public void edit(PackageURL purl, Consumer<PackageAttributeEditor> consumer) {

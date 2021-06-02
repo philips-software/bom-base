@@ -92,6 +92,14 @@ Run application:
 docker run -p 8080:8080 bom-base
 ```
 
+### Image from docker hub
+
+Run application:
+
+```
+docker run -p 8080:8080 philipssoftware/bom-base:latest
+```
+
 ## How to test the software
 
 Unit tests are executed by the Maven `mvn clean test` command.
