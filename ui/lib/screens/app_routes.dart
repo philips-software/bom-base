@@ -3,6 +3,9 @@
  * SPDX-License-Identifier: MIT
  */
 
+import 'dart:io';
+
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:yeet/yeet.dart';
 
@@ -27,6 +30,12 @@ final routes = Yeet(
     )
   ],
 );
+
+PageRoute<dynamic> appRoute(Widget Function(BuildContext) builder) {
+  return (Platform.isIOS || Platform.isMacOS)
+      ? CupertinoPageRoute(builder: builder)
+      : MaterialPageRoute(builder: builder);
+}
 
 class NotFoundView extends StatelessWidget {
   NotFoundView(this.path);

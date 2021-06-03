@@ -3,11 +3,14 @@
  * SPDX-License-Identifier: MIT
  */
 
-import 'package:bom_base_ui/screens/widgets/link_text.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
 import '../../model/package.dart';
+import '../app_routes.dart';
+import '../attributes/package_editor.dart';
+import '../widgets/edit_card.dart';
+import '../widgets/link_text.dart';
 
 class PackageCard extends StatelessWidget {
   static final dateTimeFormat = DateFormat.yMd().add_Hm();
@@ -19,7 +22,9 @@ class PackageCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final style = Theme.of(context).textTheme;
-    return Card(
+    return EditCard(
+      onEdit: () =>
+          Navigator.push(context, appRoute((_) => PackageEditor(package))),
       child: Padding(
         padding: const EdgeInsets.all(8.0),
         child: Column(
