@@ -14,16 +14,16 @@ import org.junit.jupiter.api.Test;
 import static org.assertj.core.api.Assertions.assertThat;
 
 class ClearlyDefinedAPITest {
-    private static final int MAX_SCORE = 70;
+    private static final int SCORE = 42;
 
     @Test
     void derivesMetadataScore() {
         final var response = new ResponseJson();
         response.described = new DescribedJson();
         response.described.score = new ScoreJson();
-        response.described.score.total = 50;
+        response.described.score.total = SCORE;
 
-        assertThat(response.getDescribedScore()).isEqualTo((int) (50 / 100f * MAX_SCORE));
+        assertThat(response.getDescribedScore()).isEqualTo(SCORE);
     }
 
     @Test
@@ -31,9 +31,9 @@ class ClearlyDefinedAPITest {
         final var response = new ResponseJson();
         response.licensed = new LicensedJson();
         response.licensed.score = new ScoreJson();
-        response.licensed.score.total = 50;
+        response.licensed.score.total = SCORE;
 
-        assertThat(response.getLicensedScore()).isEqualTo((int) (50 / 100f * MAX_SCORE));
+        assertThat(response.getLicensedScore()).isEqualTo(SCORE);
     }
 
     @Test
