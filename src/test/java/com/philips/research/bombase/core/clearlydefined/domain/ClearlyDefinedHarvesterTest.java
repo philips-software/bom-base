@@ -23,7 +23,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.*;
 
 class ClearlyDefinedHarvesterTest {
-    private static final String TYPE = "type";
+    private static final String TYPE = "maven";
     private static final String NAMESPACE = "namespace";
     private static final String NAME = "name";
     private static final String VERSION = "version";
@@ -36,8 +36,11 @@ class ClearlyDefinedHarvesterTest {
     private static final String DETECTED_LICENSE = "Detected";
     private static final String SHA1 = "Sha1";
     private static final String SHA256 = "Sha256";
-    private static final int META_SCORE = 70;
-    private static final int LICENSE_SCORE = 60;
+    private static final int MAX_SCORE = 70;
+    private static final int META_SCORE = 73;
+    private static final int META_TOTAL_SCORE = Math.round((META_SCORE * MAX_SCORE)/100f);
+    private static final int LICENSE_SCORE = 42;
+    private static final int LICENSE_TOTAL_SCORE = Math.round((LICENSE_SCORE * MAX_SCORE)/100f);
 
     private final ClearlyDefinedClient client = mock(ClearlyDefinedClient.class);
     private final ClearlyDefinedHarvester listener = new ClearlyDefinedHarvester(client);
@@ -57,6 +60,13 @@ class ClearlyDefinedHarvesterTest {
             final var task = listener.onUpdated(PURL, Set.of(), Map.of());
 
             assertThat(task).isNotEmpty();
+        }
+
+        @Test
+        void returnsNothing_unsupportedPurlType() {
+            final var task = listener.onUpdated(toPurl("pkg:generic/name@version"), Set.of(), Map.of());
+
+            assertThat(task).isEmpty();
         }
 
         @Test
@@ -94,15 +104,15 @@ class ClearlyDefinedHarvesterTest {
 
             task.accept(pkg);
 
-            verify(pkg).update(Field.TITLE, META_SCORE, NAME);
-            verify(pkg).update(Field.SOURCE_LOCATION, META_SCORE, SOURCE_LOCATION);
-            verify(pkg).update(Field.DOWNLOAD_LOCATION, META_SCORE, DOWNLOAD_LOCATION);
-            verify(pkg).update(Field.HOME_PAGE, META_SCORE, HOMEPAGE);
-            verify(pkg).update(Field.ATTRIBUTION, META_SCORE, ATTRIBUTION);
-            verify(pkg).update(Field.DECLARED_LICENSE, META_SCORE, DECLARED_LICENSE);
-            verify(pkg).update(Field.DETECTED_LICENSES, LICENSE_SCORE, List.of(DETECTED_LICENSE));
-            verify(pkg).update(Field.SHA1, META_SCORE, SHA1);
-            verify(pkg).update(Field.SHA256, META_SCORE, SHA256);
+            verify(pkg).update(Field.TITLE, META_TOTAL_SCORE, NAME);
+            verify(pkg).update(Field.SOURCE_LOCATION, META_TOTAL_SCORE, SOURCE_LOCATION);
+            verify(pkg).update(Field.DOWNLOAD_LOCATION, META_TOTAL_SCORE, DOWNLOAD_LOCATION);
+            verify(pkg).update(Field.HOME_PAGE, META_TOTAL_SCORE, HOMEPAGE);
+            verify(pkg).update(Field.ATTRIBUTION, META_TOTAL_SCORE, ATTRIBUTION);
+            verify(pkg).update(Field.DECLARED_LICENSE, META_TOTAL_SCORE, DECLARED_LICENSE);
+            verify(pkg).update(Field.DETECTED_LICENSES, LICENSE_TOTAL_SCORE, List.of(DETECTED_LICENSE));
+            verify(pkg).update(Field.SHA1, META_TOTAL_SCORE, SHA1);
+            verify(pkg).update(Field.SHA256, META_TOTAL_SCORE, SHA256);
         }
     }
 }

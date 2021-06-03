@@ -17,9 +17,6 @@ import java.util.Optional;
 import java.util.function.Function;
 
 public interface ClearlyDefinedAPI {
-    //TODO Is this even a realistic score?
-    int MAX_SCORE = 70;
-
     @GET("definitions/{type}/{provider}/{namespace}/{name}/{revision}")
     Call<ResponseJson> getDefinition(@Path("type") String type, @Path("provider") String provider, @Path("namespace") String namespace,
                                      @Path("name") String name, @Path("revision") String revision);
@@ -37,16 +34,12 @@ public interface ClearlyDefinedAPI {
 
         @Override
         public int getDescribedScore() {
-            return relativeScore(described.score.total);
+            return described.score.total;
         }
 
         @Override
         public int getLicensedScore() {
-            return relativeScore(licensed.score.total);
-        }
-
-        private int relativeScore(int score) {
-            return Math.round((score / 100f) * MAX_SCORE);
+            return licensed.score.total;
         }
 
         @Override

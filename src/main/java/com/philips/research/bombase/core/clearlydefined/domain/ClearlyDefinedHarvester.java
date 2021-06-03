@@ -19,6 +19,10 @@ import java.util.function.Consumer;
 
 @Service
 public class ClearlyDefinedHarvester implements MetaRegistry.PackageListener {
+    //TODO Is this even a realistic score?
+    private static final int MAX_SCORE = 70;
+    private static final Set<String> SUPPORTED_TYPES = Set.of("npm", "gem", "pypi", "maven", "nuget", "github", "cargo", "deb", "composer", "cocoapods");
+
     private final ClearlyDefinedClient client;
 
     @Autowired
@@ -32,7 +36,7 @@ public class ClearlyDefinedHarvester implements MetaRegistry.PackageListener {
 
     @Override
     public Optional<Consumer<PackageAttributeEditor>> onUpdated(PackageURL purl, Set<Field> updated, Map<Field, ?> values) {
-        if (!updated.isEmpty()) {
+        if (!SUPPORTED_TYPES.contains(purl.getType()) || !updated.isEmpty()) {
             return Optional.empty();
         }
 
@@ -41,8 +45,8 @@ public class ClearlyDefinedHarvester implements MetaRegistry.PackageListener {
 
     private void harvest(PackageURL purl, PackageAttributeEditor pkg) {
         client.getPackageDefinition(purl).ifPresent(def -> {
-            int metaScore = def.getDescribedScore();
-            int licenseScore = def.getLicensedScore();
+            int metaScore = absoluteScore(def.getDescribedScore());
+            int licenseScore = absoluteScore(def.getLicensedScore());
             storeField(pkg, Field.TITLE, metaScore, def.getTitle());
             storeField(pkg, Field.SOURCE_LOCATION, metaScore, def.getSourceLocation());
             storeField(pkg, Field.DOWNLOAD_LOCATION, metaScore, def.getDownloadLocation());
@@ -53,6 +57,10 @@ public class ClearlyDefinedHarvester implements MetaRegistry.PackageListener {
             storeField(pkg, Field.SHA1, metaScore, def.getSha1());
             storeField(pkg, Field.SHA256, metaScore, def.getSha256());
         });
+    }
+
+    private int absoluteScore(int score) {
+        return (int) Math.round(MAX_SCORE * score / 100.0);
     }
 
     private <T> void storeField(PackageAttributeEditor pkg, Field field, int score, Optional<T> value) {
