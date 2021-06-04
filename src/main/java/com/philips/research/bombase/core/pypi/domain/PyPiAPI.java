@@ -22,6 +22,7 @@ public interface PyPiAPI {
 
     class ResponseJson implements ReleaseDefinition {
         @NullOr String release = null;
+        @SuppressWarnings("NotNullFieldNotInitialized")
         InfoJson info;
         Map<String, List<FileJson>> releases = new HashMap<>();
 
@@ -48,7 +49,7 @@ public interface PyPiAPI {
         @Override
         public Optional<URI> getSourceUrl() {
             return releases.getOrDefault(release, List.of()).stream()
-                    .filter(file -> file.packagetype.equals("sdist"))
+                    .filter(file -> "sdist".equals(file.packagetype))
                     .map(file -> file.url)
                     .findAny();
         }
@@ -62,7 +63,7 @@ public interface PyPiAPI {
     }
 
     class FileJson {
-        String packagetype;
-        URI url;
+        @NullOr String packagetype;
+        @NullOr URI url;
     }
 }
