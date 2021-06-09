@@ -13,6 +13,7 @@ import com.philips.research.bombase.core.clearlydefined.domain.ClearlyDefinedHar
 import com.philips.research.bombase.core.meta.registry.Field;
 import com.philips.research.bombase.core.meta.registry.MetaRegistry;
 import com.philips.research.bombase.core.pypi.domain.PyPiHarvester;
+import com.philips.research.bombase.core.npm.domain.NpmHarvester;
 import com.philips.research.bombase.core.source_scan.domain.SourceLicensesHarvester;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -48,6 +49,7 @@ public class MetaInteractor implements MetaService {
 
         installListener(ClearlyDefinedHarvester.class);
         installListener(PyPiHarvester.class);
+        installListener(NpmHarvester.class);
         if (properties.isScanLicenses()) {
             installListener(SourceLicensesHarvester.class);
         }
