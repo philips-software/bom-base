@@ -71,17 +71,17 @@ class NpmHarvesterTest {
     class MetadataTaskCreated {
         private final PackageAttributeEditor pkg = mock(PackageAttributeEditor.class);
         private final Consumer<PackageAttributeEditor> task = listener.onUpdated(PURL, Set.of(), Map.of()).orElseThrow();
-        private final ReleaseDefinition response = mock(ReleaseDefinition.class);
+        private final PackageDefinition response = mock(PackageDefinition.class);
 
         @BeforeEach
         void beforeEach() {
-            when(client.getRelease(PURL)).thenReturn(Optional.of(response));
+            when(client.getPackage(PURL)).thenReturn(Optional.of(response));
         }
 
         @Test
         void harvestsMetadata() {
             when(response.getName()).thenReturn(Optional.of(NAME));
-            when(response.getSummary()).thenReturn(Optional.of(DESCRIPTION));
+            when(response.getDescription()).thenReturn(Optional.of(DESCRIPTION));
             when(response.getHomepage()).thenReturn(Optional.of(HOMEPAGE));
             when(response.getLicense()).thenReturn(Optional.of(DECLARED_LICENSE));
             when(response.getSourceUrl()).thenReturn(Optional.of(SOURCE_LOCATION));

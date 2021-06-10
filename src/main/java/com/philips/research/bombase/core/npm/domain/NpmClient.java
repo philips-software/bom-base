@@ -30,7 +30,7 @@ public class NpmClient {
     private final NpmAPI rest;
 
     NpmClient() {
-        this(URI.create("https://registery.npmjs.org"));
+        this(URI.create("https://registry.npmjs.org"));
     }
 
     NpmClient(URI uri) {
@@ -41,13 +41,9 @@ public class NpmClient {
         rest = retrofit.create(NpmAPI.class);
     }
 
-    Optional<ReleaseDefinition> getRelease(PackageURL purl) {
-        final var release = purl.getVersion();
-        return query(rest.getDefinition(purl.getName(), release))
-                .map(resp -> {
-                    resp.release = release;
-                    return resp;
-                });
+    Optional<PackageDefinition> getPackage(PackageURL purl) {
+        return query(rest.getDefinition(purl.getName(), purl.getVersion()))
+                .map(def -> (PackageDefinition) def);
     }
 
     private <T> Optional<T> query(Call<? extends T> query) {

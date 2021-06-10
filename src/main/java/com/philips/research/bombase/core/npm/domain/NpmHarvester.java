@@ -42,9 +42,9 @@ public class NpmHarvester implements MetaRegistry.PackageListener {
     }
 
     private void harvest(PackageURL purl, PackageAttributeEditor pkg) {
-        client.getRelease(purl).ifPresent(release -> {
+        client.getPackage(purl).ifPresent(release -> {
             storeField(pkg, Field.TITLE, release.getName());
-            storeField(pkg, Field.DESCRIPTION, release.getSummary());
+            storeField(pkg, Field.DESCRIPTION, release.getDescription());
             storeField(pkg, Field.HOME_PAGE, release.getHomepage());
             storeField(pkg, Field.DECLARED_LICENSE, release.getLicense());
             storeField(pkg, Field.SOURCE_LOCATION, release.getSourceUrl());

@@ -29,7 +29,7 @@ class NpmClientTest {
     private static final String NAME = "Name";
     private static final String VERSION = "Release";
     private static final PackageURL PURL = createPurl(String.format("pkg:%s/%s/%s@%s", TYPE, NAMESPACE, NAME, VERSION));
-    private static final String SUMMARY = "Summary";
+    private static final String DESCRIPTION = "Description";
     private static final String SOURCE_LOCATION = "https://example.com/source";
     private static final String HOMEPAGE = "https://example.com/home-page";
     private static final String DECLARED_LICENSE = "Declared";
@@ -59,42 +59,39 @@ class NpmClientTest {
     void skipsUndefinedPackage() throws Exception {
         mockServer.enqueue(new MockResponse().setResponseCode(404));
 
-        assertThat(client.getRelease(PURL)).isEmpty();
+        assertThat(client.getPackage(PURL)).isEmpty();
     }
 
     @Test
     void getsMetadataFromServer() throws Exception {
         mockServer.enqueue(new MockResponse().setBody(new JSONObject()
-                .put("info", new JSONObject()
-                        .put("name", NAME)
-                        .put("description", SUMMARY)
-                        .put("home_page", HOMEPAGE)
-                        .put("license", DECLARED_LICENSE)
-                        .put("dist", new JSONObject()
-                            .put("tarball", SOURCE_LOCATION)))
-                .toString()));
-        final var release = client.getRelease(PURL).orElseThrow();
+                .put("name", NAME)
+                .put("description", DESCRIPTION)
+                .put("home_page", HOMEPAGE)
+                .put("license", DECLARED_LICENSE)
+                .put("dist", new JSONObject()
+                    .put("tarball", SOURCE_LOCATION))
+            .toString()));
+        final var definition = client.getPackage(PURL).orElseThrow();
 
         final var request = mockServer.takeRequest();
         assertThat(request.getMethod()).isEqualTo("GET");
         assertThat(request.getPath()).isEqualTo(String.format("/%s/%s", NAME, VERSION));
-        assertThat(release.getName()).contains(NAME);
-        assertThat(release.getSummary()).contains(SUMMARY);
-        assertThat(release.getHomepage()).contains(URI.create(HOMEPAGE));
-        assertThat(release.getLicense()).contains(DECLARED_LICENSE);
-        assertThat(release.getSourceUrl()).contains(URI.create(SOURCE_LOCATION));
+        assertThat(definition.getName()).contains(NAME);
+        assertThat(definition.getDescription()).contains(DESCRIPTION);
+        assertThat(definition.getHomepage()).contains(URI.create(HOMEPAGE));
+        assertThat(definition.getLicense()).contains(DECLARED_LICENSE);
+        assertThat(definition.getSourceUrl()).contains(URI.create(SOURCE_LOCATION));
     }
 
     @Test
     void acceptsEmptyMetadataFromServer() throws Exception {
         mockServer.enqueue(new MockResponse().setBody(new JSONObject()
-                .put("info", new JSONObject())
-                .put("releases", new JSONObject())
                 .toString()));
 
-        final var release = client.getRelease(PURL).orElseThrow();
+        final var release = client.getPackage(PURL).orElseThrow();
 
-        assertThat(release).isInstanceOf(ReleaseDefinition.class);
+        assertThat(release).isInstanceOf(PackageDefinition.class);
     }
 
 
@@ -102,7 +99,7 @@ class NpmClientTest {
     void throws_serverNotReachable() {
         var serverlessClient = new NpmClient(URI.create("http://localhost:1234"));
 
-        assertThatThrownBy(() -> serverlessClient.getRelease(PURL))
+        assertThatThrownBy(() -> serverlessClient.getPackage(PURL))
                 .isInstanceOf(NpmException.class)
                 .hasMessageContaining("not reachable");
     }
@@ -111,7 +108,7 @@ class NpmClientTest {
     void throws_unexpectedResponseFromServer() {
         mockServer.enqueue(new MockResponse().setResponseCode(500));
 
-        assertThatThrownBy(() -> client.getRelease(PURL))
+        assertThatThrownBy(() -> client.getPackage(PURL))
                 .isInstanceOf(NpmException.class)
                 .hasMessageContaining("status 500");
     }

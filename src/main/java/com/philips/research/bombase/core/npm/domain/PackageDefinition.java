@@ -8,10 +8,10 @@ package com.philips.research.bombase.core.npm.domain;
 import java.net.URI;
 import java.util.Optional;
 
-interface ReleaseDefinition {
+interface PackageDefinition {
     Optional<String> getName();
 
-    Optional<String> getSummary();
+    Optional<String> getDescription();
 
     Optional<URI> getHomepage();
 
