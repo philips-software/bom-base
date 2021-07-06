@@ -58,7 +58,7 @@ The backend is built by the Maven `mvn clean install` command, and yields a
 "fat" executable jar containing all dependencies.
 
 The backend server is started as a standard Java executable
-using `java -jar BOM-bar-<version>.jar`.
+using `java -jar BOM-base-<version>.jar`.
 
 Some useful command line parameters are:
 
@@ -103,7 +103,25 @@ docker run -p 8080:8080 philipssoftware/bom-base:latest
 ## How to test the software
 
 Unit tests are executed by the Maven `mvn clean test` command.
+Test requires scancode-toolkit to be installed.
 
+find how to install and configure based on OS at https://scancode-toolkit.readthedocs.io/en/latest/getting-started/install.html#source-code-install 
+
+On Linux/Mac:
+1. Open a terminal
+2. cd to the clone directory
+3. run ./configure
+4. run source bin/activate 
+5. create symbolic links in /usr/local/bin to the build results.
+   Now run the tests.
+   
+On Windows:
+1. open a command prompt
+2. cd to the clone directory
+3. run configure
+4. run Scripts\activate
+   (still need to find how to configure scancode that is available for the tests)
+   
 ## Known issues
 
 The software is not suited for production use.
