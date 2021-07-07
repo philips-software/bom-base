@@ -13,9 +13,15 @@ interface PackageDefinition {
 
     Optional<String> getDescription();
 
+    Optional<String> getAuthor();
+
     Optional<URI> getHomepage();
 
     Optional<String> getLicense();
 
     Optional<URI> getSourceUrl();
+
+    Optional<URI> getDownloadUrl();
+
+    Optional<String> getSha();
 }

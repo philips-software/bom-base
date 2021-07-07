@@ -38,9 +38,9 @@ class ClearlyDefinedHarvesterTest {
     private static final String SHA256 = "Sha256";
     private static final int MAX_SCORE = 70;
     private static final int META_SCORE = 73;
-    private static final int META_TOTAL_SCORE = Math.round((META_SCORE * MAX_SCORE)/100f);
+    private static final int META_TOTAL_SCORE = Math.round((META_SCORE * MAX_SCORE) / 100f);
     private static final int LICENSE_SCORE = 42;
-    private static final int LICENSE_TOTAL_SCORE = Math.round((LICENSE_SCORE * MAX_SCORE)/100f);
+    private static final int LICENSE_TOTAL_SCORE = Math.round((LICENSE_SCORE * MAX_SCORE) / 100f);
 
     private final ClearlyDefinedClient client = mock(ClearlyDefinedClient.class);
     private final ClearlyDefinedHarvester listener = new ClearlyDefinedHarvester(client);

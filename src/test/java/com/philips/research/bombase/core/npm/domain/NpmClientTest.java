@@ -10,7 +10,6 @@ import com.github.packageurl.PackageURL;
 import com.philips.research.bombase.core.npm.NpmException;
 import okhttp3.mockwebserver.MockResponse;
 import okhttp3.mockwebserver.MockWebServer;
-import org.json.JSONArray;
 import org.json.JSONObject;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -31,8 +30,11 @@ class NpmClientTest {
     private static final PackageURL PURL = createPurl(String.format("pkg:%s/%s/%s@%s", TYPE, NAMESPACE, NAME, VERSION));
     private static final String DESCRIPTION = "Description";
     private static final String SOURCE_LOCATION = "https://example.com/source";
+    private static final String DOWNLOAD_LOCATION = "https://example.com/binary";
+    private static final String SHA1 = "Sha1";
     private static final String HOMEPAGE = "https://example.com/home-page";
     private static final String DECLARED_LICENSE = "Declared";
+    private static final String ATTRIBUTION = "Attribution";
 
     private final NpmClient client = new NpmClient(URI.create("http://localhost:" + PORT));
     private final MockWebServer mockServer = new MockWebServer();
@@ -68,10 +70,15 @@ class NpmClientTest {
                 .put("name", NAME)
                 .put("description", DESCRIPTION)
                 .put("home_page", HOMEPAGE)
+                .put("author", new JSONObject()
+                        .put("name", ATTRIBUTION))
                 .put("license", DECLARED_LICENSE)
+                .put("repository", new JSONObject()
+                        .put("url", SOURCE_LOCATION))
                 .put("dist", new JSONObject()
-                    .put("tarball", SOURCE_LOCATION))
-            .toString()));
+                        .put("tarball", DOWNLOAD_LOCATION)
+                        .put("shasum", SHA1))
+                .toString()));
         final var definition = client.getPackage(PURL).orElseThrow();
 
         final var request = mockServer.takeRequest();
@@ -82,6 +89,9 @@ class NpmClientTest {
         assertThat(definition.getHomepage()).contains(URI.create(HOMEPAGE));
         assertThat(definition.getLicense()).contains(DECLARED_LICENSE);
         assertThat(definition.getSourceUrl()).contains(URI.create(SOURCE_LOCATION));
+        assertThat(definition.getDownloadUrl()).contains(URI.create(DOWNLOAD_LOCATION));
+        assertThat(definition.getSha()).contains(SHA1);
+        assertThat(definition.getAuthor()).contains(ATTRIBUTION);
     }
 
     @Test

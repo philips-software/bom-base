@@ -11,9 +11,6 @@ import retrofit2.http.GET;
 import retrofit2.http.Path;
 
 import java.net.URI;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 
 public interface NpmAPI {
@@ -27,6 +24,8 @@ public interface NpmAPI {
         @NullOr String description;
         @NullOr URI homePage;
         @NullOr String license;
+        @NullOr PersonJson author;
+        @NullOr RepositoryJson repository;
         DistJson dist;
 
         @Override
@@ -37,6 +36,11 @@ public interface NpmAPI {
         @Override
         public Optional<String> getDescription() {
             return Optional.ofNullable(description);
+        }
+
+        @Override
+        public Optional<String> getAuthor() {
+            return Optional.ofNullable(author != null ? author.name : null);
         }
 
         @Override
@@ -51,11 +55,30 @@ public interface NpmAPI {
 
         @Override
         public Optional<URI> getSourceUrl() {
+            return Optional.ofNullable(repository != null ? repository.url : null);
+        }
+
+        @Override
+        public Optional<URI> getDownloadUrl() {
             return Optional.ofNullable(dist.tarball);
         }
+
+        @Override
+        public Optional<String> getSha() {
+            return Optional.ofNullable(dist.shasum);
+        }
+    }
+
+    class RepositoryJson {
+        @NullOr URI url;
+    }
+
+    class PersonJson {
+        @NullOr String name;
     }
 
     class DistJson {
         @NullOr URI tarball;
+        @NullOr String shasum;
     }
 }
