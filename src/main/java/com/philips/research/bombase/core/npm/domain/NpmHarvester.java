@@ -9,6 +9,8 @@ import com.github.packageurl.PackageURL;
 import com.philips.research.bombase.core.meta.registry.Field;
 import com.philips.research.bombase.core.meta.registry.MetaRegistry;
 import com.philips.research.bombase.core.meta.registry.PackageAttributeEditor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -19,6 +21,7 @@ import java.util.function.Consumer;
 
 @Service
 public class NpmHarvester implements MetaRegistry.PackageListener {
+    private static final Logger LOG = LoggerFactory.getLogger(NpmHarvester.class);
     private static final int NPM_SCORE = 80;
 
     private final NpmClient client;
@@ -42,13 +45,13 @@ public class NpmHarvester implements MetaRegistry.PackageListener {
     }
 
     private void harvest(PackageURL purl, PackageAttributeEditor pkg) {
-        client.getPackage(purl).ifPresent(release -> {
+        client.getPackage(purl).ifPresentOrElse(release -> {
             storeField(pkg, Field.TITLE, release.getName());
             storeField(pkg, Field.DESCRIPTION, release.getDescription());
             storeField(pkg, Field.HOME_PAGE, release.getHomepage());
             storeField(pkg, Field.DECLARED_LICENSE, release.getLicense());
             storeField(pkg, Field.SOURCE_LOCATION, release.getSourceUrl());
-        });
+        }, () -> LOG.info("No metadata for {}", purl));
     }
 
     private <T> void storeField(PackageAttributeEditor pkg, Field field, Optional<T> value) {

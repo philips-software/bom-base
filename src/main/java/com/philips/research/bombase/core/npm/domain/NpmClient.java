@@ -10,7 +10,7 @@ import com.fasterxml.jackson.annotation.PropertyAccessor;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.PropertyNamingStrategy;
+import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.github.packageurl.PackageURL;
 import com.philips.research.bombase.core.npm.NpmException;
 import retrofit2.Call;
@@ -25,7 +25,7 @@ public class NpmClient {
     private static final ObjectMapper MAPPER = new ObjectMapper()
             .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
             .setVisibility(PropertyAccessor.FIELD, JsonAutoDetect.Visibility.NON_PRIVATE)
-            .setPropertyNamingStrategy(PropertyNamingStrategy.SNAKE_CASE);
+            .setPropertyNamingStrategy(PropertyNamingStrategies.SNAKE_CASE);
 
     private final NpmAPI rest;
 
@@ -43,7 +43,7 @@ public class NpmClient {
 
     Optional<PackageDefinition> getPackage(PackageURL purl) {
         return query(rest.getDefinition(purl.getName(), purl.getVersion()))
-                .map(def -> (PackageDefinition) def);
+                .map(def -> def);
     }
 
     private <T> Optional<T> query(Call<? extends T> query) {
@@ -53,13 +53,13 @@ public class NpmClient {
                 return Optional.empty();
             }
             if (!response.isSuccessful()) {
-                throw new NpmException("Npm server responded with status " + response.code());
+                throw new NpmException("NPM server responded with status " + response.code());
             }
             return Optional.ofNullable(response.body());
         } catch (JsonProcessingException e) {
             throw new IllegalArgumentException("JSON formatting error", e);
         } catch (IOException e) {
-            throw new NpmException("Npm is not reachable");
+            throw new NpmException("NPM is not reachable");
         }
     }
 }

@@ -18,7 +18,7 @@ import java.util.Optional;
 
 public interface NpmAPI {
     @GET("{project}/{version}")
-    Call<ResponseJson> getDefinition(@Path("project") String project, 
+    Call<ResponseJson> getDefinition(@Path("project") String project,
                                      @Path("version") String version);
 
     @SuppressWarnings("NotNullFieldNotInitialized")
@@ -27,8 +27,7 @@ public interface NpmAPI {
         @NullOr String description;
         @NullOr URI homePage;
         @NullOr String license;
-        @NullOr DistJson dist;
-        
+        DistJson dist;
 
         @Override
         public Optional<String> getName() {
