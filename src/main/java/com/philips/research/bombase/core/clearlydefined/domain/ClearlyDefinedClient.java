@@ -36,6 +36,7 @@ class ClearlyDefinedClient {
             "github", "git");
     private static final Map<String, String> PROVIDER_MAPPING = Map.of( // Default is 1:1 mapping from ClearlyDefined type
             "crate", "cratesio",
+            "deb", "debian",
             "git", "github",
             "maven", "mavencentral",
             "npm", "npmjs",
