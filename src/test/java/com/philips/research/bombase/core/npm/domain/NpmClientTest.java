@@ -22,7 +22,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 class NpmClientTest {
-    private static final int PORT = 1080;
+    private static final int PORT = 1081;
     private static final String TYPE = "type";
     private static final String NAMESPACE = "Namespace";
     private static final String NAME = "Name";
