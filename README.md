@@ -112,7 +112,6 @@ These are the most important topics that are to be addressed:
 (A marked checkbox means the topic is in progress.)
 
 - [x] Add manual curation user interface
-- [ ] Retry failed harvesting attempts (e.g. when source offline)
 - [ ] Handle false information (e.g. non-existing source location)
 - [ ] Harvesting metadata from inner source repositories
 - [ ] Add auto-converter for obvious (but formally wrong) SPDX license names
