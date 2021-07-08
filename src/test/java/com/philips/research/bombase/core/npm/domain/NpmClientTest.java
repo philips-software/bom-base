@@ -10,6 +10,7 @@ import com.github.packageurl.PackageURL;
 import com.philips.research.bombase.core.npm.NpmException;
 import okhttp3.mockwebserver.MockResponse;
 import okhttp3.mockwebserver.MockWebServer;
+import org.json.JSONArray;
 import org.json.JSONObject;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -17,6 +18,7 @@ import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
 import java.net.URI;
+import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -58,7 +60,7 @@ class NpmClientTest {
     }
 
     @Test
-    void skipsUndefinedPackage() throws Exception {
+    void skipsUndefinedPackage() {
         mockServer.enqueue(new MockResponse().setResponseCode(404));
 
         assertThat(client.getPackage(PURL)).isEmpty();
@@ -91,11 +93,11 @@ class NpmClientTest {
         assertThat(definition.getSourceUrl()).contains(URI.create(SOURCE_LOCATION));
         assertThat(definition.getDownloadUrl()).contains(URI.create(DOWNLOAD_LOCATION));
         assertThat(definition.getSha()).contains(SHA1);
-        assertThat(definition.getAuthor()).contains(ATTRIBUTION);
+        assertThat(definition.getAuthors()).contains(List.of(ATTRIBUTION));
     }
 
     @Test
-    void acceptsEmptyMetadataFromServer() throws Exception {
+    void acceptsEmptyMetadataFromServer() {
         mockServer.enqueue(new MockResponse().setBody(new JSONObject()
                 .toString()));
 
@@ -104,6 +106,33 @@ class NpmClientTest {
         assertThat(release).isInstanceOf(PackageDefinition.class);
     }
 
+    @Test
+    void expandsListOfLicenses() throws Exception {
+        mockServer.enqueue(new MockResponse().setBody(new JSONObject()
+                .put("license", new JSONArray()
+                        .put("license1")
+                        .put("license2"))
+                .toString()));
+
+        final var definition = client.getPackage(PURL).orElseThrow();
+
+        assertThat(definition.getLicense()).contains("license1 AND license2");
+    }
+
+    @Test
+    void expandsListOfAuthors() throws Exception {
+        mockServer.enqueue(new MockResponse().setBody(new JSONObject()
+                .put("author", new JSONArray()
+                        .put(new JSONObject()
+                                .put("name", "name1"))
+                        .put(new JSONObject()
+                                .put("name", "name2")))
+                .toString()));
+
+        final var definition = client.getPackage(PURL).orElseThrow();
+
+        assertThat(definition.getAuthors()).contains(List.of("name1", "name2"));
+    }
 
     @Test
     void throws_serverNotReachable() {

@@ -6,6 +6,7 @@
 package com.philips.research.bombase.core.npm.domain;
 
 import java.net.URI;
+import java.util.List;
 import java.util.Optional;
 
 interface PackageDefinition {
@@ -13,7 +14,7 @@ interface PackageDefinition {
 
     Optional<String> getDescription();
 
-    Optional<String> getAuthor();
+    Optional<List<String>> getAuthors();
 
     Optional<URI> getHomepage();
 

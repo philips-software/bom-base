@@ -5,13 +5,17 @@
 
 package com.philips.research.bombase.core.npm.domain;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import pl.tlinkowski.annotation.basic.NullOr;
 import retrofit2.Call;
 import retrofit2.http.GET;
 import retrofit2.http.Path;
 
 import java.net.URI;
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
+import java.util.stream.StreamSupport;
 
 public interface NpmAPI {
     @GET("{project}/{version}")
@@ -23,8 +27,8 @@ public interface NpmAPI {
         @NullOr String name;
         @NullOr String description;
         @NullOr URI homePage;
-        @NullOr String license;
-        @NullOr PersonJson author;
+        @NullOr JsonNode license;
+        @NullOr JsonNode author;
         @NullOr RepositoryJson repository;
         DistJson dist;
 
@@ -39,8 +43,12 @@ public interface NpmAPI {
         }
 
         @Override
-        public Optional<String> getAuthor() {
-            return Optional.ofNullable(author != null ? author.name : null);
+        public Optional<List<String>> getAuthors() {
+            if (author == null) {
+                return Optional.empty();
+            }
+            final var result = author.findValuesAsText("name");
+            return Optional.of(result);
         }
 
         @Override
@@ -50,7 +58,16 @@ public interface NpmAPI {
 
         @Override
         public Optional<String> getLicense() {
-            return Optional.ofNullable(license);
+            if (license == null) {
+                return Optional.empty();
+            }
+            if (license.isArray()) {
+                final var result = StreamSupport.stream(license.spliterator(), false)
+                        .map(JsonNode::textValue)
+                        .collect(Collectors.joining(" AND "));
+                return Optional.of(result);
+            }
+            return Optional.of(license.textValue());
         }
 
         @Override
@@ -71,10 +88,6 @@ public interface NpmAPI {
 
     class RepositoryJson {
         @NullOr URI url;
-    }
-
-    class PersonJson {
-        @NullOr String name;
     }
 
     class DistJson {
