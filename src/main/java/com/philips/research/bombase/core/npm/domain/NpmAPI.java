@@ -58,16 +58,22 @@ public interface NpmAPI {
 
         @Override
         public Optional<String> getLicense() {
-            if (license == null) {
-                return Optional.empty();
+            return Optional.ofNullable(licenseOf(license));
+        }
+
+        @NullOr String licenseOf(@NullOr JsonNode node) {
+            if (node == null) {
+                return null;
             }
-            if (license.isArray()) {
-                final var result = StreamSupport.stream(license.spliterator(), false)
-                        .map(JsonNode::textValue)
-                        .collect(Collectors.joining(" AND "));
-                return Optional.of(result);
+            if (node.isArray()) {
+                return StreamSupport.stream(node.spliterator(), false)
+                        .map(this::licenseOf)
+                        .collect(Collectors.joining(" AND ")); // NPM provides insufficient info
             }
-            return Optional.of(license.textValue());
+            if (node.isObject()) {
+                return node.get("type").textValue();
+            }
+            return node.textValue();
         }
 
         @Override

@@ -120,6 +120,18 @@ class NpmClientTest {
     }
 
     @Test
+    void handlesLicenseObjectFormat() throws Exception {
+        mockServer.enqueue(new MockResponse().setBody(new JSONObject()
+                .put("license", new JSONObject()
+                        .put("type", DECLARED_LICENSE))
+                .toString()));
+
+        final var definition = client.getPackage(PURL).orElseThrow();
+
+        assertThat(definition.getLicense()).contains(DECLARED_LICENSE);
+    }
+
+    @Test
     void expandsListOfAuthors() throws Exception {
         mockServer.enqueue(new MockResponse().setBody(new JSONObject()
                 .put("author", new JSONArray()
