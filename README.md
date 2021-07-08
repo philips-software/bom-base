@@ -137,7 +137,8 @@ These are the most important topics that are to be addressed:
 - [ ] Harvesting metadata from inner source repositories
 - [ ] Add auto-converter for obvious (but formally wrong) SPDX license names
 - [ ] Add harvester for Maven
-- [ ] Add harvester for NPM
+- [x] Add harvester for NPM
+- [x] Add harvester for PyPi
 - [ ] Add harvester for APK
 - [ ] Add harvester for Debian
 - [ ] Add harvester for NuGet
