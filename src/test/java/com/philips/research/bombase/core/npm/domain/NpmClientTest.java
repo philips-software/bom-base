@@ -107,6 +107,17 @@ class NpmClientTest {
     }
 
     @Test
+    void acceptsBareRepositoryURLs() throws Exception {
+        mockServer.enqueue(new MockResponse().setBody(new JSONObject()
+                .put("repository", SOURCE_LOCATION)
+                .toString()));
+
+        final var definition = client.getPackage(PURL).orElseThrow();
+
+        assertThat(definition.getSourceUrl()).contains(SOURCE_LOCATION);
+    }
+
+    @Test
     void expandsListOfLicenses() throws Exception {
         mockServer.enqueue(new MockResponse().setBody(new JSONObject()
                 .put("license", new JSONArray()

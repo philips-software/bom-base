@@ -29,7 +29,7 @@ public interface NpmAPI {
         @NullOr URI homePage;
         @NullOr JsonNode license;
         @NullOr JsonNode author;
-        @NullOr RepositoryJson repository;
+        @NullOr JsonNode repository;
         DistJson dist;
 
         @Override
@@ -78,7 +78,13 @@ public interface NpmAPI {
 
         @Override
         public Optional<String> getSourceUrl() {
-            return Optional.ofNullable(repository != null ? repository.url : null);
+            if (repository == null) {
+                return Optional.empty();
+            }
+            if (repository.isObject()) {
+                return Optional.ofNullable(repository.get("url").textValue());
+            }
+            return Optional.of(repository.textValue());
         }
 
         @Override
@@ -90,10 +96,6 @@ public interface NpmAPI {
         public Optional<String> getSha() {
             return Optional.ofNullable(dist.shasum);
         }
-    }
-
-    class RepositoryJson {
-        @NullOr String url;
     }
 
     class DistJson {
