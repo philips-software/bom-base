@@ -6,9 +6,12 @@
 package com.philips.research.bombase.core.clearlydefined.domain;
 
 import com.github.packageurl.PackageURL;
+import com.philips.research.bombase.core.clearlydefined.ClearlyDefinedException;
 import com.philips.research.bombase.core.meta.registry.Field;
 import com.philips.research.bombase.core.meta.registry.MetaRegistry;
 import com.philips.research.bombase.core.meta.registry.PackageAttributeEditor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -19,6 +22,7 @@ import java.util.function.Consumer;
 
 @Service
 public class ClearlyDefinedHarvester implements MetaRegistry.PackageListener {
+    private static final Logger LOG = LoggerFactory.getLogger(ClearlyDefinedHarvester.class);
     //TODO Is this even a realistic score?
     private static final int MAX_SCORE = 70;
     private static final Set<String> SUPPORTED_TYPES = Set.of("npm", "gem", "pypi", "maven", "nuget", "github", "cargo", "deb", "composer", "cocoapods");
@@ -44,19 +48,23 @@ public class ClearlyDefinedHarvester implements MetaRegistry.PackageListener {
     }
 
     private void harvest(PackageURL purl, PackageAttributeEditor pkg) {
-        client.getPackageDefinition(purl).ifPresent(def -> {
-            int metaScore = absoluteScore(def.getDescribedScore());
-            int licenseScore = absoluteScore(def.getLicensedScore());
-            storeField(pkg, Field.TITLE, metaScore, def.getTitle());
-            storeField(pkg, Field.SOURCE_LOCATION, metaScore, def.getSourceLocation());
-            storeField(pkg, Field.DOWNLOAD_LOCATION, metaScore, def.getDownloadLocation());
-            storeField(pkg, Field.HOME_PAGE, metaScore, def.getHomepage());
-            storeField(pkg, Field.ATTRIBUTION, metaScore, def.getAuthors());
-            storeField(pkg, Field.DECLARED_LICENSE, metaScore, def.getDeclaredLicense());
-            storeField(pkg, Field.DETECTED_LICENSES, licenseScore, def.getDetectedLicenses());
-            storeField(pkg, Field.SHA1, metaScore, def.getSha1());
-            storeField(pkg, Field.SHA256, metaScore, def.getSha256());
-        });
+        try {
+            client.getPackageDefinition(purl).ifPresentOrElse(def -> {
+                int metaScore = absoluteScore(def.getDescribedScore());
+                int licenseScore = absoluteScore(def.getLicensedScore());
+                storeField(pkg, Field.TITLE, metaScore, def.getTitle());
+                storeField(pkg, Field.SOURCE_LOCATION, metaScore, def.getSourceLocation());
+                storeField(pkg, Field.DOWNLOAD_LOCATION, metaScore, def.getDownloadLocation());
+                storeField(pkg, Field.HOME_PAGE, metaScore, def.getHomepage());
+                storeField(pkg, Field.ATTRIBUTION, metaScore, def.getAuthors());
+                storeField(pkg, Field.DECLARED_LICENSE, metaScore, def.getDeclaredLicense());
+                storeField(pkg, Field.DETECTED_LICENSES, licenseScore, def.getDetectedLicenses());
+                storeField(pkg, Field.SHA1, metaScore, def.getSha1());
+                storeField(pkg, Field.SHA256, metaScore, def.getSha256());
+            }, () -> LOG.info("No metadata for {}", purl));
+        } catch (Exception e) {
+            throw new ClearlyDefinedException("Failed to harvest " + purl, e);
+        }
     }
 
     private int absoluteScore(int score) {

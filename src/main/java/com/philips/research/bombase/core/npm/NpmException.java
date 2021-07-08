@@ -3,16 +3,16 @@
  * SPDX-License-Identifier: MIT
  */
 
-package com.philips.research.bombase.core.source_scan;
+package com.philips.research.bombase.core.npm;
 
 import com.philips.research.bombase.core.BusinessException;
 
-public class SourceScanException extends BusinessException {
-    public SourceScanException(String message) {
+public class NpmException extends BusinessException {
+    public NpmException(String message) {
         super(message);
     }
 
-    public SourceScanException(String message, Throwable cause) {
+    public NpmException(String message, Throwable cause) {
         super(message, cause);
     }
 }

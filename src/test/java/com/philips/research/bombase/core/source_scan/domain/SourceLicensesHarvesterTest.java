@@ -34,7 +34,7 @@ import static org.mockito.Mockito.*;
 
 class SourceLicensesHarvesterTest {
     private static final PackageURL PURL = createPurl("pkg:type/ns/name@version");
-    private static final URI SOURCE_LOCATION = URI.create("https://example.com/sources");
+    private static final String SOURCE_LOCATION = "https://example.com/sources";
 
     private final DownloadService downloader = mock(DownloadService.class);
     private final ScannerService scanner = mock(ScannerService.class);
@@ -81,7 +81,7 @@ class SourceLicensesHarvesterTest {
                 final Consumer<Path> consumer = a.getArgument(1);
                 consumer.accept(PATH);
                 return null;
-            }).when(downloader).download(eq(SOURCE_LOCATION), any());
+            }).when(downloader).download(eq(URI.create(SOURCE_LOCATION)), any());
             when(scanner.scan(PATH)).thenReturn(scanResult);
         }
 
@@ -89,7 +89,7 @@ class SourceLicensesHarvesterTest {
         void scansDownloadedSources() {
             task.accept(pkg);
 
-            verify(downloader).download(eq(SOURCE_LOCATION), any());
+            verify(downloader).download(eq(URI.create(SOURCE_LOCATION)), any());
             verify(scanner).scan(PATH);
         }
 

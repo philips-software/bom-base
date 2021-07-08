@@ -23,7 +23,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 class PyPiClientTest {
-    private static final int PORT = 1080;
+    private static final int PORT = 1082;
     private static final String TYPE = "type";
     private static final String NAMESPACE = "Namespace";
     private static final String NAME = "Name";
@@ -88,7 +88,7 @@ class PyPiClientTest {
         assertThat(release.getSummary()).contains(SUMMARY);
         assertThat(release.getHomepage()).contains(URI.create(HOMEPAGE));
         assertThat(release.getLicense()).contains(DECLARED_LICENSE);
-        assertThat(release.getSourceUrl()).contains(URI.create(SOURCE_LOCATION));
+        assertThat(release.getSourceUrl()).contains(SOURCE_LOCATION);
     }
 
     @Test

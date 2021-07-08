@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: MIT
  */
 
-package com.philips.research.bombase.core.pypi.domain;
+package com.philips.research.bombase.core.npm.domain;
 
 import com.github.packageurl.PackageURL;
 import com.philips.research.bombase.core.meta.registry.Field;
@@ -22,19 +22,19 @@ import java.util.function.Consumer;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.*;
 
-class PyPiHarvesterTest {
+class NpmHarvesterTest {
     private static final String NAMESPACE = "namespace";
     private static final String NAME = "name";
     private static final String VERSION = "version";
-    private static final PackageURL PURL = toPurl(String.format("pkg:pypi/%s/%s@%s", NAMESPACE, NAME, VERSION));
+    private static final PackageURL PURL = toPurl(String.format("pkg:npm/%s/%s@%s", NAMESPACE, NAME, VERSION));
     private static final String DESCRIPTION = "Description";
     private static final URI HOMEPAGE = URI.create("https://example.com/home");
     private static final String DECLARED_LICENSE = "Declared";
     private static final String SOURCE_LOCATION = "git+https://github.com/source";
     private static final int META_SCORE = 80;
 
-    private final PyPiClient client = mock(PyPiClient.class);
-    private final PyPiHarvester listener = new PyPiHarvester(client);
+    private final NpmClient client = mock(NpmClient.class);
+    private final NpmHarvester listener = new NpmHarvester(client);
 
     static PackageURL toPurl(String uri) {
         try {
@@ -61,8 +61,8 @@ class PyPiHarvesterTest {
         }
 
         @Test
-        void returnsNothing_notPythonPurl() {
-            final var task = listener.onUpdated(toPurl("pkg:npm/name@1.0"), Set.of(), Map.of());
+        void returnsNothing_notNpmPurl() {
+            final var task = listener.onUpdated(toPurl("pkg:pypi/name@1.0"), Set.of(), Map.of());
 
             assertThat(task).isEmpty();
         }
@@ -72,17 +72,17 @@ class PyPiHarvesterTest {
     class MetadataTaskCreated {
         private final PackageAttributeEditor editor = spy(new PackageAttributeEditor(new Package(PURL)));
         private final Consumer<PackageAttributeEditor> task = listener.onUpdated(PURL, Set.of(), Map.of()).orElseThrow();
-        private final ReleaseDefinition response = mock(ReleaseDefinition.class);
+        private final PackageDefinition response = mock(PackageDefinition.class);
 
         @BeforeEach
         void beforeEach() {
-            when(client.getRelease(PURL)).thenReturn(Optional.of(response));
+            when(client.getPackage(PURL)).thenReturn(Optional.of(response));
         }
 
         @Test
         void harvestsMetadata() {
             when(response.getName()).thenReturn(Optional.of(NAME));
-            when(response.getSummary()).thenReturn(Optional.of(DESCRIPTION));
+            when(response.getDescription()).thenReturn(Optional.of(DESCRIPTION));
             when(response.getHomepage()).thenReturn(Optional.of(HOMEPAGE));
             when(response.getLicense()).thenReturn(Optional.of(DECLARED_LICENSE));
             when(response.getSourceUrl()).thenReturn(Optional.of(SOURCE_LOCATION));

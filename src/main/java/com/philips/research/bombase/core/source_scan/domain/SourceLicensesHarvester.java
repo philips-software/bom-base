@@ -11,6 +11,7 @@ import com.philips.research.bombase.core.meta.registry.Field;
 import com.philips.research.bombase.core.meta.registry.MetaRegistry;
 import com.philips.research.bombase.core.meta.registry.PackageAttributeEditor;
 import com.philips.research.bombase.core.scanner.ScannerService;
+import com.philips.research.bombase.core.source_scan.SourceScanException;
 import org.springframework.stereotype.Service;
 
 import java.net.URI;
@@ -45,13 +46,17 @@ public class SourceLicensesHarvester implements MetaRegistry.PackageListener {
     }
 
     private void harvest(PackageURL purl, PackageAttributeEditor pkg) {
-        pkg.<URI>get(Field.SOURCE_LOCATION)
-                .ifPresent(location -> downloader.download(location, directory -> {
-                    final var detections = licensesScannedIn(directory);
-                    final var score = score(detections);
-                    final var expressions = licensesIn(detections);
-                    pkg.update(Field.DETECTED_LICENSES, score, expressions);
-                }));
+        try {
+            pkg.<String>get(Field.SOURCE_LOCATION)
+                    .ifPresent(location -> downloader.download(URI.create(location), directory -> {
+                        final var detections = licensesScannedIn(directory);
+                        final var score = score(detections);
+                        final var expressions = licensesIn(detections);
+                        pkg.update(Field.DETECTED_LICENSES, score, expressions);
+                    }));
+        } catch (Exception e) {
+            throw new SourceScanException("Failed to scan licenses for " + purl, e);
+        }
     }
 
     /**

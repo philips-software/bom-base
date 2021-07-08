@@ -11,4 +11,8 @@ public class ClearlyDefinedException extends BusinessException {
     public ClearlyDefinedException(String message) {
         super(message);
     }
+
+    public ClearlyDefinedException(String message, Throwable cause) {
+        super(message, cause);
+    }
 }

@@ -3,13 +3,13 @@
  * SPDX-License-Identifier: MIT
  */
 
-package com.philips.research.bombase.core.pypi.domain;
+package com.philips.research.bombase.core.npm.domain;
 
 import com.github.packageurl.PackageURL;
 import com.philips.research.bombase.core.meta.registry.Field;
 import com.philips.research.bombase.core.meta.registry.MetaRegistry;
 import com.philips.research.bombase.core.meta.registry.PackageAttributeEditor;
-import com.philips.research.bombase.core.pypi.PyPiException;
+import com.philips.research.bombase.core.npm.NpmException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,24 +21,24 @@ import java.util.Set;
 import java.util.function.Consumer;
 
 @Service
-public class PyPiHarvester implements MetaRegistry.PackageListener {
-    private static final Logger LOG = LoggerFactory.getLogger(PyPiHarvester.class);
-    private static final int PYPI_SCORE = 80;
+public class NpmHarvester implements MetaRegistry.PackageListener {
+    private static final Logger LOG = LoggerFactory.getLogger(NpmHarvester.class);
+    private static final int NPM_SCORE = 80;
 
-    private final PyPiClient client;
+    private final NpmClient client;
 
     @Autowired
-    public PyPiHarvester() {
-        this(new PyPiClient());
+    public NpmHarvester() {
+        this(new NpmClient());
     }
 
-    PyPiHarvester(PyPiClient client) {
+    NpmHarvester(NpmClient client) {
         this.client = client;
     }
 
     @Override
     public Optional<Consumer<PackageAttributeEditor>> onUpdated(PackageURL purl, Set<Field> updated, Map<Field, ?> values) {
-        if (!purl.getType().equals("pypi") || !updated.isEmpty()) {
+        if (!purl.getType().equals("npm") || !updated.isEmpty()) {
             return Optional.empty();
         }
 
@@ -47,19 +47,22 @@ public class PyPiHarvester implements MetaRegistry.PackageListener {
 
     private void harvest(PackageURL purl, PackageAttributeEditor pkg) {
         try {
-            client.getRelease(purl).ifPresentOrElse(release -> {
+            client.getPackage(purl).ifPresentOrElse(release -> {
                 storeField(pkg, Field.TITLE, release.getName());
-                storeField(pkg, Field.DESCRIPTION, release.getSummary());
+                storeField(pkg, Field.DESCRIPTION, release.getDescription());
+                storeField(pkg, Field.ATTRIBUTION, release.getAuthors());
                 storeField(pkg, Field.HOME_PAGE, release.getHomepage());
                 storeField(pkg, Field.DECLARED_LICENSE, release.getLicense());
                 storeField(pkg, Field.SOURCE_LOCATION, release.getSourceUrl());
+                storeField(pkg, Field.DOWNLOAD_LOCATION, release.getDownloadUrl());
+                storeField(pkg, Field.SHA1, release.getSha());
             }, () -> LOG.info("No metadata for {}", purl));
         } catch (Exception e) {
-            throw new PyPiException("Failed to harvest " + purl, e);
+            throw new NpmException("Failed to harvest " + purl, e);
         }
     }
 
     private <T> void storeField(PackageAttributeEditor pkg, Field field, Optional<T> value) {
-        value.ifPresent(v -> pkg.update(field, PYPI_SCORE, v));
+        value.ifPresent(v -> pkg.update(field, NPM_SCORE, v));
     }
 }

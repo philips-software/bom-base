@@ -20,7 +20,7 @@ interface PackageDefinition {
 
     Optional<URI> getDownloadLocation();
 
-    Optional<URI> getSourceLocation();
+    Optional<String> getSourceLocation();
 
     Optional<URI> getHomepage();
 

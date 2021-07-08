@@ -7,6 +7,7 @@ package com.philips.research.bombase.core.clearlydefined.domain;
 
 import com.github.packageurl.PackageURL;
 import com.philips.research.bombase.core.meta.registry.Field;
+import com.philips.research.bombase.core.meta.registry.Package;
 import com.philips.research.bombase.core.meta.registry.PackageAttributeEditor;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
@@ -30,7 +31,7 @@ class ClearlyDefinedHarvesterTest {
     private static final PackageURL PURL = toPurl(String.format("pkg:%s/%s/%s@%s", TYPE, NAMESPACE, NAME, VERSION));
     private static final URI HOMEPAGE = URI.create("https://example.com/home");
     private static final URI DOWNLOAD_LOCATION = URI.create("https://example.com/download");
-    private static final URI SOURCE_LOCATION = URI.create("git+https://github.com/source");
+    private static final String SOURCE_LOCATION = "git+https://github.com/source";
     private static final List<String> ATTRIBUTION = List.of("Attribution");
     private static final String DECLARED_LICENSE = "Declared";
     private static final String DETECTED_LICENSE = "Detected";
@@ -38,9 +39,9 @@ class ClearlyDefinedHarvesterTest {
     private static final String SHA256 = "Sha256";
     private static final int MAX_SCORE = 70;
     private static final int META_SCORE = 73;
-    private static final int META_TOTAL_SCORE = Math.round((META_SCORE * MAX_SCORE)/100f);
+    private static final int META_TOTAL_SCORE = Math.round((META_SCORE * MAX_SCORE) / 100f);
     private static final int LICENSE_SCORE = 42;
-    private static final int LICENSE_TOTAL_SCORE = Math.round((LICENSE_SCORE * MAX_SCORE)/100f);
+    private static final int LICENSE_TOTAL_SCORE = Math.round((LICENSE_SCORE * MAX_SCORE) / 100f);
 
     private final ClearlyDefinedClient client = mock(ClearlyDefinedClient.class);
     private final ClearlyDefinedHarvester listener = new ClearlyDefinedHarvester(client);
@@ -79,7 +80,7 @@ class ClearlyDefinedHarvesterTest {
 
     @Nested
     class MetadataTaskCreated {
-        private final PackageAttributeEditor pkg = mock(PackageAttributeEditor.class);
+        private final PackageAttributeEditor editor = spy(new PackageAttributeEditor(new Package(PURL)));
         private final Consumer<PackageAttributeEditor> task = listener.onUpdated(PURL, Set.of(), Map.of()).orElseThrow();
         private final PackageDefinition response = mock(PackageDefinition.class);
 
@@ -102,17 +103,17 @@ class ClearlyDefinedHarvesterTest {
             when(response.getSha1()).thenReturn(Optional.of(SHA1));
             when(response.getSha256()).thenReturn(Optional.of(SHA256));
 
-            task.accept(pkg);
+            task.accept(editor);
 
-            verify(pkg).update(Field.TITLE, META_TOTAL_SCORE, NAME);
-            verify(pkg).update(Field.SOURCE_LOCATION, META_TOTAL_SCORE, SOURCE_LOCATION);
-            verify(pkg).update(Field.DOWNLOAD_LOCATION, META_TOTAL_SCORE, DOWNLOAD_LOCATION);
-            verify(pkg).update(Field.HOME_PAGE, META_TOTAL_SCORE, HOMEPAGE);
-            verify(pkg).update(Field.ATTRIBUTION, META_TOTAL_SCORE, ATTRIBUTION);
-            verify(pkg).update(Field.DECLARED_LICENSE, META_TOTAL_SCORE, DECLARED_LICENSE);
-            verify(pkg).update(Field.DETECTED_LICENSES, LICENSE_TOTAL_SCORE, List.of(DETECTED_LICENSE));
-            verify(pkg).update(Field.SHA1, META_TOTAL_SCORE, SHA1);
-            verify(pkg).update(Field.SHA256, META_TOTAL_SCORE, SHA256);
+            verify(editor).update(Field.TITLE, META_TOTAL_SCORE, NAME);
+            verify(editor).update(Field.SOURCE_LOCATION, META_TOTAL_SCORE, SOURCE_LOCATION);
+            verify(editor).update(Field.DOWNLOAD_LOCATION, META_TOTAL_SCORE, DOWNLOAD_LOCATION);
+            verify(editor).update(Field.HOME_PAGE, META_TOTAL_SCORE, HOMEPAGE);
+            verify(editor).update(Field.ATTRIBUTION, META_TOTAL_SCORE, ATTRIBUTION);
+            verify(editor).update(Field.DECLARED_LICENSE, META_TOTAL_SCORE, DECLARED_LICENSE);
+            verify(editor).update(Field.DETECTED_LICENSES, LICENSE_TOTAL_SCORE, List.of(DETECTED_LICENSE));
+            verify(editor).update(Field.SHA1, META_TOTAL_SCORE, SHA1);
+            verify(editor).update(Field.SHA256, META_TOTAL_SCORE, SHA256);
         }
     }
 }
