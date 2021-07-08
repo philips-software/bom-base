@@ -53,7 +53,7 @@ public interface ClearlyDefinedAPI {
         }
 
         @Override
-        public Optional<URI> getSourceLocation() {
+        public Optional<String> getSourceLocation() {
             return described.getSourceLocation();
         }
 
@@ -105,7 +105,7 @@ public interface ClearlyDefinedAPI {
             return Optional.ofNullable((urls != null && urls.download != null) ? urls.download : null);
         }
 
-        Optional<URI> getSourceLocation() {
+        Optional<String> getSourceLocation() {
             return Optional.ofNullable((sourceLocation != null && sourceLocation.url != null) ? sourceLocation.url : null);
         }
 
@@ -124,7 +124,7 @@ public interface ClearlyDefinedAPI {
 
     class SourceLocationJson {
         @NullOr String name;
-        @NullOr URI url;
+        @NullOr String url;
     }
 
     class UrlJson {

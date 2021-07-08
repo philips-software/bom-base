@@ -77,7 +77,7 @@ public interface NpmAPI {
         }
 
         @Override
-        public Optional<URI> getSourceUrl() {
+        public Optional<String> getSourceUrl() {
             return Optional.ofNullable(repository != null ? repository.url : null);
         }
 
@@ -93,7 +93,7 @@ public interface NpmAPI {
     }
 
     class RepositoryJson {
-        @NullOr URI url;
+        @NullOr String url;
     }
 
     class DistJson {

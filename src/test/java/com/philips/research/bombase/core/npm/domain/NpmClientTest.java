@@ -90,7 +90,7 @@ class NpmClientTest {
         assertThat(definition.getDescription()).contains(DESCRIPTION);
         assertThat(definition.getHomepage()).contains(URI.create(HOMEPAGE));
         assertThat(definition.getLicense()).contains(DECLARED_LICENSE);
-        assertThat(definition.getSourceUrl()).contains(URI.create(SOURCE_LOCATION));
+        assertThat(definition.getSourceUrl()).contains(SOURCE_LOCATION);
         assertThat(definition.getDownloadUrl()).contains(URI.create(DOWNLOAD_LOCATION));
         assertThat(definition.getSha()).contains(SHA1);
         assertThat(definition.getAuthors()).contains(List.of(ATTRIBUTION));

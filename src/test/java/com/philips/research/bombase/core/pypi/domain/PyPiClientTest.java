@@ -88,7 +88,7 @@ class PyPiClientTest {
         assertThat(release.getSummary()).contains(SUMMARY);
         assertThat(release.getHomepage()).contains(URI.create(HOMEPAGE));
         assertThat(release.getLicense()).contains(DECLARED_LICENSE);
-        assertThat(release.getSourceUrl()).contains(URI.create(SOURCE_LOCATION));
+        assertThat(release.getSourceUrl()).contains(SOURCE_LOCATION);
     }
 
     @Test

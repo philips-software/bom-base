@@ -105,7 +105,7 @@ class ClearlyDefinedClientTest {
         assertThat(request.getMethod()).isEqualTo("GET");
         assertThat(request.getPath()).isEqualTo(String.format("/definitions/%s/%s/%s/%s/%s", TYPE, TYPE, NAMESPACE, NAME, VERSION));
         assertThat(definition.getTitle()).contains(NAME);
-        assertThat(definition.getSourceLocation()).contains(URI.create(SOURCE_LOCATION));
+        assertThat(definition.getSourceLocation()).contains(SOURCE_LOCATION);
         assertThat(definition.getDownloadLocation()).contains(URI.create(DOWNLOAD_LOCATION));
         assertThat(definition.getHomepage()).contains(URI.create(HOMEPAGE));
         assertThat(definition.getSha1()).contains(SHA1);

@@ -17,5 +17,5 @@ interface ReleaseDefinition {
 
     Optional<String> getLicense();
 
-    Optional<URI> getSourceUrl();
+    Optional<String> getSourceUrl();
 }

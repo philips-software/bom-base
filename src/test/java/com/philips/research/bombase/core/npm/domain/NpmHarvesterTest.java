@@ -7,6 +7,7 @@ package com.philips.research.bombase.core.npm.domain;
 
 import com.github.packageurl.PackageURL;
 import com.philips.research.bombase.core.meta.registry.Field;
+import com.philips.research.bombase.core.meta.registry.Package;
 import com.philips.research.bombase.core.meta.registry.PackageAttributeEditor;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
@@ -29,7 +30,7 @@ class NpmHarvesterTest {
     private static final String DESCRIPTION = "Description";
     private static final URI HOMEPAGE = URI.create("https://example.com/home");
     private static final String DECLARED_LICENSE = "Declared";
-    private static final URI SOURCE_LOCATION = URI.create("git+https://github.com/source");
+    private static final String SOURCE_LOCATION = "git+https://github.com/source";
     private static final int META_SCORE = 80;
 
     private final NpmClient client = mock(NpmClient.class);
@@ -69,7 +70,7 @@ class NpmHarvesterTest {
 
     @Nested
     class MetadataTaskCreated {
-        private final PackageAttributeEditor pkg = mock(PackageAttributeEditor.class);
+        private final PackageAttributeEditor editor = spy(new PackageAttributeEditor(new Package(PURL)));
         private final Consumer<PackageAttributeEditor> task = listener.onUpdated(PURL, Set.of(), Map.of()).orElseThrow();
         private final PackageDefinition response = mock(PackageDefinition.class);
 
@@ -86,13 +87,13 @@ class NpmHarvesterTest {
             when(response.getLicense()).thenReturn(Optional.of(DECLARED_LICENSE));
             when(response.getSourceUrl()).thenReturn(Optional.of(SOURCE_LOCATION));
 
-            task.accept(pkg);
+            task.accept(editor);
 
-            verify(pkg).update(Field.TITLE, META_SCORE, NAME);
-            verify(pkg).update(Field.DESCRIPTION, META_SCORE, DESCRIPTION);
-            verify(pkg).update(Field.HOME_PAGE, META_SCORE, HOMEPAGE);
-            verify(pkg).update(Field.DECLARED_LICENSE, META_SCORE, DECLARED_LICENSE);
-            verify(pkg).update(Field.SOURCE_LOCATION, META_SCORE, SOURCE_LOCATION);
+            verify(editor).update(Field.TITLE, META_SCORE, NAME);
+            verify(editor).update(Field.DESCRIPTION, META_SCORE, DESCRIPTION);
+            verify(editor).update(Field.HOME_PAGE, META_SCORE, HOMEPAGE);
+            verify(editor).update(Field.DECLARED_LICENSE, META_SCORE, DECLARED_LICENSE);
+            verify(editor).update(Field.SOURCE_LOCATION, META_SCORE, SOURCE_LOCATION);
         }
     }
 }

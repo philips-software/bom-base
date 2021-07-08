@@ -47,7 +47,7 @@ public interface PyPiAPI {
         }
 
         @Override
-        public Optional<URI> getSourceUrl() {
+        public Optional<String> getSourceUrl() {
             return releases.getOrDefault(release, List.of()).stream()
                     .filter(file -> "sdist".equals(file.packagetype))
                     .map(file -> file.url)
@@ -64,6 +64,6 @@ public interface PyPiAPI {
 
     class FileJson {
         @NullOr String packagetype;
-        @NullOr URI url;
+        @NullOr String url;
     }
 }

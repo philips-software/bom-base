@@ -20,7 +20,7 @@ interface PackageDefinition {
 
     Optional<String> getLicense();
 
-    Optional<URI> getSourceUrl();
+    Optional<String> getSourceUrl();
 
     Optional<URI> getDownloadUrl();
 
