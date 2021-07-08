@@ -50,9 +50,12 @@ public class NpmHarvester implements MetaRegistry.PackageListener {
             client.getPackage(purl).ifPresentOrElse(release -> {
                 storeField(pkg, Field.TITLE, release.getName());
                 storeField(pkg, Field.DESCRIPTION, release.getDescription());
+                storeField(pkg, Field.ATTRIBUTION, release.getAuthors());
                 storeField(pkg, Field.HOME_PAGE, release.getHomepage());
                 storeField(pkg, Field.DECLARED_LICENSE, release.getLicense());
                 storeField(pkg, Field.SOURCE_LOCATION, release.getSourceUrl());
+                storeField(pkg, Field.DOWNLOAD_LOCATION, release.getDownloadUrl());
+                storeField(pkg, Field.SHA1, release.getSha());
             }, () -> LOG.info("No metadata for {}", purl));
         } catch (Exception e) {
             throw new NpmException("Failed to harvest " + purl, e);
