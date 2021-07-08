@@ -122,9 +122,6 @@ docker run -p 8080:8080 philipssoftware/bom-base:latest
 
 Unit tests are executed by the Maven `mvn clean test` command.
 
-Pre-requisite: scancode-toolkit(Refer to the installation section).
-Few existing tests depend on scancode.
-  
 ## Known issues
 
 The software is not suited for production use.
