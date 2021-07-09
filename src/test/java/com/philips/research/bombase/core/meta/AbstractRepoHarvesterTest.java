@@ -26,6 +26,7 @@ import static org.mockito.Mockito.*;
 class AbstractRepoHarvesterTest {
     private static final PackageURL PURL = toPurl("pkg:type/namespace/name@version");
     private static final String TITLE = "Title";
+    private static final String DESCRIPTION = "Description";
     private static final URI HOMEPAGE = URI.create("https://example.com/home");
     private static final String SOURCE_LOCATION = "git+https://github.com/source";
     private static final List<String> ATTRIBUTION = List.of("Attribution");
@@ -98,6 +99,7 @@ class AbstractRepoHarvesterTest {
             when(response.score(any())).thenReturn(SCORE);
             when(response.getSourceLocation()).thenReturn(Optional.of(SOURCE_LOCATION));
             when(response.getTitle()).thenReturn(Optional.of(TITLE));
+            when(response.getDescription()).thenReturn(Optional.of(DESCRIPTION));
             when(response.getDownloadLocation()).thenReturn(Optional.of(DOWNLOAD_LOCATION));
             when(response.getHomepage()).thenReturn(Optional.of(HOMEPAGE));
             when(response.getAuthors()).thenReturn(Optional.of(ATTRIBUTION));
@@ -109,6 +111,7 @@ class AbstractRepoHarvesterTest {
             task.accept(editor);
 
             verify(editor).update(Field.TITLE, SCORE, TITLE);
+            verify(editor).update(Field.DESCRIPTION, SCORE, DESCRIPTION);
             verify(editor).update(Field.SOURCE_LOCATION, SCORE, SOURCE_LOCATION);
             verify(editor).update(Field.DOWNLOAD_LOCATION, SCORE, DOWNLOAD_LOCATION);
             verify(editor).update(Field.HOME_PAGE, SCORE, HOMEPAGE);

@@ -16,10 +16,6 @@ public class ClearlyDefinedHarvester extends AbstractRepoHarvester {
     private static final Set<String> SUPPORTED_TYPES = Set.of("npm", "gem", "pypi", "maven", "nuget", "github", "cargo", "deb", "composer", "cocoapods");
 
     @Autowired
-    public ClearlyDefinedHarvester() {
-        this(new ClearlyDefinedClient());
-    }
-
     ClearlyDefinedHarvester(ClearlyDefinedClient client) {
         super(client::getPackageMetadata);
     }

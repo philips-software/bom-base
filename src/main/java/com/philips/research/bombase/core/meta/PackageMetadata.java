@@ -16,6 +16,8 @@ public interface PackageMetadata {
 
     Optional<String> getTitle();
 
+    Optional<String> getDescription();
+
     Optional<List<String>> getAuthors();
 
     Optional<URI> getHomepage();
@@ -26,7 +28,9 @@ public interface PackageMetadata {
         return Optional.empty();
     }
 
-    Optional<List<String>> getDetectedLicenses();
+    default Optional<List<String>> getDetectedLicenses() {
+        return Optional.empty();
+    }
 
     Optional<URI> getDownloadLocation();
 

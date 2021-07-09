@@ -16,6 +16,7 @@ import com.philips.research.bombase.core.clearlydefined.ClearlyDefinedException;
 import com.philips.research.bombase.core.meta.PackageMetadata;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Component;
 import retrofit2.Call;
 import retrofit2.Retrofit;
 import retrofit2.converter.jackson.JacksonConverterFactory;
@@ -25,6 +26,7 @@ import java.net.URI;
 import java.util.Map;
 import java.util.Optional;
 
+@Component
 class ClearlyDefinedClient {
     private static final Logger LOG = LoggerFactory.getLogger(ClearlyDefinedClient.class);
     private static final ObjectMapper MAPPER = new ObjectMapper()

@@ -48,6 +48,7 @@ public abstract class AbstractRepoHarvester implements MetaRegistry.PackageListe
         try {
             client.read(purl).ifPresentOrElse(def -> {
                 def.getTitle().ifPresent(title -> editor.update(Field.TITLE, def.score(Field.TITLE), title));
+                def.getDescription().ifPresent(description -> editor.update(Field.DESCRIPTION, def.score(Field.DESCRIPTION), description));
                 def.getSourceLocation().ifPresent(url -> editor.update(Field.SOURCE_LOCATION, def.score(Field.SOURCE_LOCATION), url));
                 def.getDownloadLocation().ifPresent(url -> editor.update(Field.DOWNLOAD_LOCATION, def.score(Field.DOWNLOAD_LOCATION), url));
                 def.getHomepage().ifPresent(url -> editor.update(Field.HOME_PAGE, def.score(Field.HOME_PAGE), url));

@@ -47,6 +47,11 @@ public interface ClearlyDefinedAPI {
         }
 
         @Override
+        public Optional<String> getDescription() {
+            return Optional.empty();
+        }
+
+        @Override
         public Optional<URI> getDownloadLocation() {
             return described.getDownloadLocation();
         }
