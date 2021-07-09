@@ -42,7 +42,7 @@ public abstract class AbstractRepoHarvester implements MetaRegistry.PackageListe
      * @param type Type field of the package URL
      * @return true if this harvester supports the given type
      */
-    abstract boolean isSupportedType(String type);
+    protected abstract boolean isSupportedType(String type);
 
     private void harvest(PackageURL purl, PackageAttributeEditor editor) {
         try {
@@ -63,7 +63,7 @@ public abstract class AbstractRepoHarvester implements MetaRegistry.PackageListe
     }
 
     @FunctionalInterface
-    interface Client {
+    public interface Client {
         Optional<PackageMetadata> read(PackageURL purl);
     }
 }

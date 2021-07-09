@@ -47,6 +47,17 @@ class AbstractRepoHarvesterTest {
         }
     }
 
+    static class TestHarvester extends AbstractRepoHarvester {
+        TestHarvester(Client client) {
+            super(client);
+        }
+
+        @Override
+        protected boolean isSupportedType(String type) {
+            return type.equals(PURL.getType());
+        }
+    }
+
     @Nested
     class TaskCreation {
         @Test
@@ -113,17 +124,6 @@ class AbstractRepoHarvesterTest {
             task.accept(editor);
 
             verifyNoInteractions(editor);
-        }
-    }
-
-    static class TestHarvester extends AbstractRepoHarvester {
-        TestHarvester(Client client) {
-            super(client);
-        }
-
-        @Override
-        boolean isSupportedType(String type) {
-            return type.equals(PURL.getType());
         }
     }
 }

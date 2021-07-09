@@ -13,6 +13,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.github.packageurl.PackageURL;
 import com.philips.research.bombase.core.clearlydefined.ClearlyDefinedException;
+import com.philips.research.bombase.core.meta.PackageMetadata;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import retrofit2.Call;
@@ -56,14 +57,14 @@ class ClearlyDefinedClient {
         rest = retrofit.create(ClearlyDefinedAPI.class);
     }
 
-    Optional<PackageDefinition> getPackageDefinition(PackageURL purl) {
+    Optional<PackageMetadata> getPackageMetadata(PackageURL purl) {
         final var type = TYPE_MAPPING.getOrDefault(purl.getType().toLowerCase(), purl.getType());
         final var provider = PROVIDER_MAPPING.getOrDefault(type.toLowerCase(), type);
         final var namespace = purl.getNamespace();
         final var ns = (namespace == null || namespace.isEmpty()) ? "-" : namespace;
         return query(rest.getDefinition(type, provider, ns, purl.getName(), purl.getVersion()))
-                .map(def -> (PackageDefinition) def)
-                .filter(PackageDefinition::isValid);
+                .filter(ClearlyDefinedAPI.ResponseJson::isValid)
+                .map(meta -> meta);
     }
 
     private <T> Optional<T> query(Call<? extends T> query) {
