@@ -69,7 +69,7 @@ class NpmClientTest {
         mockServer.enqueue(new MockResponse().setBody(new JSONObject()
                 .put("name", TITLE)
                 .put("description", DESCRIPTION)
-                .put("home_page", HOMEPAGE)
+                .put("homepage", HOMEPAGE)
                 .put("author", new JSONObject()
                         .put("name", AUTHOR))
                 .put("license", DECLARED_LICENSE)

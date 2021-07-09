@@ -31,7 +31,7 @@ public interface NpmAPI {
     class ResponseJson implements PackageMetadata {
         @NullOr String name;
         @NullOr String description;
-        @NullOr URI homePage;
+        @NullOr URI homepage;
         @NullOr JsonNode license;
         @NullOr JsonNode author;
         @NullOr JsonNode repository;
@@ -63,7 +63,7 @@ public interface NpmAPI {
 
         @Override
         public Optional<URI> getHomepage() {
-            return Optional.ofNullable(homePage);
+            return Optional.ofNullable(homepage);
         }
 
         @Override
