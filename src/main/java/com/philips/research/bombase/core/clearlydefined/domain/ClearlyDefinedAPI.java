@@ -14,9 +14,12 @@ import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.function.Function;
 
 public interface ClearlyDefinedAPI {
+    Set<String> IGNORED_LICENSES = Set.of("NOASSERTION", "OTHER");
+
     @GET("definitions/{type}/{provider}/{namespace}/{name}/{revision}")
     Call<ResponseJson> getDefinition(@Path("type") String type, @Path("provider") String provider, @Path("namespace") String namespace,
                                      @Path("name") String name, @Path("revision") String revision);
@@ -142,7 +145,7 @@ public interface ClearlyDefinedAPI {
         ScoreJson score;
 
         Optional<String> getDeclaredLicense() {
-            if ("NOASSERTION".equals(declared)) {
+            if (IGNORED_LICENSES.contains(declared)) {
                 return Optional.empty();
             }
             return Optional.ofNullable(declared);
