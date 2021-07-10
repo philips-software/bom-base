@@ -7,6 +7,7 @@ package com.philips.research.bombase.core.npm.domain;
 
 import com.github.packageurl.MalformedPackageURLException;
 import com.github.packageurl.PackageURL;
+import com.philips.research.bombase.core.meta.PackageMetadata;
 import com.philips.research.bombase.core.npm.NpmException;
 import okhttp3.mockwebserver.MockResponse;
 import okhttp3.mockwebserver.MockWebServer;
@@ -25,18 +26,15 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 class NpmClientTest {
     private static final int PORT = 1081;
-    private static final String TYPE = "type";
-    private static final String NAMESPACE = "Namespace";
-    private static final String NAME = "Name";
-    private static final String VERSION = "Release";
-    private static final PackageURL PURL = createPurl(String.format("pkg:%s/%s/%s@%s", TYPE, NAMESPACE, NAME, VERSION));
+    private static final PackageURL PURL = createPurl("pkg:npm/name@version");
+    private static final String TITLE = "Title";
+    private static final String HOMEPAGE = "https://example.com/home-page";
     private static final String DESCRIPTION = "Description";
+    private static final String AUTHOR = "Attribution";
     private static final String SOURCE_LOCATION = "https://example.com/source";
     private static final String DOWNLOAD_LOCATION = "https://example.com/binary";
     private static final String SHA1 = "Sha1";
-    private static final String HOMEPAGE = "https://example.com/home-page";
     private static final String DECLARED_LICENSE = "Declared";
-    private static final String ATTRIBUTION = "Attribution";
 
     private final NpmClient client = new NpmClient(URI.create("http://localhost:" + PORT));
     private final MockWebServer mockServer = new MockWebServer();
@@ -63,17 +61,17 @@ class NpmClientTest {
     void skipsUndefinedPackage() {
         mockServer.enqueue(new MockResponse().setResponseCode(404));
 
-        assertThat(client.getPackage(PURL)).isEmpty();
+        assertThat(client.getPackageMetadata(PURL)).isEmpty();
     }
 
     @Test
     void getsMetadataFromServer() throws Exception {
         mockServer.enqueue(new MockResponse().setBody(new JSONObject()
-                .put("name", NAME)
+                .put("name", TITLE)
                 .put("description", DESCRIPTION)
-                .put("home_page", HOMEPAGE)
+                .put("homepage", HOMEPAGE)
                 .put("author", new JSONObject()
-                        .put("name", ATTRIBUTION))
+                        .put("name", AUTHOR))
                 .put("license", DECLARED_LICENSE)
                 .put("repository", new JSONObject()
                         .put("url", SOURCE_LOCATION))
@@ -81,19 +79,19 @@ class NpmClientTest {
                         .put("tarball", DOWNLOAD_LOCATION)
                         .put("shasum", SHA1))
                 .toString()));
-        final var definition = client.getPackage(PURL).orElseThrow();
+        final var definition = client.getPackageMetadata(PURL).orElseThrow();
 
         final var request = mockServer.takeRequest();
         assertThat(request.getMethod()).isEqualTo("GET");
-        assertThat(request.getPath()).isEqualTo(String.format("/%s/%s", NAME, VERSION));
-        assertThat(definition.getName()).contains(NAME);
+        assertThat(request.getPath()).isEqualTo("/name/version");
+        assertThat(definition.getTitle()).contains(TITLE);
         assertThat(definition.getDescription()).contains(DESCRIPTION);
         assertThat(definition.getHomepage()).contains(URI.create(HOMEPAGE));
-        assertThat(definition.getLicense()).contains(DECLARED_LICENSE);
-        assertThat(definition.getSourceUrl()).contains(SOURCE_LOCATION);
-        assertThat(definition.getDownloadUrl()).contains(URI.create(DOWNLOAD_LOCATION));
-        assertThat(definition.getSha()).contains(SHA1);
-        assertThat(definition.getAuthors()).contains(List.of(ATTRIBUTION));
+        assertThat(definition.getAuthors()).contains(List.of(AUTHOR));
+        assertThat(definition.getSourceLocation()).contains(SOURCE_LOCATION);
+        assertThat(definition.getDeclaredLicense()).contains(DECLARED_LICENSE);
+        assertThat(definition.getDownloadLocation()).contains(URI.create(DOWNLOAD_LOCATION));
+        assertThat(definition.getSha1()).contains(SHA1);
     }
 
     @Test
@@ -101,9 +99,9 @@ class NpmClientTest {
         mockServer.enqueue(new MockResponse().setBody(new JSONObject()
                 .toString()));
 
-        final var release = client.getPackage(PURL).orElseThrow();
+        final var release = client.getPackageMetadata(PURL).orElseThrow();
 
-        assertThat(release).isInstanceOf(PackageDefinition.class);
+        assertThat(release).isInstanceOf(PackageMetadata.class);
     }
 
     @Test
@@ -112,9 +110,9 @@ class NpmClientTest {
                 .put("repository", SOURCE_LOCATION)
                 .toString()));
 
-        final var definition = client.getPackage(PURL).orElseThrow();
+        final var definition = client.getPackageMetadata(PURL).orElseThrow();
 
-        assertThat(definition.getSourceUrl()).contains(SOURCE_LOCATION);
+        assertThat(definition.getSourceLocation()).contains(SOURCE_LOCATION);
     }
 
     @Test
@@ -125,9 +123,9 @@ class NpmClientTest {
                         .put("license2"))
                 .toString()));
 
-        final var definition = client.getPackage(PURL).orElseThrow();
+        final var definition = client.getPackageMetadata(PURL).orElseThrow();
 
-        assertThat(definition.getLicense()).contains("license1 AND license2");
+        assertThat(definition.getDeclaredLicense()).contains("license1 AND license2");
     }
 
     @Test
@@ -137,9 +135,9 @@ class NpmClientTest {
                         .put("type", DECLARED_LICENSE))
                 .toString()));
 
-        final var definition = client.getPackage(PURL).orElseThrow();
+        final var definition = client.getPackageMetadata(PURL).orElseThrow();
 
-        assertThat(definition.getLicense()).contains(DECLARED_LICENSE);
+        assertThat(definition.getDeclaredLicense()).contains(DECLARED_LICENSE);
     }
 
     @Test
@@ -152,7 +150,7 @@ class NpmClientTest {
                                 .put("name", "name2")))
                 .toString()));
 
-        final var definition = client.getPackage(PURL).orElseThrow();
+        final var definition = client.getPackageMetadata(PURL).orElseThrow();
 
         assertThat(definition.getAuthors()).contains(List.of("name1", "name2"));
     }
@@ -161,7 +159,7 @@ class NpmClientTest {
     void throws_serverNotReachable() {
         var serverlessClient = new NpmClient(URI.create("http://localhost:1234"));
 
-        assertThatThrownBy(() -> serverlessClient.getPackage(PURL))
+        assertThatThrownBy(() -> serverlessClient.getPackageMetadata(PURL))
                 .isInstanceOf(NpmException.class)
                 .hasMessageContaining("not reachable");
     }
@@ -170,7 +168,7 @@ class NpmClientTest {
     void throws_unexpectedResponseFromServer() {
         mockServer.enqueue(new MockResponse().setResponseCode(500));
 
-        assertThatThrownBy(() -> client.getPackage(PURL))
+        assertThatThrownBy(() -> client.getPackageMetadata(PURL))
                 .isInstanceOf(NpmException.class)
                 .hasMessageContaining("status 500");
     }

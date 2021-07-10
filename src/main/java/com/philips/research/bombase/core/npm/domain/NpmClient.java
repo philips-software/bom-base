@@ -12,7 +12,9 @@ import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.github.packageurl.PackageURL;
+import com.philips.research.bombase.core.meta.PackageMetadata;
 import com.philips.research.bombase.core.npm.NpmException;
+import org.springframework.stereotype.Component;
 import retrofit2.Call;
 import retrofit2.Retrofit;
 import retrofit2.converter.jackson.JacksonConverterFactory;
@@ -21,6 +23,7 @@ import java.io.IOException;
 import java.net.URI;
 import java.util.Optional;
 
+@Component
 public class NpmClient {
     private static final ObjectMapper MAPPER = new ObjectMapper()
             .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
@@ -41,7 +44,7 @@ public class NpmClient {
         rest = retrofit.create(NpmAPI.class);
     }
 
-    Optional<PackageDefinition> getPackage(PackageURL purl) {
+    Optional<PackageMetadata> getPackageMetadata(PackageURL purl) {
         return query(rest.getDefinition(purl.getName(), purl.getVersion()))
                 .map(def -> def);
     }
