@@ -10,9 +10,11 @@ import com.fasterxml.jackson.annotation.PropertyAccessor;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.PropertyNamingStrategy;
+import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.github.packageurl.PackageURL;
+import com.philips.research.bombase.core.meta.PackageMetadata;
 import com.philips.research.bombase.core.pypi.PyPiException;
+import org.springframework.stereotype.Component;
 import retrofit2.Call;
 import retrofit2.Retrofit;
 import retrofit2.converter.jackson.JacksonConverterFactory;
@@ -21,11 +23,12 @@ import java.io.IOException;
 import java.net.URI;
 import java.util.Optional;
 
+@Component
 public class PyPiClient {
     private static final ObjectMapper MAPPER = new ObjectMapper()
             .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
             .setVisibility(PropertyAccessor.FIELD, JsonAutoDetect.Visibility.NON_PRIVATE)
-            .setPropertyNamingStrategy(PropertyNamingStrategy.SNAKE_CASE);
+            .setPropertyNamingStrategy(PropertyNamingStrategies.SNAKE_CASE);
 
     private final PyPiAPI rest;
 
@@ -41,7 +44,7 @@ public class PyPiClient {
         rest = retrofit.create(PyPiAPI.class);
     }
 
-    Optional<ReleaseDefinition> getRelease(PackageURL purl) {
+    Optional<PackageMetadata> getPackageMetadata(PackageURL purl) {
         final var release = purl.getVersion();
         return query(rest.getDefinition(purl.getName(), release))
                 .map(resp -> {

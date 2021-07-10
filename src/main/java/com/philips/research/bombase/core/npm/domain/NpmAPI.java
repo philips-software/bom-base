@@ -6,6 +6,8 @@
 package com.philips.research.bombase.core.npm.domain;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import com.philips.research.bombase.core.meta.PackageMetadata;
+import com.philips.research.bombase.core.meta.registry.Field;
 import pl.tlinkowski.annotation.basic.NullOr;
 import retrofit2.Call;
 import retrofit2.http.GET;
@@ -18,22 +20,30 @@ import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
 public interface NpmAPI {
+    // TODO Is this a proper value?
+    int NPM_SCORE = 80;
+
     @GET("{project}/{version}")
     Call<ResponseJson> getDefinition(@Path("project") String project,
                                      @Path("version") String version);
 
     @SuppressWarnings("NotNullFieldNotInitialized")
-    class ResponseJson implements PackageDefinition {
+    class ResponseJson implements PackageMetadata {
         @NullOr String name;
         @NullOr String description;
-        @NullOr URI homePage;
+        @NullOr URI homepage;
         @NullOr JsonNode license;
         @NullOr JsonNode author;
         @NullOr JsonNode repository;
         DistJson dist;
 
         @Override
-        public Optional<String> getName() {
+        public int score(Field field) {
+            return NPM_SCORE;
+        }
+
+        @Override
+        public Optional<String> getTitle() {
             return Optional.ofNullable(name);
         }
 
@@ -53,11 +63,11 @@ public interface NpmAPI {
 
         @Override
         public Optional<URI> getHomepage() {
-            return Optional.ofNullable(homePage);
+            return Optional.ofNullable(homepage);
         }
 
         @Override
-        public Optional<String> getLicense() {
+        public Optional<String> getDeclaredLicense() {
             return Optional.ofNullable(licenseOf(license));
         }
 
@@ -77,7 +87,7 @@ public interface NpmAPI {
         }
 
         @Override
-        public Optional<String> getSourceUrl() {
+        public Optional<String> getSourceLocation() {
             if (repository == null) {
                 return Optional.empty();
             }
@@ -88,12 +98,12 @@ public interface NpmAPI {
         }
 
         @Override
-        public Optional<URI> getDownloadUrl() {
+        public Optional<URI> getDownloadLocation() {
             return Optional.ofNullable(dist.tarball);
         }
 
         @Override
-        public Optional<String> getSha() {
+        public Optional<String> getSha1() {
             return Optional.ofNullable(dist.shasum);
         }
     }

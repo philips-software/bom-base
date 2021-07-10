@@ -5,6 +5,8 @@
 
 package com.philips.research.bombase.core.clearlydefined.domain;
 
+import com.philips.research.bombase.core.meta.PackageMetadata;
+import com.philips.research.bombase.core.meta.registry.Field;
 import pl.tlinkowski.annotation.basic.NullOr;
 import retrofit2.Call;
 import retrofit2.http.GET;
@@ -17,34 +19,36 @@ import java.util.Optional;
 import java.util.function.Function;
 
 public interface ClearlyDefinedAPI {
+    //TODO Is this a realistic value?
+    int SCORE = 70;
+
     @GET("definitions/{type}/{provider}/{namespace}/{name}/{revision}")
     Call<ResponseJson> getDefinition(@Path("type") String type, @Path("provider") String provider, @Path("namespace") String namespace,
                                      @Path("name") String name, @Path("revision") String revision);
 
     @SuppressWarnings("NotNullFieldNotInitialized")
-    class ResponseJson implements PackageDefinition {
+    class ResponseJson implements PackageMetadata {
         DescribedJson described;
         LicensedJson licensed;
         @NullOr ScoresJson scores;
 
-        @Override
         public boolean isValid() {
-            return (scores != null) && scores.effective > 0;
+            return scores != null && scores.effective > 0;
         }
 
         @Override
-        public int getDescribedScore() {
-            return described.score.total;
-        }
-
-        @Override
-        public int getLicensedScore() {
-            return licensed.score.total;
+        public int score(Field field) {
+            return SCORE;
         }
 
         @Override
         public Optional<String> getTitle() {
             return described.getName();
+        }
+
+        @Override
+        public Optional<String> getDescription() {
+            return Optional.empty();
         }
 
         @Override
