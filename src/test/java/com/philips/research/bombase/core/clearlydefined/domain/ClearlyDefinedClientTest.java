@@ -138,7 +138,7 @@ class ClearlyDefinedClientTest {
                         .put("effective", 100))
                 .toString()));
 
-        final var definition = client.getPackageDefinition(PURL).orElseThrow();
+        final var definition = client.getPackageMetadata(PURL).orElseThrow();
 
         assertThat(definition.getDeclaredLicense()).isEmpty();
     }
@@ -152,7 +152,7 @@ class ClearlyDefinedClientTest {
                         .put("effective", 100))
                 .toString()));
 
-        final var definition = client.getPackageDefinition(PURL).orElseThrow();
+        final var definition = client.getPackageMetadata(PURL).orElseThrow();
 
         assertThat(definition.getDeclaredLicense()).isEmpty();
     }
