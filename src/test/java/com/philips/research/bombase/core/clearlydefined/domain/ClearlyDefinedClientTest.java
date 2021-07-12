@@ -130,6 +130,34 @@ class ClearlyDefinedClientTest {
     }
 
     @Test
+    void ignoresNoAssertionLicense() throws Exception {
+        mockServer.enqueue(new MockResponse().setBody(new JSONObject()
+                .put("licensed", new JSONObject()
+                        .put("declared", "NOASSERTION"))
+                .put("scores", new JSONObject()
+                        .put("effective", 100))
+                .toString()));
+
+        final var definition = client.getPackageMetadata(PURL).orElseThrow();
+
+        assertThat(definition.getDeclaredLicense()).isEmpty();
+    }
+
+    @Test
+    void ignoresOtherLicense() throws Exception {
+        mockServer.enqueue(new MockResponse().setBody(new JSONObject()
+                .put("licensed", new JSONObject()
+                        .put("declared", "OTHER"))
+                .put("scores", new JSONObject()
+                        .put("effective", 100))
+                .toString()));
+
+        final var definition = client.getPackageMetadata(PURL).orElseThrow();
+
+        assertThat(definition.getDeclaredLicense()).isEmpty();
+    }
+
+    @Test
     void mapsPurlTypeToClearlyDefinedProvider() throws Exception {
         mockServer.enqueue(new MockResponse().setBody("{}"));
         client.getPackageMetadata(new PackageURL("cargo", NAMESPACE, NAME, VERSION, null, null));
