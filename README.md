@@ -68,6 +68,7 @@ Some useful command line parameters are:
 - `--server.port=9090` changes the http port (from default 8080) to 9090.
 - `--bom-base.scan-licenses=false` disables the source code license scanner,
   reducing the machine load during development and testing.
+- `--bom-base.harvest-clearly-defined=false` disables the clearly-defined lookup
 
 ### Install ScanCode Toolkit license scanner
 
