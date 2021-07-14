@@ -47,7 +47,7 @@ public class MetaInteractor implements MetaService {
     void init() {
         final var properties = context.getBean(ConfigProperties.class);
 
-        if (properties.isUseClearlyDefined()) {
+        if (properties.harvestClearlyDefined()) {
           installListener(ClearlyDefinedHarvester.class);
         }
         installListener(PyPiHarvester.class);

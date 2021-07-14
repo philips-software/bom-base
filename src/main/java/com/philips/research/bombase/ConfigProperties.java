@@ -10,14 +10,14 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 @ConfigurationProperties(prefix = "bom-base")
 public class ConfigProperties {
     private boolean scanLicenses = true;
-    private boolean useClearlyDefined = true;
+    private boolean harvestClearlyDefined = true;
 
     public boolean isScanLicenses() {
         return scanLicenses;
     }
     
-    public boolean isUseClearlyDefined() {
-        return useClearlyDefined;
+    public boolean harvestClearlyDefined() {
+        return harvestClearlyDefined;
     }
 
     public ConfigProperties setScanLicenses(boolean scanLicenses) {
@@ -25,8 +25,8 @@ public class ConfigProperties {
         return this;
     }
     
-    public ConfigProperties setUseClearlyDefined(boolean useClearlyDefined) {
-        this.useClearlyDefined = useClearlyDefined;
+    public ConfigProperties setHarvestClearlyDefined(boolean harvestClearlyDefined) {
+        this.harvestClearlyDefined = harvestClearlyDefined;
         return this;
     }
 }
