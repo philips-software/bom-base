@@ -15,6 +15,7 @@ import com.philips.research.bombase.core.meta.registry.Field;
 import com.philips.research.bombase.core.meta.registry.MetaRegistry;
 import com.philips.research.bombase.core.meta.registry.Trust;
 import com.philips.research.bombase.core.npm.domain.NpmHarvester;
+import com.philips.research.bombase.core.nuget.domain.NugetHarvester;
 import com.philips.research.bombase.core.pypi.domain.PyPiHarvester;
 import com.philips.research.bombase.core.source_scan.domain.SourceLicensesHarvester;
 import org.slf4j.Logger;
@@ -54,6 +55,7 @@ public class MetaInteractor implements MetaService {
         }
         installListener(PyPiHarvester.class);
         installListener(NpmHarvester.class);
+        installListener(NugetHarvester.class);
         installListener(MavenHarvester.class);
         if (properties.isScanLicenses()) {
             installListener(SourceLicensesHarvester.class);
