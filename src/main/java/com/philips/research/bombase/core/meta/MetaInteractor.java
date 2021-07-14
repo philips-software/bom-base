@@ -10,6 +10,7 @@ import com.philips.research.bombase.ConfigProperties;
 import com.philips.research.bombase.core.MetaService;
 import com.philips.research.bombase.core.UnknownPackageException;
 import com.philips.research.bombase.core.clearlydefined.domain.ClearlyDefinedHarvester;
+import com.philips.research.bombase.core.maven.domain.MavenHarvester;
 import com.philips.research.bombase.core.meta.registry.Field;
 import com.philips.research.bombase.core.meta.registry.MetaRegistry;
 import com.philips.research.bombase.core.npm.domain.NpmHarvester;
@@ -50,6 +51,7 @@ public class MetaInteractor implements MetaService {
         installListener(ClearlyDefinedHarvester.class);
         installListener(PyPiHarvester.class);
         installListener(NpmHarvester.class);
+        installListener(MavenHarvester.class);
         if (properties.isScanLicenses()) {
             installListener(SourceLicensesHarvester.class);
         }
