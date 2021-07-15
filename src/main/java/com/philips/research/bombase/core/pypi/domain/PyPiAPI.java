@@ -7,6 +7,7 @@ package com.philips.research.bombase.core.pypi.domain;
 
 import com.philips.research.bombase.core.meta.PackageMetadata;
 import com.philips.research.bombase.core.meta.registry.Field;
+import com.philips.research.bombase.core.meta.registry.Trust;
 import pl.tlinkowski.annotation.basic.NullOr;
 import retrofit2.Call;
 import retrofit2.http.GET;
@@ -23,8 +24,6 @@ import java.util.stream.Stream;
  * See https://warehouse.readthedocs.io/api-reference/json.html#release
  */
 public interface PyPiAPI {
-    //TODO Is this an appropriate score?
-    int PYPI_SCORE = 80;
     String SOURCE_FILE = "sdist";
     String BINARY_FILE = "bdist_wheel";
 
@@ -38,8 +37,8 @@ public interface PyPiAPI {
         List<FileJson> urls = new ArrayList<>();
 
         @Override
-        public int score(Field field) {
-            return PYPI_SCORE;
+        public Trust trust(Field field) {
+            return Trust.LIKELY;
         }
 
         @Override

@@ -11,6 +11,7 @@ import com.philips.research.bombase.core.downloader.DownloadService;
 import com.philips.research.bombase.core.meta.registry.Field;
 import com.philips.research.bombase.core.meta.registry.MetaRegistry;
 import com.philips.research.bombase.core.meta.registry.PackageAttributeEditor;
+import com.philips.research.bombase.core.meta.registry.Trust;
 import com.philips.research.bombase.core.scanner.ScannerService;
 import com.philips.research.bombase.core.scanner.ScannerService.LicenseResult;
 import com.philips.research.bombase.core.scanner.ScannerService.ScanResult;
@@ -101,23 +102,7 @@ class SourceLicensesHarvesterTest {
 
             task.accept(pkg);
 
-            verify(pkg).update(Field.DETECTED_LICENSES, SourceLicensesHarvester.MAX_SCORE, List.of(LICENSE1, LICENSE2));
-        }
-
-        @Test
-        void weightsDetectedLicenses() {
-            LicenseResult license1 = mock(LicenseResult.class);
-            when(license1.getScore()).thenReturn(50);
-            when(license1.getConfirmations()).thenReturn(400);
-            LicenseResult license2 = mock(LicenseResult.class);
-            when(license2.getScore()).thenReturn(80);
-            when(license2.getConfirmations()).thenReturn(200);
-            when(scanResult.getLicenses()).thenReturn(List.of(license1, license2));
-
-            task.accept(pkg);
-
-            final var expected = Math.round((50f * 400 + 80f * 200) / ((400 + 200) * 100) * SourceLicensesHarvester.MAX_SCORE);
-            verify(pkg).update(eq(Field.DETECTED_LICENSES), eq(expected), anyList());
+            verify(pkg).update(Field.DETECTED_LICENSES, Trust.PROBABLY, List.of(LICENSE1, LICENSE2));
         }
     }
 }

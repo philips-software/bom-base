@@ -10,6 +10,7 @@ import com.philips.research.bombase.core.downloader.DownloadService;
 import com.philips.research.bombase.core.meta.registry.Field;
 import com.philips.research.bombase.core.meta.registry.MetaRegistry;
 import com.philips.research.bombase.core.meta.registry.PackageAttributeEditor;
+import com.philips.research.bombase.core.meta.registry.Trust;
 import com.philips.research.bombase.core.scanner.ScannerService;
 import com.philips.research.bombase.core.source_scan.SourceScanException;
 import org.springframework.stereotype.Service;
@@ -50,27 +51,12 @@ public class SourceLicensesHarvester implements MetaRegistry.PackageListener {
             pkg.<String>get(Field.SOURCE_LOCATION)
                     .ifPresent(location -> downloader.download(URI.create(location), directory -> {
                         final var detections = licensesScannedIn(directory);
-                        final var score = score(detections);
                         final var expressions = licensesIn(detections);
-                        pkg.update(Field.DETECTED_LICENSES, score, expressions);
+                        pkg.update(Field.DETECTED_LICENSES, Trust.PROBABLY, expressions);
                     }));
         } catch (Exception e) {
             throw new SourceScanException("Failed to scan licenses for " + purl, e);
         }
-    }
-
-    /**
-     * Weights the detection score with the number of confirmations, and clips to the maximum score.
-     */
-    private int score(List<ScannerService.LicenseResult> detections) {
-        int count = 0;
-        int sum = 0;
-        for (var det : detections) {
-            final var qty = det.getConfirmations();
-            sum += qty * det.getScore();
-            count += qty;
-        }
-        return Math.round((sum / (100f * count)) * MAX_SCORE);
     }
 
     private List<String> licensesIn(List<ScannerService.LicenseResult> detections) {

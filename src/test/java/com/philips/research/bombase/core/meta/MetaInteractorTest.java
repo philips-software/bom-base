@@ -80,7 +80,7 @@ class MetaInteractorTest {
 
         @Test
         void queriesPackageDetails() {
-            editor.update(Field.TITLE, 100, TITLE);
+            editor.update(Field.TITLE, Trust.TRUTH, TITLE);
 
             final var values = interactor.getAttributes(PURL);
 
@@ -109,7 +109,7 @@ class MetaInteractorTest {
 
         @Test
         void updatesAttributeValue() {
-            editor.update(Field.TITLE, 99, "Removed");
+            editor.update(Field.TITLE, Trust.CERTAIN, "Removed");
 
             interactor.setAttributes(PURL, Map.of("title", TITLE));
 
