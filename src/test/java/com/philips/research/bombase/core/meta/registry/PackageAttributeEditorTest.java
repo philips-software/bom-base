@@ -75,4 +75,17 @@ class PackageAttributeEditorTest {
 
         assertThat(snapshot).isEqualTo(Map.of(Field.TITLE, TITLE));
     }
+
+    @Test
+    void indicatesTrustForField() {
+        pkg.add(new Attribute<>(Field.TITLE));
+        editor.update(Field.TITLE, TRUST, TITLE);
+
+        assertThat(editor.trust(Field.TITLE)).isEqualTo(TRUST);
+    }
+
+    @Test
+    void minimalTrustForFieldWithoutValue() {
+        assertThat(editor.trust(Field.TITLE)).isEqualTo(Trust.NONE);
+    }
 }

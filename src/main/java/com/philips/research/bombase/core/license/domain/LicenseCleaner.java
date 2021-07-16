@@ -9,7 +9,6 @@ import com.github.packageurl.PackageURL;
 import com.philips.research.bombase.core.meta.registry.Field;
 import com.philips.research.bombase.core.meta.registry.MetaRegistry;
 import com.philips.research.bombase.core.meta.registry.PackageAttributeEditor;
-import com.philips.research.bombase.core.meta.registry.Trust;
 import com.philips.research.bombase.core.scanner.ScannerService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -49,7 +48,7 @@ public class LicenseCleaner implements MetaRegistry.PackageListener {
                 .map(lic -> (String) lic)
                 .map(lic -> URL_PATTERN.matcher(lic)
                         .replaceAll(result -> licenseFor(result.group())))
-                .ifPresent(lic -> editor.update(Field.DECLARED_LICENSE, Trust.PROBABLY, lic));
+                .ifPresent(lic -> editor.update(Field.DECLARED_LICENSE, editor.trust(Field.DECLARED_LICENSE), lic));
     }
 
     private String licenseFor(String url) {

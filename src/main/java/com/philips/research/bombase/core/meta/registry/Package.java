@@ -34,7 +34,7 @@ public class Package {
         return lastUpdated;
     }
 
-    public Attribute<?> add(Attribute<?> attribute) {
+    public <T> Attribute<T> add(Attribute<T> attribute) {
         if (attributes.contains(attribute)) {
             throw new IllegalArgumentException("The " + attribute.getField().name() + " attribute already exists in package " + purl);
         }

@@ -49,6 +49,16 @@ public class PackageAttributeEditor {
     }
 
     /**
+     * @return trust of the current value for the indicated field
+     */
+    public Trust trust(Field field) {
+        return pkg.getAttributeFor(field)
+                .map(Attribute::getScore)
+                .map(Trust::of)
+                .orElse(Trust.NONE);
+    }
+
+    /**
      * Optionally updates the value of a field based on its relative trust.
      *
      * @param field the metadata attribute to overwrite
@@ -67,13 +77,13 @@ public class PackageAttributeEditor {
         return this;
     }
 
-    private Attribute getOrCreateAttr(Field field) {
-        return pkg.getAttributeFor(field).orElseGet(() -> createAttribute(field));
+    private <T> Attribute<T> getOrCreateAttr(Field field) {
+        return pkg.<T>getAttributeFor(field).orElseGet(() -> createAttribute(field));
     }
 
     // Necessary to allow generation of a tracked persistence entity.
-    protected Attribute createAttribute(Field field) {
-        return pkg.add(new Attribute(field));
+    protected <T> Attribute<T> createAttribute(Field field) {
+        return pkg.add(new Attribute<>(field));
     }
 
     /**

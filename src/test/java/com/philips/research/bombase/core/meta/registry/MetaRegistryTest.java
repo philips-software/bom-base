@@ -111,7 +111,7 @@ class MetaRegistryTest {
 
         @Test
         void cascadesEditsToListenersUntilNoMoreEditsAreMade() {
-            final var counter = new AtomicInteger();
+            final var counter = new AtomicInteger(1);
             final var task = mock(Consumer.class);
             //noinspection unchecked
             when(listener.onUpdated(any(), any(), any())).thenReturn(Optional.of(task));
@@ -128,7 +128,7 @@ class MetaRegistryTest {
             registry.edit(PURL, editor -> editor.update(FIELD, TRUST, VALUE));
 
             //noinspection unchecked
-            verify(task, times(Trust.values().length)).accept(any());
+            verify(task, times(Trust.values().length - 1)).accept(any());
         }
     }
 }

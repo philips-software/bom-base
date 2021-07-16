@@ -6,6 +6,7 @@
 package com.philips.research.bombase.core.meta.registry;
 
 public enum Trust {
+    NONE(0),
     MAYBE(10),
     PROBABLY(60),
     LIKELY(70),
@@ -16,6 +17,15 @@ public enum Trust {
 
     Trust(int score) {
         this.score = score;
+    }
+
+    static Trust of(int score) {
+        for (var trust : Trust.values()) {
+            if (trust.getScore() >= score) {
+                return trust;
+            }
+        }
+        return Trust.TRUTH;
     }
 
     int getScore() {
