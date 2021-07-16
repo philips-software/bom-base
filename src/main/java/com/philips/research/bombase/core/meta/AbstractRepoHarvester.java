@@ -47,16 +47,16 @@ public abstract class AbstractRepoHarvester implements MetaRegistry.PackageListe
     private void harvest(PackageURL purl, PackageAttributeEditor editor) {
         try {
             client.read(purl).ifPresentOrElse(def -> {
-                def.getTitle().ifPresent(title -> editor.update(Field.TITLE, def.score(Field.TITLE), title));
-                def.getDescription().ifPresent(description -> editor.update(Field.DESCRIPTION, def.score(Field.DESCRIPTION), description));
-                def.getSourceLocation().ifPresent(url -> editor.update(Field.SOURCE_LOCATION, def.score(Field.SOURCE_LOCATION), url));
-                def.getDownloadLocation().ifPresent(url -> editor.update(Field.DOWNLOAD_LOCATION, def.score(Field.DOWNLOAD_LOCATION), url));
-                def.getHomepage().ifPresent(url -> editor.update(Field.HOME_PAGE, def.score(Field.HOME_PAGE), url));
-                def.getAuthors().ifPresent(list -> editor.update(Field.ATTRIBUTION, def.score(Field.ATTRIBUTION), list));
-                def.getDeclaredLicense().ifPresent(license -> editor.update(Field.DECLARED_LICENSE, def.score(Field.DECLARED_LICENSE), license));
-                def.getDetectedLicenses().ifPresent(list -> editor.update(Field.DETECTED_LICENSES, def.score(Field.DETECTED_LICENSES), list));
-                def.getSha1().ifPresent(sha -> editor.update(Field.SHA1, def.score(Field.SHA1), sha));
-                def.getSha256().ifPresent(sha -> editor.update(Field.SHA256, def.score(Field.SHA256), sha));
+                def.getTitle().ifPresent(title -> editor.update(Field.TITLE, def.trust(Field.TITLE), title));
+                def.getDescription().ifPresent(description -> editor.update(Field.DESCRIPTION, def.trust(Field.DESCRIPTION), description));
+                def.getSourceLocation().ifPresent(url -> editor.update(Field.SOURCE_LOCATION, def.trust(Field.SOURCE_LOCATION), url));
+                def.getDownloadLocation().ifPresent(url -> editor.update(Field.DOWNLOAD_LOCATION, def.trust(Field.DOWNLOAD_LOCATION), url));
+                def.getHomepage().ifPresent(url -> editor.update(Field.HOME_PAGE, def.trust(Field.HOME_PAGE), url));
+                def.getAuthors().ifPresent(list -> editor.update(Field.ATTRIBUTION, def.trust(Field.ATTRIBUTION), list));
+                def.getDeclaredLicense().ifPresent(license -> editor.update(Field.DECLARED_LICENSE, def.trust(Field.DECLARED_LICENSE), license));
+                def.getDetectedLicenses().ifPresent(list -> editor.update(Field.DETECTED_LICENSES, def.trust(Field.DETECTED_LICENSES), list));
+                def.getSha1().ifPresent(sha -> editor.update(Field.SHA1, def.trust(Field.SHA1), sha));
+                def.getSha256().ifPresent(sha -> editor.update(Field.SHA256, def.trust(Field.SHA256), sha));
             }, () -> LOG.info("No metadata for {}", purl));
         } catch (Exception e) {
             throw new MetaException("Failed to harvest " + purl, e);

@@ -13,6 +13,7 @@ import com.philips.research.bombase.core.clearlydefined.domain.ClearlyDefinedHar
 import com.philips.research.bombase.core.maven.domain.MavenHarvester;
 import com.philips.research.bombase.core.meta.registry.Field;
 import com.philips.research.bombase.core.meta.registry.MetaRegistry;
+import com.philips.research.bombase.core.meta.registry.Trust;
 import com.philips.research.bombase.core.npm.domain.NpmHarvester;
 import com.philips.research.bombase.core.pypi.domain.PyPiHarvester;
 import com.philips.research.bombase.core.source_scan.domain.SourceLicensesHarvester;
@@ -82,7 +83,7 @@ public class MetaInteractor implements MetaService {
     public Map<String, AttributeDto> setAttributes(PackageURL purl, Map<String, @NullOr Object> values) {
         registry.edit(purl, pkg -> values.forEach((key, value) -> {
             final var field = Field.valueOf(Field.class, key.toUpperCase());
-            pkg.update(field, 100, value);
+            pkg.update(field, Trust.TRUTH, value);
         }));
         return getAttributes(purl);
     }

@@ -7,6 +7,7 @@ package com.philips.research.bombase.core.maven.domain;
 
 import com.philips.research.bombase.core.meta.PackageMetadata;
 import com.philips.research.bombase.core.meta.registry.Field;
+import com.philips.research.bombase.core.meta.registry.Trust;
 import pl.tlinkowski.annotation.basic.NullOr;
 
 import java.net.URI;
@@ -21,8 +22,6 @@ import java.util.stream.Collectors;
  * @see <a href="https://search.maven.org/classic/#api">POM format</a>
  */
 class PomXml implements PackageMetadata {
-    private static final int MAVEN_SCORE = 80;
-
     @NullOr String name;
     @NullOr String description;
     @NullOr String url;
@@ -31,8 +30,8 @@ class PomXml implements PackageMetadata {
     @NullOr ReferenceXml scm;
 
     @Override
-    public int score(Field field) {
-        return MAVEN_SCORE;
+    public Trust trust(Field field) {
+        return Trust.LIKELY;
     }
 
     @Override

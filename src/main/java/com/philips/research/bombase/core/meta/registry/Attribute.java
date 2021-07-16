@@ -14,8 +14,6 @@ import java.util.Optional;
  * Current value for a field.
  */
 public class Attribute<T> implements AttributeValue<T> {
-    private static final int TRUTH = 100;
-
     private final Field field;
     private int score;
     private @NullOr T value;
@@ -39,16 +37,17 @@ public class Attribute<T> implements AttributeValue<T> {
         return score;
     }
 
-    boolean setValue(int score, @NullOr T value) {
-        if (value == null || score <= 0 || (this.score == TRUTH && score < TRUTH)) {
+    boolean setValue(Trust trust, @NullOr T value) {
+        int score = trust.getScore();
+        if (value == null) {
             return false;
         }
 
         field.validate(value);
-        if (score >= TRUTH) {
+        if (trust == Trust.TRUTH) {
             updateTruth(value);
             return true;
-        } else if (score > this.score) {
+        } else if (score >= this.score) {
             return updateValue(score, value);
         } else {
             updateAltValue(score, value);
@@ -57,7 +56,7 @@ public class Attribute<T> implements AttributeValue<T> {
     }
 
     private void updateTruth(@NullOr T value) {
-        this.score = TRUTH;
+        this.score = Trust.TRUTH.getScore();
         this.value = value;
         this.altScore = 0;
         this.altValue = null;
@@ -74,14 +73,14 @@ public class Attribute<T> implements AttributeValue<T> {
     }
 
     private void updateAltValue(int score, @NullOr T value) {
-        if (score > this.altScore) {
+        if (score >= this.altScore) {
             this.altScore = score;
             this.altValue = value;
         }
     }
 
     private boolean updateValue(int score, @NullOr T value) {
-        if (!value.equals(this.value)) {
+        if (!Objects.equals(this.value, value)) {
             replaceValue(score, value);
             return true;
         } else {

@@ -49,16 +49,18 @@ public class PackageAttributeEditor {
     }
 
     /**
-     * Updates the value of a field using the provided score as priority
+     * Optionally updates the value of a field based on its relative trust.
      *
-     * @param score percentage indicating how trustworthy the value is
+     * @param field the metadata attribute to overwrite
+     * @param trust indicates how reliable the value is
+     * @param value new value to assign
      */
-    public PackageAttributeEditor update(Field field, int score, @NullOr Object value) {
+    public PackageAttributeEditor update(Field field, Trust trust, @NullOr Object value) {
         if (value == null) {
             return this;
         }
 
-        final var modified = getOrCreateAttr(field).setValue(score, value);
+        final var modified = getOrCreateAttr(field).setValue(trust, value);
         if (modified) {
             modifiedFields.add(field);
         }
@@ -91,5 +93,4 @@ public class PackageAttributeEditor {
         }
         return modified;
     }
-
 }
