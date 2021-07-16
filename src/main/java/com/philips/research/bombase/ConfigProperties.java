@@ -15,16 +15,16 @@ public class ConfigProperties {
     public boolean isScanLicenses() {
         return scanLicenses;
     }
-    
-    public boolean harvestClearlyDefined() {
-        return harvestClearlyDefined;
-    }
 
     public ConfigProperties setScanLicenses(boolean scanLicenses) {
         this.scanLicenses = scanLicenses;
         return this;
     }
-    
+
+    public boolean harvestClearlyDefined() {
+        return harvestClearlyDefined;
+    }
+
     public ConfigProperties setHarvestClearlyDefined(boolean harvestClearlyDefined) {
         this.harvestClearlyDefined = harvestClearlyDefined;
         return this;
