@@ -42,4 +42,8 @@ public interface PackageMetadata {
         return Optional.empty();
     }
 
+    default Optional<String> getSha512() {
+        return Optional.empty();
+    }
+
 }

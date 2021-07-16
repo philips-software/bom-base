@@ -57,6 +57,7 @@ public abstract class AbstractRepoHarvester implements MetaRegistry.PackageListe
                 def.getDetectedLicenses().ifPresent(list -> editor.update(Field.DETECTED_LICENSES, def.score(Field.DETECTED_LICENSES), list));
                 def.getSha1().ifPresent(sha -> editor.update(Field.SHA1, def.score(Field.SHA1), sha));
                 def.getSha256().ifPresent(sha -> editor.update(Field.SHA256, def.score(Field.SHA256), sha));
+                def.getSha512().ifPresent(sha -> editor.update(Field.SHA512, def.score(Field.SHA512), sha));
             }, () -> LOG.info("No metadata for {}", purl));
         } catch (Exception e) {
             throw new MetaException("Failed to harvest " + purl, e);
