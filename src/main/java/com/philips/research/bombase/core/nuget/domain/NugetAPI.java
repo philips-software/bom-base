@@ -33,15 +33,15 @@ public interface NugetAPI {
 
     @SuppressWarnings("NotNullFieldNotInitialized")
     class CatalogResponseJson {
-        @JsonProperty("@id")
+        @NullOr @JsonProperty("@id")
         public String id;
-        @JsonProperty("@type")
+        @NullOr @JsonProperty("@type")
         public List<String> type;
-        @JsonProperty("catalogEntry")
+        @NullOr @JsonProperty("catalogEntry")
         public String catalogEntry;
-        public boolean listed;
-        public Date published;
-        public String registration;
+        @NullOr public boolean listed;
+        @NullOr public Date published;
+        @NullOr public String registration;
 
     }
     @SuppressWarnings("NotNullFieldNotInitialized")
@@ -52,10 +52,13 @@ public interface NugetAPI {
         @JsonProperty("projectUrl")
         @NullOr URI homepage;
         @JsonProperty("licenseExpression")
-        @NullOr String license;
+        @NullOr String licenseExpression;
+        @JsonProperty("licenseUrl")
+        @NullOr String licenseUrl;
         @JsonProperty("authors")
         @NullOr String author;
         @NullOr JsonNode repository;
+        // TODO: This package hash is not correct, probably need to make a new call to a different endpoint
         @JsonProperty("packageHash")
         @NullOr String packageHash;
 
@@ -91,7 +94,10 @@ public interface NugetAPI {
 
         @Override
         public Optional<String> getDeclaredLicense() {
-            return Optional.ofNullable(license);
+            if (licenseUrl != null) {
+                return Optional.ofNullable(licenseUrl);
+            }
+            return Optional.ofNullable(licenseExpression);
         }
 
         @Override
@@ -111,7 +117,7 @@ public interface NugetAPI {
         }
 
         @Override
-        // TODO: This actually is a SHA256
+        // TODO: This actually is a SHA512
         public Optional<String> getSha1() {
             return Optional.ofNullable(packageHash);
         }

@@ -26,6 +26,7 @@ import java.util.Optional;
 
 @Component
 public class NugetClient {
+    private URI baseURI;
     private static final ObjectMapper MAPPER = new ObjectMapper()
             .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
             .setVisibility(PropertyAccessor.FIELD, JsonAutoDetect.Visibility.NON_PRIVATE)
@@ -43,15 +44,24 @@ public class NugetClient {
                 .addConverterFactory(JacksonConverterFactory.create(MAPPER))
                 .build();
         rest = retrofit.create(NugetAPI.class);
+        baseURI = uri;
     }
 
     Optional<PackageMetadata> getPackageMetadata(PackageURL purl) {
-        Optional<NugetAPI.CatalogResponseJson> optionalCatalogResponseJson = query(rest.getCatalogEntry(purl.getName().toLowerCase(Locale.ROOT), purl.getVersion()));
-        String catalogEntryUrl = null;
-        if (optionalCatalogResponseJson.isPresent() && optionalCatalogResponseJson.get().catalogEntry != null) {
-            catalogEntryUrl = optionalCatalogResponseJson.get().catalogEntry.split("https://api.nuget.org/v3/")[1];
+        Optional<NugetAPI.CatalogResponseJson> optionalCatalogResponseJson = query(rest.getCatalogEntry(
+                purl.getName().toLowerCase(Locale.ROOT), purl.getVersion()));
+        if (optionalCatalogResponseJson.isEmpty() || optionalCatalogResponseJson.get().catalogEntry == null) {
+            return Optional.empty();
+        } else {
+            Optional<String> catalogEntryUrl = Optional.ofNullable(optionalCatalogResponseJson.get()
+                    .catalogEntry.split(baseURI.toASCIIString())[1]);
+
+            if (catalogEntryUrl.isPresent()) {
+                return query(rest.getDefinition(catalogEntryUrl.get()));
+            } else {
+                return Optional.empty();
+            }
         }
-        return query(rest.getDefinition(catalogEntryUrl));
     }
 
     private <T> Optional<T> query(Call<? extends T> query) {
