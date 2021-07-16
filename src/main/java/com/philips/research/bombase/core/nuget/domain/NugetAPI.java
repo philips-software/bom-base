@@ -117,8 +117,7 @@ public interface NugetAPI {
         }
 
         @Override
-        // TODO: This actually is a SHA512
-        public Optional<String> getSha1() {
+        public Optional<String> getSha512() {
             return Optional.ofNullable(packageHash);
         }
     }
