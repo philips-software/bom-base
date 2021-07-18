@@ -9,6 +9,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.philips.research.bombase.core.meta.PackageMetadata;
 import com.philips.research.bombase.core.meta.registry.Field;
+import com.philips.research.bombase.core.meta.registry.Trust;
 import pl.tlinkowski.annotation.basic.NullOr;
 import retrofit2.Call;
 import retrofit2.http.GET;
@@ -22,9 +23,6 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public interface NugetAPI {
-    // TODO Is this a proper value?
-    int NUGET_SCORE = 80;
-
     @GET("registration5-semver1/{project}/{version}.json")
     Call<CatalogResponseJson> getCatalogEntry(@Path("project") String project,
                                               @Path("version") String version);
@@ -63,8 +61,8 @@ public interface NugetAPI {
         @NullOr String packageHash;
 
         @Override
-        public int score(Field field) {
-            return NUGET_SCORE;
+        public Trust trust(Field field) {
+            return Trust.LIKELY;
         }
 
         @Override
