@@ -15,6 +15,7 @@ import java.net.URI;
 import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -54,6 +55,16 @@ class ScannerInteractorTest {
     }
 
     @Test
+    void prioritizesLicensesScannedFromUrl() {
+        setupDownloader(LICENSE_URL, PATH);
+        when(scanner.scan(PATH)).thenAnswer((x) -> scanResult("A", "B", "C"));
+
+        final var licenses = interactor.scanLicenses(LICENSE_URL);
+
+        assertThat(licenses).containsExactly("C", "B", "A");
+    }
+
+    @Test
     void throws_downloadFails() {
         when(downloader.download(eq(LICENSE_URL), any())).thenThrow(new DownloadException("Test"));
 
@@ -83,13 +94,15 @@ class ScannerInteractorTest {
     }
 
     /**
-     * Configures scanner to report the indicated licenses.
+     * Configures scanner to report the indicated licenses by increasing score.
      */
     private ScannerService.ScanResult scanResult(String... licenses) {
+        final var score = new AtomicInteger();
         final var list = Arrays.stream(licenses)
                 .map(lic -> {
                     final var result = mock(ScannerService.LicenseResult.class);
                     when(result.getExpression()).thenReturn(lic);
+                    when(result.getScore()).thenReturn(score.addAndGet(10));
                     return result;
                 })
                 .collect(Collectors.toList());
