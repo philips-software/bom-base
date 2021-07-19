@@ -6,7 +6,6 @@
 package com.philips.research.bombase.core.nuget.domain;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.databind.JsonNode;
 import com.philips.research.bombase.core.meta.PackageMetadata;
 import com.philips.research.bombase.core.meta.registry.Field;
 import com.philips.research.bombase.core.meta.registry.Trust;
@@ -26,17 +25,74 @@ public interface NugetAPI {
     @GET("registration5-semver1/{project}/{version}.json")
     Call<CatalogResponseJson> getCatalogEntry(@Path("project") String project,
                                               @Path("version") String version);
+
     @GET("{catalogEntryUrl}")
     Call<ResponseJson> getDefinition(@Path("catalogEntryUrl") String catalogEntryUrl);
 
+    @GET("{nugetSpecUrl}")
+    Call<_package> getNugetSpec(@Path("nugetSpecUrl") String nugetSpecUrl);
+
+class license {
+    public String type;
+    public String text;
+}
+
+     class repository {
+        public String type;
+        public String url;
+        public String commit;
+    }
+
+     class group {
+        public String targetFramework;
+        public List<dependency> dependency;
+    }
+
+     class dependency {
+        public String id;
+        public String version;
+        public String exclude;
+    }
+
+     class dependencies {
+        public List<group> group;
+    }
+
+     class metadata {
+        public String id;
+        public String version;
+        public String title;
+        public String authors;
+        public boolean requireLicenseAcceptance;
+        public license license;
+        public String licenseUrl;
+        public String icon;
+        public String projectUrl;
+        public String description;
+        public String copyright;
+        public String tags;
+        public repository repository;
+        public dependencies dependencies;
+        public String minClientVersion;
+        public String text;
+    }
+
+     class _package {
+        public metadata metadata;
+        public String xmlns;
+        public String text;
+    }
+
     @SuppressWarnings("NotNullFieldNotInitialized")
     class CatalogResponseJson {
-        @NullOr @JsonProperty("@id")
-        public String id;
-        @NullOr @JsonProperty("@type")
-        public List<String> type;
-        @NullOr @JsonProperty("catalogEntry")
-        public String catalogEntry;
+        @JsonProperty("@id")
+        @NullOr public String id;
+        @JsonProperty("@type")
+        @NullOr public List<String> type;
+        @JsonProperty("catalogEntry")
+        @NullOr public String catalogEntry;
+        @JsonProperty("packageContent")
+        @NullOr public String packageContent;
         @NullOr public boolean listed;
         @NullOr public Date published;
         @NullOr public String registration;
@@ -44,6 +100,8 @@ public interface NugetAPI {
     }
     @SuppressWarnings("NotNullFieldNotInitialized")
     class ResponseJson implements PackageMetadata {
+        @NullOr String downloadLocation;
+
         @JsonProperty("title")
         @NullOr String name;
         @NullOr String description;
@@ -55,8 +113,7 @@ public interface NugetAPI {
         @NullOr String licenseUrl;
         @JsonProperty("authors")
         @NullOr String author;
-        @NullOr JsonNode repository;
-        // TODO: This package hash is not correct, probably need to make a new call to a different endpoint
+        @NullOr String sourceUrl;
         @JsonProperty("packageHash")
         @NullOr String packageHash;
 
@@ -100,18 +157,18 @@ public interface NugetAPI {
 
         @Override
         public Optional<String> getSourceLocation() {
-            if (repository == null) {
+            if (sourceUrl == null) {
                 return Optional.empty();
             }
-            if (repository.isObject()) {
-                return Optional.ofNullable(repository.get("url").textValue());
-            }
-            return Optional.of(repository.textValue());
+            return Optional.ofNullable(sourceUrl);
         }
 
         @Override
         public Optional<URI> getDownloadLocation() {
-            return Optional.ofNullable(null);
+            if (downloadLocation == null) {
+                return Optional.empty();
+            }
+            return Optional.ofNullable(URI.create(downloadLocation));
         }
 
         @Override

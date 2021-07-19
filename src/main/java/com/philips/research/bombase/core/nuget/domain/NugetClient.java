@@ -11,6 +11,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
+import com.fasterxml.jackson.dataformat.xml.XmlMapper;
 import com.github.packageurl.PackageURL;
 import com.philips.research.bombase.core.meta.PackageMetadata;
 import com.philips.research.bombase.core.nuget.NugetException;
@@ -27,37 +28,54 @@ import java.util.Optional;
 @Component
 public class NugetClient {
     private URI baseURI;
+    // TODO: Can these mappers be cleaned up a bit more?
     private static final ObjectMapper MAPPER = new ObjectMapper()
             .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
             .setVisibility(PropertyAccessor.FIELD, JsonAutoDetect.Visibility.NON_PRIVATE)
             .setPropertyNamingStrategy(PropertyNamingStrategies.SNAKE_CASE);
+    private static final ObjectMapper XMLMAPPER = new XmlMapper()
+            .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
+            .setVisibility(PropertyAccessor.FIELD, JsonAutoDetect.Visibility.NON_PRIVATE);
 
-    private final NugetAPI rest;
+    private final NugetAPI restJson;
+    private final NugetAPI restXml;
 
     NugetClient() {
         this(URI.create("https://api.nuget.org/v3/"));
     }
 
     NugetClient(URI uri) {
-        final var retrofit = new Retrofit.Builder()
+        final var retrofitJson = new Retrofit.Builder()
                 .baseUrl(uri.toASCIIString())
                 .addConverterFactory(JacksonConverterFactory.create(MAPPER))
                 .build();
-        rest = retrofit.create(NugetAPI.class);
+        final var retrofitXML = new Retrofit.Builder()
+                .baseUrl(uri.toASCIIString())
+                .addConverterFactory(JacksonConverterFactory.create(XMLMAPPER))
+                .build();
+        restJson = retrofitJson.create(NugetAPI.class);
+        restXml = retrofitXML.create(NugetAPI.class);
         baseURI = uri;
     }
 
     Optional<PackageMetadata> getPackageMetadata(PackageURL purl) {
-        Optional<NugetAPI.CatalogResponseJson> optionalCatalogResponseJson = query(rest.getCatalogEntry(
+        Optional<NugetAPI.CatalogResponseJson> optionalCatalogResponseJson = query(restJson.getCatalogEntry(
                 purl.getName().toLowerCase(Locale.ROOT), purl.getVersion()));
         if (optionalCatalogResponseJson.isEmpty() || optionalCatalogResponseJson.get().catalogEntry == null) {
             return Optional.empty();
         } else {
             Optional<String> catalogEntryUrl = Optional.ofNullable(optionalCatalogResponseJson.get()
                     .catalogEntry.split(baseURI.toASCIIString())[1]);
-
+            Optional<NugetAPI._package> nugetSpecXML = query(restXml.getNugetSpec(
+                    String.format("flatcontainer/%s/%s/%s.nuspec", purl.getName().toLowerCase(Locale.ROOT),
+                            purl.getVersion(), purl.getName().toLowerCase(Locale.ROOT))));
             if (catalogEntryUrl.isPresent()) {
-                return query(rest.getDefinition(catalogEntryUrl.get()));
+                return query(restJson.getDefinition(catalogEntryUrl.get())).map(result -> {
+                    result.downloadLocation = optionalCatalogResponseJson.get().packageContent;
+                    // TODO: Need to check if optional actually exists...
+                    result.sourceUrl = nugetSpecXML.get().metadata.repository.url;
+                    return result;
+                });
             } else {
                 return Optional.empty();
             }
