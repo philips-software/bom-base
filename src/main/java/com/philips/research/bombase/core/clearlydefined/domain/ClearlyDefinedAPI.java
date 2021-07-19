@@ -7,6 +7,7 @@ package com.philips.research.bombase.core.clearlydefined.domain;
 
 import com.philips.research.bombase.core.meta.PackageMetadata;
 import com.philips.research.bombase.core.meta.registry.Field;
+import com.philips.research.bombase.core.meta.registry.Trust;
 import pl.tlinkowski.annotation.basic.NullOr;
 import retrofit2.Call;
 import retrofit2.http.GET;
@@ -21,8 +22,6 @@ import java.util.function.Function;
 
 public interface ClearlyDefinedAPI {
     Set<String> IGNORED_LICENSES = Set.of("NOASSERTION", "OTHER");
-    //TODO Is this a realistic value?
-    int SCORE = 70;
 
     @GET("definitions/{type}/{provider}/{namespace}/{name}/{revision}")
     Call<ResponseJson> getDefinition(@Path("type") String type, @Path("provider") String provider, @Path("namespace") String namespace,
@@ -39,8 +38,14 @@ public interface ClearlyDefinedAPI {
         }
 
         @Override
-        public int score(Field field) {
-            return SCORE;
+        public Trust trust(Field field) {
+            //noinspection SwitchStatementWithTooFewBranches
+            switch (field) {
+                case DETECTED_LICENSES:
+                    return Trust.LIKELY;
+                default:
+                    return Trust.PROBABLY;
+            }
         }
 
         @Override

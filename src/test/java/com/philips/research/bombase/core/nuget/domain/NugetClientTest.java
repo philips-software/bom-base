@@ -111,6 +111,10 @@ class NugetClientTest {
 
     @Test
     void acceptsBareRepositoryURLs() throws Exception {
+<<<<<<< HEAD
+=======
+        enqueueCatalogEntryMock();
+>>>>>>> 11159a3a6b751b0072f0e746edad6e4919c09a11
         mockServer.enqueue(new MockResponse().setBody(new JSONObject()
                 .put("repository", SOURCE_LOCATION)
                 .toString()));

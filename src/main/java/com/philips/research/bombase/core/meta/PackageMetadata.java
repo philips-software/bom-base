@@ -6,13 +6,14 @@
 package com.philips.research.bombase.core.meta;
 
 import com.philips.research.bombase.core.meta.registry.Field;
+import com.philips.research.bombase.core.meta.registry.Trust;
 
 import java.net.URI;
 import java.util.List;
 import java.util.Optional;
 
 public interface PackageMetadata {
-    int score(Field field);
+    Trust trust(Field field);
 
     Optional<String> getTitle();
 

@@ -9,6 +9,7 @@ import com.github.packageurl.PackageURL;
 import com.philips.research.bombase.core.meta.registry.Field;
 import com.philips.research.bombase.core.meta.registry.Package;
 import com.philips.research.bombase.core.meta.registry.PackageAttributeEditor;
+import com.philips.research.bombase.core.meta.registry.Trust;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -35,7 +36,7 @@ class AbstractRepoHarvesterTest {
     private static final URI DOWNLOAD_LOCATION = URI.create("https://example.com/download");
     private static final String SHA1 = "Sha1";
     private static final String SHA256 = "Sha256";
-    private static final int SCORE = 70;
+    private static final Trust TRUST = Trust.PROBABLY;
 
     private final AbstractRepoHarvester.Client client = mock(AbstractRepoHarvester.Client.class);
     private final AbstractRepoHarvester harvester = new TestHarvester(client);
@@ -96,7 +97,7 @@ class AbstractRepoHarvesterTest {
 
         @Test
         void harvestsMetadata() {
-            when(response.score(any())).thenReturn(SCORE);
+            when(response.trust(any())).thenReturn(TRUST);
             when(response.getSourceLocation()).thenReturn(Optional.of(SOURCE_LOCATION));
             when(response.getTitle()).thenReturn(Optional.of(TITLE));
             when(response.getDescription()).thenReturn(Optional.of(DESCRIPTION));
@@ -110,16 +111,16 @@ class AbstractRepoHarvesterTest {
 
             task.accept(editor);
 
-            verify(editor).update(Field.TITLE, SCORE, TITLE);
-            verify(editor).update(Field.DESCRIPTION, SCORE, DESCRIPTION);
-            verify(editor).update(Field.SOURCE_LOCATION, SCORE, SOURCE_LOCATION);
-            verify(editor).update(Field.DOWNLOAD_LOCATION, SCORE, DOWNLOAD_LOCATION);
-            verify(editor).update(Field.HOME_PAGE, SCORE, HOMEPAGE);
-            verify(editor).update(Field.ATTRIBUTION, SCORE, ATTRIBUTION);
-            verify(editor).update(Field.DECLARED_LICENSE, SCORE, DECLARED_LICENSE);
-            verify(editor).update(Field.DETECTED_LICENSES, SCORE, List.of(DETECTED_LICENSE));
-            verify(editor).update(Field.SHA1, SCORE, SHA1);
-            verify(editor).update(Field.SHA256, SCORE, SHA256);
+            verify(editor).update(Field.TITLE, TRUST, TITLE);
+            verify(editor).update(Field.DESCRIPTION, TRUST, DESCRIPTION);
+            verify(editor).update(Field.SOURCE_LOCATION, TRUST, SOURCE_LOCATION);
+            verify(editor).update(Field.DOWNLOAD_LOCATION, TRUST, DOWNLOAD_LOCATION);
+            verify(editor).update(Field.HOME_PAGE, TRUST, HOMEPAGE);
+            verify(editor).update(Field.ATTRIBUTION, TRUST, ATTRIBUTION);
+            verify(editor).update(Field.DECLARED_LICENSE, TRUST, DECLARED_LICENSE);
+            verify(editor).update(Field.DETECTED_LICENSES, TRUST, List.of(DETECTED_LICENSE));
+            verify(editor).update(Field.SHA1, TRUST, SHA1);
+            verify(editor).update(Field.SHA256, TRUST, SHA256);
         }
 
         @Test

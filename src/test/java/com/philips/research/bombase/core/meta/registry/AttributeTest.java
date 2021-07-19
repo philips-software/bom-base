@@ -9,8 +9,6 @@ import com.philips.research.bombase.core.meta.MetaException;
 import nl.jqno.equalsverifier.EqualsVerifier;
 import org.junit.jupiter.api.Test;
 
-import java.time.Instant;
-
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
@@ -18,12 +16,11 @@ class AttributeTest {
     private static final String VALUE = "Value";
     private static final String OTHER_VALUE = "Other";
     private static final Field FIELD = Field.TITLE;
-    private static final int SCORE = 50;
-    private static final int HIGHER_SCORE = 75;
-    private static final int LOWER_SCORE = 25;
+    private static final Trust TRUST = Trust.PROBABLY;
+    private static final Trust HIGHER_TRUST = Trust.CERTAIN;
+    private static final Trust LOWER_TRUST = Trust.MAYBE;
 
-    private final Instant start = Instant.now();
-    private final Attribute field = new Attribute(FIELD);
+    private final Attribute<Object> field = new Attribute<>(FIELD);
 
     @Test
     void createsInstance() {
@@ -34,7 +31,7 @@ class AttributeTest {
 
     @Test
     void setsValue() {
-        final var modified = field.setValue(SCORE, VALUE);
+        final var modified = field.setValue(TRUST, VALUE);
 
         assertThat(modified).isTrue();
         assertThat(field.getValue()).contains(VALUE);
@@ -42,9 +39,19 @@ class AttributeTest {
     }
 
     @Test
-    void overridesValue_higherScore() {
-        field.setValue(SCORE, VALUE);
-        final var modified = field.setValue(HIGHER_SCORE, OTHER_VALUE);
+    void overridesValue_equalTrust() {
+        field.setValue(TRUST, VALUE);
+        final var modified = field.setValue(TRUST, OTHER_VALUE);
+
+        assertThat(modified).isTrue();
+        assertThat(field.getValue()).contains(OTHER_VALUE);
+        assertThat(field.getAltValue()).contains(VALUE);
+    }
+
+    @Test
+    void overridesValue_higherTrust() {
+        field.setValue(TRUST, VALUE);
+        final var modified = field.setValue(HIGHER_TRUST, OTHER_VALUE);
 
         assertThat(modified).isTrue();
         assertThat(field.getValue()).contains(OTHER_VALUE);
@@ -53,33 +60,17 @@ class AttributeTest {
 
     @Test
     void ignoresIdenticalValue() {
-        field.setValue(SCORE, VALUE);
-        final var modified = field.setValue(HIGHER_SCORE, VALUE);
+        field.setValue(TRUST, VALUE);
+        final var modified = field.setValue(HIGHER_TRUST, VALUE);
 
         assertThat(modified).isFalse();
         assertThat(field.getAltValue()).isEmpty();
     }
 
     @Test
-    void ignoresZeroScore() {
-        final var modified = field.setValue(0, VALUE);
-
-        assertThat(modified).isFalse();
-        assertThat(field.getValue()).isEmpty();
-    }
-
-    @Test
-    void clipsScoreToZero() {
-        final var modified = field.setValue(-1, VALUE);
-
-        assertThat(modified).isFalse();
-        assertThat(field.getValue()).isEmpty();
-    }
-
-    @Test
     void contestsValue_lowerScore() {
-        field.setValue(SCORE, VALUE);
-        final var modified = field.setValue(LOWER_SCORE, OTHER_VALUE);
+        field.setValue(TRUST, VALUE);
+        final var modified = field.setValue(LOWER_TRUST, OTHER_VALUE);
 
         assertThat(modified).isFalse();
         assertThat(field.getValue()).contains(VALUE);
@@ -88,9 +79,9 @@ class AttributeTest {
 
     @Test
     void overridesValueAndContestingValue() {
-        field.setValue(LOWER_SCORE, "Replaced");
-        field.setValue(SCORE, VALUE);
-        final var modified = field.setValue(HIGHER_SCORE, OTHER_VALUE);
+        field.setValue(LOWER_TRUST, "Replaced");
+        field.setValue(TRUST, VALUE);
+        final var modified = field.setValue(HIGHER_TRUST, OTHER_VALUE);
 
         assertThat(modified).isTrue();
         assertThat(field.getValue()).contains(OTHER_VALUE);
@@ -99,9 +90,9 @@ class AttributeTest {
 
     @Test
     void overridesContestingValue() {
-        field.setValue(HIGHER_SCORE, VALUE);
-        field.setValue(LOWER_SCORE, "Replaced");
-        final var modified = field.setValue(SCORE, OTHER_VALUE);
+        field.setValue(HIGHER_TRUST, VALUE);
+        field.setValue(LOWER_TRUST, "Replaced");
+        final var modified = field.setValue(TRUST, OTHER_VALUE);
 
         assertThat(modified).isFalse();
         assertThat(field.getValue()).contains(VALUE);
@@ -110,9 +101,9 @@ class AttributeTest {
 
     @Test
     void promotesContestingValue() {
-        field.setValue(LOWER_SCORE, VALUE);
-        field.setValue(SCORE, OTHER_VALUE);
-        final var modified = field.setValue(HIGHER_SCORE, VALUE);
+        field.setValue(LOWER_TRUST, VALUE);
+        field.setValue(TRUST, OTHER_VALUE);
+        final var modified = field.setValue(HIGHER_TRUST, VALUE);
 
         assertThat(modified).isTrue();
         assertThat(field.getValue()).contains(VALUE);
@@ -120,36 +111,16 @@ class AttributeTest {
     }
 
     @Test
-    void keepsAbsoluteTruth() {
-        field.setValue(SCORE, "Removed");
-        field.setValue(100, VALUE);
-        final var modified = field.setValue(LOWER_SCORE, "Ignored");
-
-        assertThat(modified).isFalse();
-        assertThat(field.getValue()).contains(VALUE);
-        assertThat(field.getAltValue()).isEmpty();
-    }
-
-    @Test
-    void clipsScoreAtAbsoluteTruth() {
-        field.setValue(101, "Removed");
-        final var modified = field.setValue(100, VALUE);
-
-        assertThat(modified).isTrue();
-        assertThat(field.getValue()).contains(VALUE);
-    }
-
-    @Test
     void throws_ValueOfWrongType() {
-        assertThatThrownBy(() -> field.setValue(SCORE, 666))
+        assertThatThrownBy(() -> field.setValue(TRUST, 666))
                 .isInstanceOf(MetaException.class)
                 .hasMessageContaining("cannot hold");
     }
 
     @Test
     void ignoresNullValue() {
-        field.setValue(SCORE, VALUE);
-        final var modified = field.setValue(HIGHER_SCORE, null);
+        field.setValue(TRUST, VALUE);
+        final var modified = field.setValue(HIGHER_TRUST, null);
 
         assertThat(modified).isFalse();
         assertThat(field.getValue()).contains(VALUE);
