@@ -34,7 +34,8 @@ class NugetClientTest {
     private static final String SOURCE_LOCATION = "https://example.com/source";
     private static final String DOWNLOAD_LOCATION = "https://example.com/binary";
     private static final String SHA512 = "Sha512";
-    private static final String CATALOG_ENTRY = "http://localhost:" + PORT + "/catalog0/data/timestamp/package.version.json";
+    private static final String CATALOG_ENTRY = "http://localhost:" + PORT +
+            "/catalog0/data/timestamp/package.version.json";
     private static final String LICENSE_EXPRESSION = "MIT";
     private static final String LICENSE_URL = "https://example.com/mit-license";
 

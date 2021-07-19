@@ -21,6 +21,13 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+/**
+ * NuGet package management repository metadata.
+ *
+ * @see <a href="https://api.nuget.org/v3/index.json">For more information.</a>
+ * Combination of JSON and XML is used in the NuGet API.
+ * More information can also be found <a href="https://docs.microsoft.com/en-us/nuget/api/overview">here</a>
+ */
 public interface NugetAPI {
     @GET("registration5-semver1/{project}/{version}.json")
     Call<CatalogResponseJson> getCatalogEntry(@Path("project") String project,
@@ -30,55 +37,55 @@ public interface NugetAPI {
     Call<ResponseJson> getDefinition(@Path("catalogEntryUrl") String catalogEntryUrl);
 
     @GET("{nugetSpecUrl}")
-    Call<_package> getNugetSpec(@Path("nugetSpecUrl") String nugetSpecUrl);
+    Call<XmlNugetSpecPackage> getNugetSpec(@Path("nugetSpecUrl") String nugetSpecUrl);
 
-class license {
-    public String type;
-    public String text;
-}
+    class License {
+        public String type;
+        public String text;
+    }
 
-     class repository {
+    class Repository {
         public String type;
         public String url;
         public String commit;
     }
 
-     class group {
+    class Group {
         public String targetFramework;
-        public List<dependency> dependency;
+        public List<Dependency> dependency;
     }
 
-     class dependency {
+    class Dependency {
         public String id;
         public String version;
         public String exclude;
     }
 
-     class dependencies {
-        public List<group> group;
+    class Dependencies {
+        public List<Group> group;
     }
 
-     class metadata {
+    class Metadata {
         public String id;
         public String version;
         public String title;
         public String authors;
         public boolean requireLicenseAcceptance;
-        public license license;
+        public License license;
         public String licenseUrl;
         public String icon;
         public String projectUrl;
         public String description;
         public String copyright;
         public String tags;
-        public repository repository;
-        public dependencies dependencies;
+        public Repository repository;
+        public Dependencies dependencies;
         public String minClientVersion;
         public String text;
     }
 
-     class _package {
-        public metadata metadata;
+    class XmlNugetSpecPackage {
+        public Metadata metadata;
         public String xmlns;
         public String text;
     }
@@ -86,18 +93,26 @@ class license {
     @SuppressWarnings("NotNullFieldNotInitialized")
     class CatalogResponseJson {
         @JsonProperty("@id")
-        @NullOr public String id;
+        @NullOr
+        public String id;
         @JsonProperty("@type")
-        @NullOr public List<String> type;
+        @NullOr
+        public List<String> type;
         @JsonProperty("catalogEntry")
-        @NullOr public String catalogEntry;
+        @NullOr
+        public String catalogEntry;
         @JsonProperty("packageContent")
-        @NullOr public String packageContent;
-        @NullOr public boolean listed;
-        @NullOr public Date published;
-        @NullOr public String registration;
+        @NullOr
+        public String packageContent;
+        @NullOr
+        public boolean listed;
+        @NullOr
+        public Date published;
+        @NullOr
+        public String registration;
 
     }
+
     @SuppressWarnings("NotNullFieldNotInitialized")
     class ResponseJson implements PackageMetadata {
         @NullOr String downloadLocation;

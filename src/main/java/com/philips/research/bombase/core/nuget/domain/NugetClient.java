@@ -27,7 +27,6 @@ import java.util.Optional;
 
 @Component
 public class NugetClient {
-    private URI baseURI;
     // TODO: Can these mappers be cleaned up a bit more?
     private static final ObjectMapper MAPPER = new ObjectMapper()
             .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
@@ -36,9 +35,9 @@ public class NugetClient {
     private static final ObjectMapper XMLMAPPER = new XmlMapper()
             .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
             .setVisibility(PropertyAccessor.FIELD, JsonAutoDetect.Visibility.NON_PRIVATE);
-
     private final NugetAPI restJson;
     private final NugetAPI restXml;
+    private final URI baseURI;
 
     NugetClient() {
         this(URI.create("https://api.nuget.org/v3/"));
@@ -59,21 +58,25 @@ public class NugetClient {
     }
 
     Optional<PackageMetadata> getPackageMetadata(PackageURL purl) {
-        Optional<NugetAPI.CatalogResponseJson> optionalCatalogResponseJson = query(restJson.getCatalogEntry(
-                purl.getName().toLowerCase(Locale.ROOT), purl.getVersion()));
-        if (optionalCatalogResponseJson.isEmpty() || optionalCatalogResponseJson.get().catalogEntry == null) {
+        final var catalogResponse =
+                query(restJson.getCatalogEntry(purl.getName().toLowerCase(
+                        Locale.ROOT), purl.getVersion()));
+        if (catalogResponse.isEmpty() || catalogResponse.get().catalogEntry == null) {
             return Optional.empty();
         } else {
-            Optional<String> catalogEntryUrl = Optional.ofNullable(optionalCatalogResponseJson.get()
+            final var catalogEntryUrl = Optional.ofNullable(catalogResponse.get()
                     .catalogEntry.split(baseURI.toASCIIString())[1]);
-            Optional<NugetAPI._package> nugetSpecXML = query(restXml.getNugetSpec(
-                    String.format("flatcontainer/%s/%s/%s.nuspec", purl.getName().toLowerCase(Locale.ROOT),
-                            purl.getVersion(), purl.getName().toLowerCase(Locale.ROOT))));
+            final var nugetSpecResponse =
+                    query(restXml.getNugetSpec(
+                    String.format("flatcontainer/%s/%s/%s.nuspec",
+                            purl.getName().toLowerCase(Locale.ROOT),
+                            purl.getVersion(),
+                            purl.getName().toLowerCase(Locale.ROOT))));
             if (catalogEntryUrl.isPresent()) {
-                return query(restJson.getDefinition(catalogEntryUrl.get())).map(result -> {
-                    result.downloadLocation = optionalCatalogResponseJson.get().packageContent;
-                    // TODO: Need to check if optional actually exists...
-                    result.sourceUrl = nugetSpecXML.get().metadata.repository.url;
+                return query(restJson.getDefinition(catalogEntryUrl.get()))
+                        .map(result -> { result.downloadLocation =
+                                catalogResponse.get().packageContent;
+                    result.sourceUrl = nugetSpecResponse.get().metadata.repository.url;
                     return result;
                 });
             } else {
@@ -89,7 +92,8 @@ public class NugetClient {
                 return Optional.empty();
             }
             if (!response.isSuccessful()) {
-                throw new NugetException("Nuget server responded with status " + response.code());
+                throw new NugetException("Nuget server responded with status " +
+                        response.code());
             }
             return Optional.ofNullable(response.body());
         } catch (JsonProcessingException e) {
