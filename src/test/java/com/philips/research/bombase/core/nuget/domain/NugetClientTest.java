@@ -15,6 +15,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
@@ -60,48 +61,85 @@ class NugetClientTest {
         mockServer.shutdown();
     }
 
-    @Test
-    void skipsUndefinedPackage() {
-        mockServer.enqueue(new MockResponse().setResponseCode(404));
+    @Nested
+    class UnExpectedResults {
+        @Test
+        void skipsUndefinedPackage() {
+            mockServer.enqueue(new MockResponse().setResponseCode(404));
 
-        assertThat(client.getPackageMetadata(PURL)).isEmpty();
+            assertThat(client.getPackageMetadata(PURL)).isEmpty();
+        }
+
+        @Test
+        void withoutCatalogEntry() throws Exception {
+            mockServer.enqueue(new MockResponse().setBody(new JSONObject()
+                    .put("catalogEntry", null)
+                    .toString()));
+
+            final var definition = client.getPackageMetadata(PURL);
+
+            assertThat(definition).isEmpty();
+        }
+
+        @Test
+        void throws_unexpectedResponseFromServer() {
+            mockServer.enqueue(new MockResponse().setResponseCode(500));
+
+            assertThatThrownBy(() -> client.getPackageMetadata(PURL))
+                    .isInstanceOf(NugetException.class)
+                    .hasMessageContaining("status 500");
+        }
+
+        @Test
+        void throws_serverNotReachable() {
+            var serverlessClient = new NugetClient(URI.create("http://localhost:1234"));
+
+            assertThatThrownBy(() -> serverlessClient.getPackageMetadata(PURL))
+                    .isInstanceOf(NugetException.class)
+                    .hasMessageContaining("not reachable");
+        }
     }
 
-    @Test
-    void getsInitialMetaDataFromServer() throws Exception {
-        enqueueCatalogEntryMock();
-        enqueueNugetSpecXMLMock();
+    @Nested
+    class MetaData {
 
-        mockServer.enqueue(new MockResponse().setBody(new JSONObject()
-                .put("title", TITLE)
-                .put("description", DESCRIPTION)
-                .put("projectUrl", HOMEPAGE)
-                .put("authors", AUTHORS)
-                .put("licenseExpression", LICENSE_EXPRESSION)
-                .put("licenseUrl", LICENSE_URL)
-                .put("repository", SOURCE_LOCATION)
-                .put("packageHash", SHA512)
-                .toString()));
+        @BeforeEach
+        void setUp() throws JSONException {
+            enqueueCatalogEntryMock();
+            enqueueNugetSpecXMLMock();
+        }
 
-        final var definition = client.getPackageMetadata(PURL).orElseThrow();
+        @Test
+        void getsInitialMetaDataFromServer() throws Exception {
+            mockServer.enqueue(new MockResponse().setBody(new JSONObject()
+                    .put("title", TITLE)
+                    .put("description", DESCRIPTION)
+                    .put("projectUrl", HOMEPAGE)
+                    .put("authors", AUTHORS)
+                    .put("licenseExpression", LICENSE_EXPRESSION)
+                    .put("licenseUrl", LICENSE_URL)
+                    .put("repository", SOURCE_LOCATION)
+                    .put("packageHash", SHA512)
+                    .toString()));
 
-        final var request = mockServer.takeRequest();
-        assertThat(request.getMethod()).isEqualTo("GET");
-        assertThat(request.getPath()).isEqualTo("/registration5-semver1/name/version.json");
-        assertThat(definition.getTitle()).contains(TITLE);
-        assertThat(definition.getDescription()).contains(DESCRIPTION);
-        assertThat(definition.getHomepage()).contains(URI.create(HOMEPAGE));
-        assertThat(definition.getAuthors()).contains(List.of("Attribution1", "Attribution2"));
-        assertThat(definition.getSourceLocation()).contains(SOURCE_LOCATION);
-        assertThat(definition.getDeclaredLicense()).contains(LICENSE_URL);
-        assertThat(definition.getDownloadLocation()).contains(URI.create(DOWNLOAD_LOCATION));
-        assertThat(definition.getSha512()).contains(SHA512);
-    }
+            final var definition = client.getPackageMetadata(PURL).orElseThrow();
+
+            final var request = mockServer.takeRequest();
+            assertThat(request.getMethod()).isEqualTo("GET");
+            assertThat(request.getPath()).isEqualTo("/registration5-semver1/name/version.json");
+            assertThat(definition.getTitle()).contains(TITLE);
+            assertThat(definition.getDescription()).contains(DESCRIPTION);
+            assertThat(definition.getHomepage()).contains(URI.create(HOMEPAGE));
+            assertThat(definition.getAuthors()).contains(List.of("Attribution1", "Attribution2"));
+            assertThat(definition.getSourceLocation()).contains(SOURCE_LOCATION);
+            assertThat(definition.getDeclaredLicense()).contains(LICENSE_URL);
+            assertThat(definition.getDownloadLocation()).contains(URI.create(DOWNLOAD_LOCATION));
+            assertThat(definition.getSha512()).contains(SHA512);
+        }
+
 
     @Test
     void acceptsEmptyMetadataFromServer() throws Exception {
-        enqueueCatalogEntryMock();
-        enqueueNugetSpecXMLMock();
         mockServer.enqueue(new MockResponse().setBody(new JSONObject()
                 .toString()));
 
@@ -112,8 +150,6 @@ class NugetClientTest {
 
     @Test
     void acceptsBareRepositoryURLs() throws Exception {
-        enqueueCatalogEntryMock();
-        enqueueNugetSpecXMLMock();
         mockServer.enqueue(new MockResponse().setBody(new JSONObject()
                 .put("repository", SOURCE_LOCATION)
                 .toString()));
@@ -125,9 +161,6 @@ class NugetClientTest {
 
     @Test
     void withoutLicenseExpressionAndUrl() throws Exception {
-        enqueueCatalogEntryMock();
-        enqueueNugetSpecXMLMock();
-
         mockServer.enqueue(new MockResponse().setBody(new JSONObject()
                 .put("licenseExpression", null)
                 .put("licenseUrl", null)
@@ -138,24 +171,9 @@ class NugetClientTest {
         assertThat(definition.getDeclaredLicense()).isEmpty();
     }
 
-    private void enqueueNugetSpecXMLMock() {
-        mockServer.enqueue(new MockResponse().setBody("<package>" +
-                "<metadata>" +
-                "<title>" + TITLE + "</title>" +
-                "<description>" + DESCRIPTION + "</description>" +
-                "<license type='expression'>" + LICENSE_EXPRESSION + "</license>" +
-                "<licenseUrl>" + LICENSE_URL + "</licenseUrl>" +
-                "<url>" + HOMEPAGE + "</url>" +
-                String.format("<repository type='git' url='%s' />", SOURCE_LOCATION) +
-                "</metadata>" +
-                "</package>"));
-    }
 
     @Test
     void withoutLicenseExpressionWithFilledUrl() throws Exception {
-        enqueueCatalogEntryMock();
-        enqueueNugetSpecXMLMock();
-
         mockServer.enqueue(new MockResponse().setBody(new JSONObject()
                 .put("licenseExpression", null)
                 .put("licenseUrl", LICENSE_URL)
@@ -168,9 +186,6 @@ class NugetClientTest {
 
     @Test
     void withLicenseExpressionAndUrl() throws Exception {
-        enqueueCatalogEntryMock();
-        enqueueNugetSpecXMLMock();
-
         mockServer.enqueue(new MockResponse().setBody(new JSONObject()
                 .put("licenseExpression", LICENSE_EXPRESSION)
                 .put("licenseUrl", LICENSE_URL)
@@ -182,20 +197,7 @@ class NugetClientTest {
     }
 
     @Test
-    void withoutCatalogEntry() throws Exception {
-        mockServer.enqueue(new MockResponse().setBody(new JSONObject()
-                .put("catalogEntry", null)
-                .toString()));
-
-        final var definition = client.getPackageMetadata(PURL);
-
-        assertThat(definition).isEmpty();
-    }
-
-    @Test
     void expandsListOfAuthors() throws Exception {
-        enqueueCatalogEntryMock();
-        enqueueNugetSpecXMLMock();
         mockServer.enqueue(new MockResponse().setBody(new JSONObject()
                 .put("authors", AUTHORS)
                 .toString()));
@@ -207,8 +209,6 @@ class NugetClientTest {
 
     @Test
     void expandsListOfSingleAuthor() throws Exception {
-        enqueueCatalogEntryMock();
-        enqueueNugetSpecXMLMock();
         mockServer.enqueue(new MockResponse().setBody(new JSONObject()
                 .put("authors", "Attribution1")
                 .toString()));
@@ -224,22 +224,20 @@ class NugetClientTest {
                 .put("packageContent", DOWNLOAD_LOCATION)
                 .toString()));
     }
-
-    @Test
-    void throws_serverNotReachable() {
-        var serverlessClient = new NugetClient(URI.create("http://localhost:1234"));
-
-        assertThatThrownBy(() -> serverlessClient.getPackageMetadata(PURL))
-                .isInstanceOf(NugetException.class)
-                .hasMessageContaining("not reachable");
+    
+    private void enqueueNugetSpecXMLMock() {
+        mockServer.enqueue(new MockResponse().setBody("<package>" +
+                "<metadata>" +
+                "<title>" + TITLE + "</title>" +
+                "<description>" + DESCRIPTION + "</description>" +
+                "<license type='expression'>" + LICENSE_EXPRESSION + "</license>" +
+                "<licenseUrl>" + LICENSE_URL + "</licenseUrl>" +
+                "<url>" + HOMEPAGE + "</url>" +
+                String.format("<repository type='git' url='%s' />", SOURCE_LOCATION) +
+                "</metadata>" +
+                "</package>"));
     }
+}
 
-    @Test
-    void throws_unexpectedResponseFromServer() {
-        mockServer.enqueue(new MockResponse().setResponseCode(500));
 
-        assertThatThrownBy(() -> client.getPackageMetadata(PURL))
-                .isInstanceOf(NugetException.class)
-                .hasMessageContaining("status 500");
-    }
 }
