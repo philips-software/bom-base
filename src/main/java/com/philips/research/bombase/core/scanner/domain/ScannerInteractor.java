@@ -44,7 +44,6 @@ public class ScannerInteractor implements ScannerService {
         final var licenses = downloader.download(uri, scanner::scan)
                 .getLicenses().stream()
                 .sorted((l, r) -> Integer.compare(r.getScore(), l.getScore()))
-                .peek(lic -> System.out.println(lic.getExpression() + " [" + lic.getScore() + "%]"))
                 .map(LicenseResult::getExpression)
                 .collect(Collectors.toList());
         LOG.info("Scanned {} =>{}", uri, licenses);

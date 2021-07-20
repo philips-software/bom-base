@@ -67,7 +67,6 @@ class AnonymousVcsHandler implements VcsHandler {
         } catch (IOException e) {
             throw new DownloadException("File download failed from " + fromUri, e);
         }
-        System.out.println("File has size: " + target.length());
     }
 
     private String filenameFor(URI uri) {
@@ -121,7 +120,7 @@ class AnonymousVcsHandler implements VcsHandler {
             }
 
             uri = redirection(uri, urlConnection);
-            urlConnection = (HttpURLConnection) uri.toURL().openConnection();
+            urlConnection = (HttpU)
         }
     }
 
