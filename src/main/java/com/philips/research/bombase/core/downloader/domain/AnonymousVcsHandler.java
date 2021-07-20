@@ -120,7 +120,7 @@ class AnonymousVcsHandler implements VcsHandler {
             }
 
             uri = redirection(uri, urlConnection);
-            urlConnection = (HttpU)
+            urlConnection = (HttpURLConnection) uri.toURL().openConnection();
         }
     }
 
