@@ -13,16 +13,35 @@ class TrustTest {
     @Test
     void mapsToPercentageScore() {
         for (var trust : Trust.values()) {
-            assertThat(trust.getScore()).isBetween(1, 100);
+            assertThat(trust.getScore()).isBetween(0, 100);
         }
     }
 
     @Test
     void mapsToIncreasingScores() {
-        var previous = 0;
+        var previous = -1;
         for (var trust : Trust.values()) {
             assertThat(trust.getScore()).isGreaterThan(previous);
             previous = trust.getScore();
         }
+    }
+
+    @Test
+    void mapsScoreToTrust() {
+        for (var trust : Trust.values()) {
+            assertThat(Trust.of(trust.getScore())).isEqualTo(trust);
+        }
+    }
+
+    @Test
+    void roundsScoreUpToTrust() {
+        for (var trust : Trust.values()) {
+            assertThat(Trust.of(trust.getScore() - 1)).isEqualTo(trust);
+        }
+    }
+
+    @Test
+    void mapsExcessiveScoreToTruth() {
+        assertThat(Trust.of(666)).isEqualTo(Trust.TRUTH);
     }
 }

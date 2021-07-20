@@ -101,6 +101,6 @@ public class MetaRegistry {
          * @param values  current package metadata
          * @return (optional) operation to queue for execution
          */
-        Optional<Consumer<PackageAttributeEditor>> onUpdated(PackageURL purl, Set<Field> updated, Map<Field, ?> values);
+        Optional<Consumer<PackageAttributeEditor>> onUpdated(PackageURL purl, Set<Field> updated, Map<Field, Object> values);
     }
 }

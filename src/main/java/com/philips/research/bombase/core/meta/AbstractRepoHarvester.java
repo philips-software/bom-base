@@ -30,7 +30,7 @@ public abstract class AbstractRepoHarvester implements MetaRegistry.PackageListe
     }
 
     @Override
-    public Optional<Consumer<PackageAttributeEditor>> onUpdated(PackageURL purl, Set<Field> updated, Map<Field, ?> values) {
+    public Optional<Consumer<PackageAttributeEditor>> onUpdated(PackageURL purl, Set<Field> updated, Map<Field, Object> values) {
         if (!isSupportedType(purl.getType()) || !updated.isEmpty()) {
             return Optional.empty();
         }

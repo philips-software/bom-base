@@ -9,7 +9,6 @@ import com.github.packageurl.MalformedPackageURLException;
 import com.github.packageurl.PackageURL;
 import org.junit.jupiter.api.Test;
 
-import java.net.URI;
 import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -75,5 +74,18 @@ class PackageAttributeEditorTest {
         editor.update(Field.DESCRIPTION, TRUST, "Created");
 
         assertThat(snapshot).isEqualTo(Map.of(Field.TITLE, TITLE));
+    }
+
+    @Test
+    void indicatesTrustForField() {
+        pkg.add(new Attribute<>(Field.TITLE));
+        editor.update(Field.TITLE, TRUST, TITLE);
+
+        assertThat(editor.trust(Field.TITLE)).isEqualTo(TRUST);
+    }
+
+    @Test
+    void minimalTrustForFieldWithoutValue() {
+        assertThat(editor.trust(Field.TITLE)).isEqualTo(Trust.NONE);
     }
 }

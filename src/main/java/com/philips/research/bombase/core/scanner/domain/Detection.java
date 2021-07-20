@@ -17,17 +17,16 @@ import java.util.Objects;
  * Keeps track of the location with the highest percentage match, and the number of matches found.
  */
 public class Detection implements ScannerService.LicenseResult {
-    private static final File NO_FILE = new File("?");
     private static final String[] UNLIKELY = {"test", "sample", "docs", "demo", "tutorial", "changelog"};
 
     private final String expression;
 
     private int score;
     private int confirmations;
-    private File filePath = NO_FILE;
+    private File filePath;
     private int startLine;
     private int endLine;
-    private boolean ignored = true;
+    private boolean ignored;
 
     public Detection(String expression, int score, File file, int startLine, int endLine) {
         this.expression = expression;

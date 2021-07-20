@@ -38,7 +38,7 @@ public class SourceLicensesHarvester implements MetaRegistry.PackageListener {
     }
 
     @Override
-    public Optional<Consumer<PackageAttributeEditor>> onUpdated(PackageURL purl, Set<Field> updated, Map<Field, ?> values) {
+    public Optional<Consumer<PackageAttributeEditor>> onUpdated(PackageURL purl, Set<Field> updated, Map<Field, Object> values) {
         if (!updated.contains(Field.SOURCE_LOCATION)) {
             return Optional.empty();
         }
@@ -49,11 +49,11 @@ public class SourceLicensesHarvester implements MetaRegistry.PackageListener {
     private void harvest(PackageURL purl, PackageAttributeEditor pkg) {
         try {
             pkg.<String>get(Field.SOURCE_LOCATION)
-                    .ifPresent(location -> downloader.download(URI.create(location), directory -> {
-                        final var detections = licensesScannedIn(directory);
+                    .map(location -> downloader.download(URI.create(location), this::licensesScannedIn))
+                    .ifPresent(detections -> {
                         final var expressions = licensesIn(detections);
                         pkg.update(Field.DETECTED_LICENSES, Trust.PROBABLY, expressions);
-                    }));
+                    });
         } catch (Exception e) {
             throw new SourceScanException("Failed to scan licenses for " + purl, e);
         }

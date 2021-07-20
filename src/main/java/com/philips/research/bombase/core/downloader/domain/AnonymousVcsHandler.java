@@ -14,13 +14,19 @@ import pl.tlinkowski.annotation.basic.NullOr;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.net.HttpURLConnection;
 import java.net.URI;
+import java.net.URLDecoder;
 import java.nio.channels.Channels;
 import java.nio.channels.FileChannel;
 import java.nio.channels.ReadableByteChannel;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.time.Duration;
 import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Download handler for file and internet resources.
@@ -54,8 +60,7 @@ class AnonymousVcsHandler implements VcsHandler {
     private void copyFile(File target, URI fromUri) {
         LOG.info("Download file from {} to {}", fromUri, target);
         try (FileOutputStream out = new FileOutputStream(target)) {
-            final var url = fromUri.toURL();
-            ReadableByteChannel inChannel = Channels.newChannel(url.openStream());
+            ReadableByteChannel inChannel = Channels.newChannel(openStream(fromUri));
             FileChannel outChannel = out.getChannel();
             outChannel.transferFrom(inChannel, 0, Long.MAX_VALUE);
             inChannel.close();
@@ -85,5 +90,43 @@ class AnonymousVcsHandler implements VcsHandler {
                 .filter(File::isDirectory)
                 .findFirst().orElse(baseDir)
                 .toPath();
+    }
+
+    /**
+     * Workaround to redirect from HTTP to HTTPS.
+     *
+     * @see <a href="https://stackoverflow.com/questions/1884230/httpurlconnection-doesnt-follow-redirect-from-http-to-https">This explanation</a>
+     */
+    private InputStream openStream(URI uri) throws IOException {
+        final var connection = uri.toURL().openConnection();
+        if (!(connection instanceof HttpURLConnection)) {
+            return connection.getInputStream();
+        }
+
+        Map<URI, Integer> visited = new HashMap<>();
+        var urlConnection = (HttpURLConnection) connection;
+        while (true) {
+            final int times = visited.compute(uri, (key, count) -> count == null ? 1 : count + 1);
+            if (times > 3) {
+                throw new IOException("Aborted: Stuck in redirect loop");
+            }
+
+            urlConnection.setConnectTimeout(15000);
+            urlConnection.setReadTimeout(15000);
+            urlConnection.setInstanceFollowRedirects(false);   // We handle redirects ourselves
+            urlConnection.setRequestProperty("User-Agent", "Mozilla/5.0...");
+            if (urlConnection.getResponseCode() != 301) {
+                return urlConnection.getInputStream();
+            }
+
+            uri = redirection(uri, urlConnection);
+            urlConnection = (HttpURLConnection) uri.toURL().openConnection();
+        }
+    }
+
+    private URI redirection(URI uri, HttpURLConnection conn) {
+        final var location = conn.getHeaderField("Location");
+        final var url = URLDecoder.decode(location, StandardCharsets.UTF_8);
+        return uri.resolve(url);
     }
 }

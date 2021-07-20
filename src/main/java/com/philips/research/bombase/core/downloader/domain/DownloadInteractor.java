@@ -11,7 +11,7 @@ import org.springframework.stereotype.Service;
 import javax.annotation.PreDestroy;
 import java.net.URI;
 import java.nio.file.Path;
-import java.util.function.Consumer;
+import java.util.function.Function;
 
 @Service
 public class DownloadInteractor implements DownloadService {
@@ -29,10 +29,10 @@ public class DownloadInteractor implements DownloadService {
     }
 
     @Override
-    public void download(URI location, Consumer<Path> callback) {
+    public <T> T download(URI location, Function<Path, T> operation) {
         final var directory = cache.obtain(location);
         try {
-            callback.accept(directory);
+            return operation.apply(directory);
         } finally {
             cache.release(location);
         }

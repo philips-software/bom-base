@@ -39,11 +39,11 @@ class PomXmlTest {
         }
 
         @Test
-        void prefersNameOverUrl() {
+        void prefersUrlOverName() {
             final var xml = new PomXml();
             xml.licenses = List.of(reference(LICENSE1, URI.create(LICENSE_URL)));
 
-            assertThat(xml.getDeclaredLicense()).contains(LICENSE1);
+            assertThat(xml.getDeclaredLicense()).contains(LICENSE_URL);
         }
 
         @Test

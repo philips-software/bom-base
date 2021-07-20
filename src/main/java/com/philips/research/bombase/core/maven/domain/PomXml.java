@@ -75,7 +75,7 @@ class PomXml implements PackageMetadata {
     }
 
     private @NullOr String licenseOf(ReferenceXml xml) {
-        return (xml.name != null) ? xml.name : xml.url;
+        return (xml.url != null) ? xml.url : xml.name;
     }
 
     @Override

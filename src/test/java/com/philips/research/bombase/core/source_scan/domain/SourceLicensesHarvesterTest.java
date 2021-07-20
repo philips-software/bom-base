@@ -28,6 +28,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.function.Consumer;
+import java.util.function.Function;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
@@ -79,9 +80,8 @@ class SourceLicensesHarvesterTest {
         void beforeEach() {
             when(pkg.get(Field.SOURCE_LOCATION)).thenReturn(Optional.of(SOURCE_LOCATION));
             doAnswer(a -> { // Pass download path to provided consumer
-                final Consumer<Path> consumer = a.getArgument(1);
-                consumer.accept(PATH);
-                return null;
+                final Function<Path, ScanResult> operation = a.getArgument(1);
+                return operation.apply(PATH);
             }).when(downloader).download(eq(URI.create(SOURCE_LOCATION)), any());
             when(scanner.scan(PATH)).thenReturn(scanResult);
         }

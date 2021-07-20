@@ -11,7 +11,6 @@ import org.junit.jupiter.api.Test;
 
 import java.net.URI;
 import java.nio.file.Path;
-import java.util.concurrent.atomic.AtomicBoolean;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -23,9 +22,7 @@ class DownloadInteractorTest {
 
     @Test
     void downloadsFromUri() {
-        final var found = new AtomicBoolean(false);
-
-        interactor.download(FILE_URI, path -> found.set(path.toFile().exists()));
+        final var found = interactor.download(FILE_URI, path -> path.toFile().exists());
 
         assertThat(found).isTrue();
     }
