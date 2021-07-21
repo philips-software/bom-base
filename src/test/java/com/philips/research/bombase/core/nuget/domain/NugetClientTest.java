@@ -62,16 +62,17 @@ class NugetClientTest {
     }
 
     @Nested
-    class UnExpectedResults {
+    class WithoutMetaData {
+
         @Test
-        void skipsUndefinedPackage() {
+        void noMetaData_undefinedPackage() {
             mockServer.enqueue(new MockResponse().setResponseCode(404));
 
             assertThat(client.getPackageMetadata(PURL)).isEmpty();
         }
 
         @Test
-        void withoutCatalogEntry_returnEmpty() throws Exception {
+        void noMetaData_noCatalogEntry() throws Exception {
             mockServer.enqueue(new MockResponse().setBody(new JSONObject()
                     .put("catalogEntry", null)
                     .toString()));
@@ -101,7 +102,7 @@ class NugetClientTest {
     }
 
     @Nested
-    class MetaData {
+    class WithMetaData {
 
         @BeforeEach
         void setUp() throws JSONException {
@@ -164,17 +165,7 @@ class NugetClientTest {
         }
 
         @Test
-        void acceptsEmptyMetadataFromServer() {
-            mockServer.enqueue(new MockResponse().setBody(new JSONObject()
-                    .toString()));
-
-            final var release = client.getPackageMetadata(PURL).orElseThrow();
-
-            assertThat(release).isInstanceOf(PackageMetadata.class);
-        }
-
-        @Test
-        void withLicenseExpressionAndUrl_PreferLicenseUrl() throws Exception {
+        void preferLicenseUrl_withLicenseExpressionAndUrl() throws Exception {
             mockServer.enqueue(new MockResponse().setBody(new JSONObject()
                     .put("licenseExpression", LICENSE_EXPRESSION)
                     .put("licenseUrl", LICENSE_URL)
@@ -183,6 +174,16 @@ class NugetClientTest {
             final var definition = client.getPackageMetadata(PURL).orElseThrow();
 
             assertThat(definition.getDeclaredLicense()).contains(LICENSE_URL);
+        }
+
+        @Test
+        void returnEmptyPackageMetaData_emptyResponse() {
+            mockServer.enqueue(new MockResponse().setBody(new JSONObject()
+                    .toString()));
+
+            final var release = client.getPackageMetadata(PURL).orElseThrow();
+
+            assertThat(release).isInstanceOf(PackageMetadata.class);
         }
 
         private void enqueueCatalogEntryMock() throws JSONException {
@@ -195,11 +196,6 @@ class NugetClientTest {
         private void enqueueNugetSpecXMLMock() {
             mockServer.enqueue(new MockResponse().setBody("<package>" +
                     "<metadata>" +
-                    "<title>" + TITLE + "</title>" +
-                    "<description>" + DESCRIPTION + "</description>" +
-                    "<license type='expression'>" + LICENSE_EXPRESSION + "</license>" +
-                    "<licenseUrl>" + LICENSE_URL + "</licenseUrl>" +
-                    "<url>" + HOMEPAGE + "</url>" +
                     String.format("<repository type='git' url='%s' />", SOURCE_LOCATION) +
                     "</metadata>" +
                     "</package>"));

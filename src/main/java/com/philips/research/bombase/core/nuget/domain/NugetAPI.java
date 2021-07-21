@@ -103,6 +103,10 @@ public interface NugetAPI {
         Metadata metadata;
         String xmlns;
         String text;
+
+        Optional<String> getRepositoryURL() {
+            return Optional.ofNullable(metadata.repository.url);
+        }
     }
 
     @SuppressWarnings("NotNullFieldNotInitialized")
@@ -189,10 +193,8 @@ public interface NugetAPI {
 
         @Override
         public Optional<String> getDeclaredLicense() {
-            if (licenseUrl != null) {
-                return Optional.ofNullable(licenseUrl);
-            }
-            return Optional.ofNullable(licenseExpression);
+            final var expression = (licenseUrl != null) ? licenseUrl : licenseExpression;
+            return Optional.ofNullable(expression);
         }
 
         @Override

@@ -61,26 +61,18 @@ public class NugetClient {
         final var lowerCasedPurlName = purl.getName().toLowerCase(Locale.ROOT);
         final var catalogResponse =
                 query(restJson.getCatalogEntry(lowerCasedPurlName, purl.getVersion()));
-
-        final var catalogEntryPath = catalogResponse.map(cat -> cat.extractCatalogEntryPath(cat, baseURI))
-                .orElseGet(Optional::empty);
-
-        if (catalogEntryPath.isPresent()) {
-            final var nugetSpecResponse =
-                    query(restXml.getNugetSpec(
-                            String.format("flatcontainer/%s/%s/%s.nuspec",
-                                    lowerCasedPurlName,
-                                    purl.getVersion(),
-                                    lowerCasedPurlName)));
-            return query(restJson.getDefinition(catalogEntryPath.get()))
-                    .map(result -> {
-                        result.downloadLocation =
-                                catalogResponse.get().packageContent;
-                        result.sourceUrl = nugetSpecResponse.map(s -> s.metadata.repository.url).orElse(null);
-                        return result;
-                    });
-        }
-        return Optional.empty();
+        return catalogResponse.flatMap(cat -> cat.extractCatalogEntryPath(cat, baseURI))
+                .flatMap(path -> query(restXml.getNugetSpec(
+                        String.format("flatcontainer/%s/%s/%s.nuspec",
+                                lowerCasedPurlName,
+                                purl.getVersion(),
+                                lowerCasedPurlName)))
+                        .flatMap(nugetSpecResponse -> query(restJson.getDefinition(path))
+                                .map(result -> {
+                                    result.downloadLocation = catalogResponse.get().packageContent;
+                                    nugetSpecResponse.getRepositoryURL().ifPresent(url -> result.sourceUrl = url);
+                                    return result;
+                                })));
     }
 
     private <T> Optional<T> query(Call<? extends T> query) {
@@ -95,7 +87,7 @@ public class NugetClient {
             }
             return Optional.ofNullable(response.body());
         } catch (JsonProcessingException e) {
-            throw new IllegalArgumentException("JSON formatting error", e);
+            throw new IllegalArgumentException("JSON/XML formatting error", e);
         } catch (IOException e) {
             throw new NugetException("Nuget is not reachable");
         }
