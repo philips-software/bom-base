@@ -15,16 +15,16 @@ public interface ScannerStore {
     /**
      * Persists the result of a scan
      *
-     * @param uri  location of the scanned resources
-     * @param scan scanning results
+     * @param location location of the scanned resources
+     * @param scan     scanning results
      */
-    void store(URI uri, ScannerService.ScanResult scan);
+    void store(URI location, ScannerService.ScanResult scan);
 
     /**
      * Retrieves the prior scan result.
      *
-     * @param uri location of the resources
+     * @param location location of the resources
      * @return prior scan results (if available)
      */
-    Optional<ScannerService.ScanResult> retrieve(URI uri);
+    Optional<ScannerService.ScanResult> retrieve(URI location);
 }

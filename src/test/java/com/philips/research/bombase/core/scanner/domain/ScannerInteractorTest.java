@@ -9,12 +9,14 @@ import com.philips.research.bombase.core.downloader.DownloadException;
 import com.philips.research.bombase.core.downloader.DownloadService;
 import com.philips.research.bombase.core.scanner.ScannerException;
 import com.philips.research.bombase.core.scanner.ScannerService;
+import com.philips.research.bombase.core.scanner.ScannerStore;
 import org.junit.jupiter.api.Test;
 
 import java.net.URI;
 import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -32,7 +34,8 @@ class ScannerInteractorTest {
 
     private final DownloadService downloader = mock(DownloadService.class);
     private final ScanCodeScanner scanner = mock(ScanCodeScanner.class);
-    private final ScannerService interactor = new ScannerInteractor(downloader, scanner);
+    private final ScannerStore store = mock(ScannerStore.class);
+    private final ScannerService interactor = new ScannerInteractor(store, downloader, scanner);
 
     @Test
     void scansDirectory() {
@@ -47,11 +50,23 @@ class ScannerInteractorTest {
     @Test
     void scansFromUrl() {
         setupDownloader(LICENSE_URL, PATH);
-        when(scanner.scan(PATH)).thenAnswer((x) -> scanResult(LICENSE));
+        final var scanResult = scanResult(LICENSE);
+        when(scanner.scan(PATH)).thenAnswer((x) -> scanResult);
 
         final var licenses = interactor.scanLicenses(LICENSE_URL);
 
         assertThat(licenses).containsExactly(LICENSE);
+        verify(store).store(LICENSE_URL, scanResult);
+    }
+
+    @Test
+    void reusesPriorScanResult() {
+        when(store.retrieve(LICENSE_URL)).thenAnswer((x) -> Optional.of(scanResult(LICENSE)));
+
+        final var licenses = interactor.scanLicenses(LICENSE_URL);
+
+        assertThat(licenses).contains(LICENSE);
+        verify(store, never()).store(any(), any());
     }
 
     @Test

@@ -17,6 +17,7 @@ public interface ScannerService {
      * @param directory location of the files
      * @return results of the scan
      */
+    @Deprecated
     //TODO Not sure if we should scan files instead of an URI
     ScanResult scan(Path directory);
 
