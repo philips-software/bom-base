@@ -27,12 +27,11 @@ import java.util.Optional;
 
 @Component
 public class NugetClient {
-    // TODO: Can these mappers be cleaned up a bit more?
     private static final ObjectMapper MAPPER = new ObjectMapper()
             .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
             .setVisibility(PropertyAccessor.FIELD, JsonAutoDetect.Visibility.NON_PRIVATE)
             .setPropertyNamingStrategy(PropertyNamingStrategies.SNAKE_CASE);
-    private static final ObjectMapper XMLMAPPER = new XmlMapper()
+    private static final ObjectMapper XML_MAPPER = new XmlMapper()
             .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
             .setVisibility(PropertyAccessor.FIELD, JsonAutoDetect.Visibility.NON_PRIVATE);
     private final NugetAPI restJson;
@@ -50,7 +49,7 @@ public class NugetClient {
                 .build();
         final var retrofitXML = new Retrofit.Builder()
                 .baseUrl(uri.toASCIIString())
-                .addConverterFactory(JacksonConverterFactory.create(XMLMAPPER))
+                .addConverterFactory(JacksonConverterFactory.create(XML_MAPPER))
                 .build();
         restJson = retrofitJson.create(NugetAPI.class);
         restXml = retrofitXML.create(NugetAPI.class);
@@ -58,31 +57,30 @@ public class NugetClient {
     }
 
     Optional<PackageMetadata> getPackageMetadata(PackageURL purl) {
+        // Some NuGet repositories requires a lower case package name.
+        final var lowerCasedPurlName = purl.getName().toLowerCase(Locale.ROOT);
         final var catalogResponse =
-                query(restJson.getCatalogEntry(purl.getName().toLowerCase(
-                        Locale.ROOT), purl.getVersion()));
-        if (catalogResponse.isEmpty() || catalogResponse.get().catalogEntry == null) {
-            return Optional.empty();
-        } else {
-            final var catalogEntryUrl = Optional.ofNullable(catalogResponse.get()
-                    .catalogEntry.split(baseURI.toASCIIString())[1]);
+                query(restJson.getCatalogEntry(lowerCasedPurlName, purl.getVersion()));
+
+        final var catalogEntryPath = catalogResponse.map(cat -> cat.extractCatalogEntryPath(cat, baseURI))
+                .orElseGet(Optional::empty);
+
+        if (catalogEntryPath.isPresent()) {
             final var nugetSpecResponse =
                     query(restXml.getNugetSpec(
-                    String.format("flatcontainer/%s/%s/%s.nuspec",
-                            purl.getName().toLowerCase(Locale.ROOT),
-                            purl.getVersion(),
-                            purl.getName().toLowerCase(Locale.ROOT))));
-            if (catalogEntryUrl.isPresent()) {
-                return query(restJson.getDefinition(catalogEntryUrl.get()))
-                        .map(result -> { result.downloadLocation =
+                            String.format("flatcontainer/%s/%s/%s.nuspec",
+                                    lowerCasedPurlName,
+                                    purl.getVersion(),
+                                    lowerCasedPurlName)));
+            return query(restJson.getDefinition(catalogEntryPath.get()))
+                    .map(result -> {
+                        result.downloadLocation =
                                 catalogResponse.get().packageContent;
-                    result.sourceUrl = nugetSpecResponse.get().metadata.repository.url;
-                    return result;
-                });
-            } else {
-                return Optional.empty();
-            }
+                        result.sourceUrl = nugetSpecResponse.map(s -> s.metadata.repository.url).orElse(null);
+                        return result;
+                    });
         }
+        return Optional.empty();
     }
 
     private <T> Optional<T> query(Call<? extends T> query) {

@@ -39,78 +39,103 @@ public interface NugetAPI {
     @GET("{nugetSpecUrl}")
     Call<XmlNugetSpecPackage> getNugetSpec(@Path("nugetSpecUrl") String nugetSpecUrl);
 
+    @SuppressWarnings("NotNullFieldNotInitialized")
     class License {
-        public String type;
-        public String text;
+        String type;
+        String text;
     }
 
+    @SuppressWarnings("NotNullFieldNotInitialized")
     class Repository {
-        public String type;
-        public String url;
-        public String commit;
+        @NullOr
+        String type;
+        @NullOr
+        String url;
+        @NullOr
+        String commit;
     }
 
+    @SuppressWarnings("NotNullFieldNotInitialized")
     class Group {
-        public String targetFramework;
-        public List<Dependency> dependency;
+        String targetFramework;
+        List<Dependency> dependency;
     }
 
+    @SuppressWarnings("NotNullFieldNotInitialized")
     class Dependency {
-        public String id;
-        public String version;
-        public String exclude;
+        String id;
+        String version;
+        String exclude;
     }
 
+    @SuppressWarnings("NotNullFieldNotInitialized")
     class Dependencies {
-        public List<Group> group;
+        List<Group> group;
     }
 
+    @SuppressWarnings("NotNullFieldNotInitialized")
     class Metadata {
-        public String id;
-        public String version;
-        public String title;
-        public String authors;
-        public boolean requireLicenseAcceptance;
-        public License license;
-        public String licenseUrl;
-        public String icon;
-        public String projectUrl;
-        public String description;
-        public String copyright;
-        public String tags;
-        public Repository repository;
-        public Dependencies dependencies;
-        public String minClientVersion;
-        public String text;
+        String id;
+        String version;
+        String title;
+        String authors;
+        boolean requireLicenseAcceptance;
+        @NullOr
+        License license;
+        @NullOr
+        String licenseUrl;
+        String icon;
+        @NullOr
+        String projectUrl;
+        String description;
+        @NullOr
+        String copyright;
+        @NullOr
+        String tags;
+        @NullOr
+        Repository repository;
+        Dependencies dependencies;
+        String minClientVersion;
+        String text;
     }
 
     class XmlNugetSpecPackage {
-        public Metadata metadata;
-        public String xmlns;
-        public String text;
+        Metadata metadata;
+        String xmlns;
+        String text;
     }
 
     @SuppressWarnings("NotNullFieldNotInitialized")
     class CatalogResponseJson {
         @JsonProperty("@id")
         @NullOr
-        public String id;
+        String id;
         @JsonProperty("@type")
         @NullOr
-        public List<String> type;
+        List<String> type;
         @JsonProperty("catalogEntry")
         @NullOr
-        public String catalogEntry;
+        String catalogEntry;
         @JsonProperty("packageContent")
         @NullOr
-        public String packageContent;
+        String packageContent;
         @NullOr
-        public boolean listed;
+        boolean listed;
         @NullOr
-        public Date published;
+        Date published;
         @NullOr
-        public String registration;
+        String registration;
 
+        // Extracts the catalog entry from the Catalog Response.
+        Optional<String> extractCatalogEntryPath(NugetAPI.CatalogResponseJson cat, URI baseURI) {
+            return Optional.ofNullable(cat.catalogEntry).map(temp -> {
+                final var splitUrl = temp.split(baseURI.toASCIIString());
+                if (splitUrl.length == 2) {
+                    return splitUrl[1];
+                }
+                return null;
+            });
+        }
     }
 
     @SuppressWarnings("NotNullFieldNotInitialized")
@@ -118,8 +143,8 @@ public interface NugetAPI {
         @NullOr String downloadLocation;
 
         @JsonProperty("title")
-        @NullOr String name;
-        @NullOr String description;
+        String name;
+        String description;
         @JsonProperty("projectUrl")
         @NullOr URI homepage;
         @JsonProperty("licenseExpression")
@@ -127,7 +152,7 @@ public interface NugetAPI {
         @JsonProperty("licenseUrl")
         @NullOr String licenseUrl;
         @JsonProperty("authors")
-        @NullOr String author;
+        String author;
         @NullOr String sourceUrl;
         @JsonProperty("packageHash")
         @NullOr String packageHash;
@@ -183,7 +208,7 @@ public interface NugetAPI {
             if (downloadLocation == null) {
                 return Optional.empty();
             }
-            return Optional.ofNullable(URI.create(downloadLocation));
+            return Optional.of(URI.create(downloadLocation));
         }
 
         @Override
@@ -191,5 +216,4 @@ public interface NugetAPI {
             return Optional.ofNullable(packageHash);
         }
     }
-
 }

@@ -26,7 +26,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 class NugetClientTest {
-    private static final int PORT = 1081;
+    private static final int PORT = 1084;
     private static final PackageURL PURL = createPurl("pkg:nuget/name@version");
     private static final String TITLE = "Title";
     private static final String HOMEPAGE = "https://example.com/home-page";
@@ -71,7 +71,7 @@ class NugetClientTest {
         }
 
         @Test
-        void withoutCatalogEntry() throws Exception {
+        void withoutCatalogEntry_returnEmpty() throws Exception {
             mockServer.enqueue(new MockResponse().setBody(new JSONObject()
                     .put("catalogEntry", null)
                     .toString()));
@@ -110,6 +110,35 @@ class NugetClientTest {
         }
 
         @Test
+        void verifyCorrectRequests() throws Exception {
+            mockServer.enqueue(new MockResponse().setBody(new JSONObject()
+                    .put("title", TITLE)
+                    .put("description", DESCRIPTION)
+                    .put("projectUrl", HOMEPAGE)
+                    .put("authors", AUTHORS)
+                    .put("licenseExpression", LICENSE_EXPRESSION)
+                    .put("licenseUrl", LICENSE_URL)
+                    .put("repository", SOURCE_LOCATION)
+                    .put("packageHash", SHA512)
+                    .toString()));
+
+            client.getPackageMetadata(PURL).orElseThrow();
+
+            final var registrationRequest = mockServer.takeRequest();
+            final var containerRequest = mockServer.takeRequest();
+            final var catalogRequest = mockServer.takeRequest();
+
+            assertThat(registrationRequest.getMethod()).isEqualTo("GET");
+            assertThat(registrationRequest.getPath()).isEqualTo("/registration5-semver1/name/version.json");
+
+            assertThat(containerRequest.getMethod()).isEqualTo("GET");
+            assertThat(containerRequest.getPath()).isEqualTo("/flatcontainer%2Fname%2Fversion%2Fname.nuspec");
+
+            assertThat(catalogRequest.getMethod()).isEqualTo("GET");
+            assertThat(catalogRequest.getPath()).isEqualTo("/%2Fcatalog0%2Fdata%2Ftimestamp%2Fpackage.version.json");
+        }
+
+        @Test
         void getsInitialMetaDataFromServer() throws Exception {
             mockServer.enqueue(new MockResponse().setBody(new JSONObject()
                     .put("title", TITLE)
@@ -124,9 +153,6 @@ class NugetClientTest {
 
             final var definition = client.getPackageMetadata(PURL).orElseThrow();
 
-            final var request = mockServer.takeRequest();
-            assertThat(request.getMethod()).isEqualTo("GET");
-            assertThat(request.getPath()).isEqualTo("/registration5-semver1/name/version.json");
             assertThat(definition.getTitle()).contains(TITLE);
             assertThat(definition.getDescription()).contains(DESCRIPTION);
             assertThat(definition.getHomepage()).contains(URI.create(HOMEPAGE));
@@ -137,107 +163,46 @@ class NugetClientTest {
             assertThat(definition.getSha512()).contains(SHA512);
         }
 
+        @Test
+        void acceptsEmptyMetadataFromServer() {
+            mockServer.enqueue(new MockResponse().setBody(new JSONObject()
+                    .toString()));
 
-    @Test
-    void acceptsEmptyMetadataFromServer() throws Exception {
-        mockServer.enqueue(new MockResponse().setBody(new JSONObject()
-                .toString()));
+            final var release = client.getPackageMetadata(PURL).orElseThrow();
 
-        final var release = client.getPackageMetadata(PURL).orElseThrow();
+            assertThat(release).isInstanceOf(PackageMetadata.class);
+        }
 
-        assertThat(release).isInstanceOf(PackageMetadata.class);
+        @Test
+        void withLicenseExpressionAndUrl_PreferLicenseUrl() throws Exception {
+            mockServer.enqueue(new MockResponse().setBody(new JSONObject()
+                    .put("licenseExpression", LICENSE_EXPRESSION)
+                    .put("licenseUrl", LICENSE_URL)
+                    .toString()));
+
+            final var definition = client.getPackageMetadata(PURL).orElseThrow();
+
+            assertThat(definition.getDeclaredLicense()).contains(LICENSE_URL);
+        }
+
+        private void enqueueCatalogEntryMock() throws JSONException {
+            mockServer.enqueue(new MockResponse().setBody(new JSONObject()
+                    .put("catalogEntry", CATALOG_ENTRY)
+                    .put("packageContent", DOWNLOAD_LOCATION)
+                    .toString()));
+        }
+
+        private void enqueueNugetSpecXMLMock() {
+            mockServer.enqueue(new MockResponse().setBody("<package>" +
+                    "<metadata>" +
+                    "<title>" + TITLE + "</title>" +
+                    "<description>" + DESCRIPTION + "</description>" +
+                    "<license type='expression'>" + LICENSE_EXPRESSION + "</license>" +
+                    "<licenseUrl>" + LICENSE_URL + "</licenseUrl>" +
+                    "<url>" + HOMEPAGE + "</url>" +
+                    String.format("<repository type='git' url='%s' />", SOURCE_LOCATION) +
+                    "</metadata>" +
+                    "</package>"));
+        }
     }
-
-    @Test
-    void acceptsBareRepositoryURLs() throws Exception {
-        mockServer.enqueue(new MockResponse().setBody(new JSONObject()
-                .put("repository", SOURCE_LOCATION)
-                .toString()));
-
-        final var definition = client.getPackageMetadata(PURL).orElseThrow();
-
-        assertThat(definition.getSourceLocation()).contains(SOURCE_LOCATION);
-    }
-
-    @Test
-    void withoutLicenseExpressionAndUrl() throws Exception {
-        mockServer.enqueue(new MockResponse().setBody(new JSONObject()
-                .put("licenseExpression", null)
-                .put("licenseUrl", null)
-                .toString()));
-
-        final var definition = client.getPackageMetadata(PURL).orElseThrow();
-
-        assertThat(definition.getDeclaredLicense()).isEmpty();
-    }
-
-
-    @Test
-    void withoutLicenseExpressionWithFilledUrl() throws Exception {
-        mockServer.enqueue(new MockResponse().setBody(new JSONObject()
-                .put("licenseExpression", null)
-                .put("licenseUrl", LICENSE_URL)
-                .toString()));
-
-        final var definition = client.getPackageMetadata(PURL).orElseThrow();
-
-        assertThat(definition.getDeclaredLicense()).contains(LICENSE_URL);
-    }
-
-    @Test
-    void withLicenseExpressionAndUrl() throws Exception {
-        mockServer.enqueue(new MockResponse().setBody(new JSONObject()
-                .put("licenseExpression", LICENSE_EXPRESSION)
-                .put("licenseUrl", LICENSE_URL)
-                .toString()));
-
-        final var definition = client.getPackageMetadata(PURL).orElseThrow();
-
-        assertThat(definition.getDeclaredLicense()).contains(LICENSE_URL);
-    }
-
-    @Test
-    void expandsListOfAuthors() throws Exception {
-        mockServer.enqueue(new MockResponse().setBody(new JSONObject()
-                .put("authors", AUTHORS)
-                .toString()));
-
-        final var definition = client.getPackageMetadata(PURL).orElseThrow();
-
-        assertThat(definition.getAuthors()).contains(List.of("Attribution1", "Attribution2"));
-    }
-
-    @Test
-    void expandsListOfSingleAuthor() throws Exception {
-        mockServer.enqueue(new MockResponse().setBody(new JSONObject()
-                .put("authors", "Attribution1")
-                .toString()));
-
-        final var definition = client.getPackageMetadata(PURL).orElseThrow();
-
-        assertThat(definition.getAuthors()).contains(List.of("Attribution1"));
-    }
-
-    private void enqueueCatalogEntryMock() throws JSONException {
-        mockServer.enqueue(new MockResponse().setBody(new JSONObject()
-                .put("catalogEntry", CATALOG_ENTRY)
-                .put("packageContent", DOWNLOAD_LOCATION)
-                .toString()));
-    }
-    
-    private void enqueueNugetSpecXMLMock() {
-        mockServer.enqueue(new MockResponse().setBody("<package>" +
-                "<metadata>" +
-                "<title>" + TITLE + "</title>" +
-                "<description>" + DESCRIPTION + "</description>" +
-                "<license type='expression'>" + LICENSE_EXPRESSION + "</license>" +
-                "<licenseUrl>" + LICENSE_URL + "</licenseUrl>" +
-                "<url>" + HOMEPAGE + "</url>" +
-                String.format("<repository type='git' url='%s' />", SOURCE_LOCATION) +
-                "</metadata>" +
-                "</package>"));
-    }
-}
-
-
 }
