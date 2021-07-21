@@ -38,16 +38,6 @@ class ScannerInteractorTest {
     private final ScannerService interactor = new ScannerInteractor(store, downloader, scanner);
 
     @Test
-    void scansDirectory() {
-        //TODO This seems not much of a test
-        when(scanner.scan(PATH)).thenReturn(mock(ScannerService.ScanResult.class));
-
-        final var result = interactor.scan(PATH);
-
-        assertThat(result).isNotNull();
-    }
-
-    @Test
     void scansFromUrl() {
         setupDownloader(LICENSE_URL, PATH);
         final var scanResult = scanResult(LICENSE);

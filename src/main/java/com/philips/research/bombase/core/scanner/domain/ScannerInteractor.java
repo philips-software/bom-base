@@ -14,7 +14,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.net.URI;
-import java.nio.file.Path;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -35,11 +34,6 @@ public class ScannerInteractor implements ScannerService {
         this.store = store;
         this.downloader = downloader;
         this.scanner = scanner;
-    }
-
-    @Override
-    public ScanResult scan(Path directory) {
-        return scanner.scan(directory);
     }
 
     @Override

@@ -153,10 +153,10 @@ public interface ClearlyDefinedAPI {
         ScoreJson score;
 
         Optional<String> getDeclaredLicense() {
-            if (IGNORED_LICENSES.contains(declared)) {
+            if (declared == null || IGNORED_LICENSES.contains(declared)) {
                 return Optional.empty();
             }
-            return Optional.ofNullable(declared);
+            return Optional.of(declared);
         }
 
         List<String> getDetectedLicenses() {

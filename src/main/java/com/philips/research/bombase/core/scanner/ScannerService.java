@@ -7,20 +7,9 @@ package com.philips.research.bombase.core.scanner;
 
 import java.io.File;
 import java.net.URI;
-import java.nio.file.Path;
 import java.util.List;
 
 public interface ScannerService {
-    /**
-     * Scans the files in a given directory for licenses.
-     *
-     * @param directory location of the files
-     * @return results of the scan
-     */
-    @Deprecated
-    //TODO Not sure if we should scan files instead of an URI
-    ScanResult scan(Path directory);
-
     /**
      * @return list of licenses detected in the content indicated by the URI
      */
