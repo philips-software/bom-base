@@ -7,40 +7,30 @@ package com.philips.research.bombase.core.source_scan.domain;
 
 import com.github.packageurl.MalformedPackageURLException;
 import com.github.packageurl.PackageURL;
-import com.philips.research.bombase.core.downloader.DownloadService;
 import com.philips.research.bombase.core.meta.registry.Field;
 import com.philips.research.bombase.core.meta.registry.MetaRegistry;
 import com.philips.research.bombase.core.meta.registry.PackageAttributeEditor;
 import com.philips.research.bombase.core.meta.registry.Trust;
 import com.philips.research.bombase.core.scanner.ScannerService;
-import com.philips.research.bombase.core.scanner.ScannerService.LicenseResult;
-import com.philips.research.bombase.core.scanner.ScannerService.ScanResult;
-import com.philips.research.bombase.core.scanner.domain.Detection;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
-import java.io.File;
 import java.net.URI;
-import java.nio.file.Path;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.function.Consumer;
-import java.util.function.Function;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
 class SourceLicensesHarvesterTest {
     private static final PackageURL PURL = createPurl("pkg:type/ns/name@version");
     private static final String SOURCE_LOCATION = "https://example.com/sources";
 
-    private final DownloadService downloader = mock(DownloadService.class);
     private final ScannerService scanner = mock(ScannerService.class);
-    private final MetaRegistry.PackageListener listener = new SourceLicensesHarvester(downloader, scanner);
+    private final MetaRegistry.PackageListener listener = new SourceLicensesHarvester(scanner);
 
     private static PackageURL createPurl(String purl) {
         try {
@@ -69,40 +59,19 @@ class SourceLicensesHarvesterTest {
 
     @Nested
     class MetadataTaskCreated {
-        private static final String LICENSE1 = "license1";
-        private static final String LICENSE2 = "license2";
-        private final Path PATH = Path.of("source_path");
+        private static final String LICENSE = "license";
+
         private final Consumer<PackageAttributeEditor> task = listener.onUpdated(PURL, Set.of(Field.SOURCE_LOCATION), Map.of()).orElseThrow();
-        private final PackageAttributeEditor pkg = mock(PackageAttributeEditor.class);
-        private final ScanResult scanResult = mock(ScanResult.class);
-
-        @BeforeEach
-        void beforeEach() {
-            when(pkg.get(Field.SOURCE_LOCATION)).thenReturn(Optional.of(SOURCE_LOCATION));
-            doAnswer(a -> { // Pass download path to provided consumer
-                final Function<Path, ScanResult> operation = a.getArgument(1);
-                return operation.apply(PATH);
-            }).when(downloader).download(eq(URI.create(SOURCE_LOCATION)), any());
-            when(scanner.scan(PATH)).thenReturn(scanResult);
-        }
+        private final PackageAttributeEditor editor = mock(PackageAttributeEditor.class);
 
         @Test
-        void scansDownloadedSources() {
-            task.accept(pkg);
+        void scansLocationForLicenses() {
+            when(editor.get(Field.SOURCE_LOCATION)).thenReturn(Optional.of(SOURCE_LOCATION));
+            when(scanner.scanLicenses(URI.create(SOURCE_LOCATION))).thenReturn(List.of(LICENSE));
 
-            verify(downloader).download(eq(URI.create(SOURCE_LOCATION)), any());
-            verify(scanner).scan(PATH);
-        }
+            task.accept(editor);
 
-        @Test
-        void updatesDetectedLicenses() {
-            LicenseResult license1 = new Detection(LICENSE1, 100, new File("."), 1, 2);
-            LicenseResult license2 = new Detection(LICENSE2, 100, new File("."), 1, 2);
-            when(scanResult.getLicenses()).thenReturn(List.of(license1, license2));
-
-            task.accept(pkg);
-
-            verify(pkg).update(Field.DETECTED_LICENSES, Trust.PROBABLY, List.of(LICENSE1, LICENSE2));
+            verify(editor).update(Field.DETECTED_LICENSES, Trust.PROBABLY, List.of(LICENSE));
         }
     }
 }

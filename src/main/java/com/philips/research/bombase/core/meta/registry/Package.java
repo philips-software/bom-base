@@ -34,7 +34,7 @@ public class Package {
         return lastUpdated;
     }
 
-    public <T> Attribute<T> add(Attribute<T> attribute) {
+    public synchronized <T> Attribute<T> add(Attribute<T> attribute) {
         if (attributes.contains(attribute)) {
             throw new IllegalArgumentException("The " + attribute.getField().name() + " attribute already exists in package " + purl);
         }
@@ -42,7 +42,7 @@ public class Package {
         return attribute;
     }
 
-    public <T> Optional<Attribute<T>> getAttributeFor(Field field) {
+    public synchronized <T> Optional<Attribute<T>> getAttributeFor(Field field) {
         //noinspection unchecked
         return attributes.stream()
                 .map(attr -> (Attribute<T>) attr)
