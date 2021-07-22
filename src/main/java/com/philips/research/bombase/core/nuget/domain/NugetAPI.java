@@ -47,12 +47,9 @@ public interface NugetAPI {
 
     @SuppressWarnings("NotNullFieldNotInitialized")
     class Repository {
-        @NullOr
-        String type;
-        @NullOr
-        String url;
-        @NullOr
-        String commit;
+        @NullOr String type;
+        @NullOr String url;
+        @NullOr String commit;
     }
 
     @SuppressWarnings("NotNullFieldNotInitialized")
@@ -80,20 +77,14 @@ public interface NugetAPI {
         String title;
         String authors;
         boolean requireLicenseAcceptance;
-        @NullOr
-        License license;
-        @NullOr
-        String licenseUrl;
+        @NullOr License license;
+        @NullOr String licenseUrl;
         String icon;
-        @NullOr
-        String projectUrl;
+        @NullOr String projectUrl;
         String description;
-        @NullOr
-        String copyright;
-        @NullOr
-        String tags;
-        @NullOr
-        Repository repository;
+        @NullOr String copyright;
+        @NullOr String tags;
+        @NullOr Repository repository;
         Dependencies dependencies;
         String minClientVersion;
         String text;
@@ -105,6 +96,9 @@ public interface NugetAPI {
         String text;
 
         Optional<String> getRepositoryURL() {
+            if (metadata.repository == null) {
+                return Optional.empty();
+            }
             return Optional.ofNullable(metadata.repository.url);
         }
     }
@@ -112,23 +106,16 @@ public interface NugetAPI {
     @SuppressWarnings("NotNullFieldNotInitialized")
     class CatalogResponseJson {
         @JsonProperty("@id")
-        @NullOr
-        String id;
+        @NullOr String id;
         @JsonProperty("@type")
-        @NullOr
-        List<String> type;
+        @NullOr List<String> type;
         @JsonProperty("catalogEntry")
-        @NullOr
-        String catalogEntry;
+        @NullOr String catalogEntry;
         @JsonProperty("packageContent")
-        @NullOr
-        String packageContent;
-        @NullOr
-        boolean listed;
-        @NullOr
-        Date published;
-        @NullOr
-        String registration;
+        @NullOr String packageContent;
+        @NullOr boolean listed;
+        @NullOr Date published;
+        @NullOr String registration;
 
         // Extracts the catalog entry from the Catalog Response.
         Optional<String> extractCatalogEntryPath(NugetAPI.CatalogResponseJson cat, URI baseURI) {
@@ -145,7 +132,6 @@ public interface NugetAPI {
     @SuppressWarnings("NotNullFieldNotInitialized")
     class ResponseJson implements PackageMetadata {
         @NullOr String downloadLocation;
-
         @JsonProperty("title")
         String name;
         String description;
