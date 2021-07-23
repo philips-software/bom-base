@@ -59,6 +59,7 @@ Next, the backend can be built through the Maven `mvn clean install` command,
 and yields a "fat" executable jar containing all dependencies.
 
 The backend server starts as a standard Java executable:
+
 ```
 java -jar BOM-base-<version>.jar
 ```
@@ -79,8 +80,8 @@ Follow any of
 these [installation instructions](https://scancode-toolkit.readthedocs.io/en/latest/getting-started/install.html)
 to install the command line application.
 
-Then make sure the `scancode` and `extractcode` commands are accessible from
-any directory by updating the path or creating symbolic links in an appropriate
+Then make sure the `scancode` and `extractcode` commands are accessible from any
+directory by updating the path or creating symbolic links in an appropriate
 location.
 
 ### Docker
@@ -160,5 +161,5 @@ See [LICENSE.md](LICENSE.md).
 - If you are looking for tools to build a bill-of-materials, you might want to
   have a look at
   the [SPDX-Builder](https://github.com/philips-software/spdx-builder) project
-  that can (among various other solutions) use BOM-Base metadata to build 
-  rich bill-of-materials documents in the SPDX format.
+  that can (among various other solutions) use BOM-Base metadata to build rich
+  bill-of-materials documents in the SPDX format.

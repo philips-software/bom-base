@@ -1,4 +1,4 @@
-name: Build application 
+name: Build application
 
 on:
   push:
@@ -9,7 +9,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout 
+      - name: Checkout
         uses: actions/checkout@v2
 
       - uses: subosito/flutter-action@v1.5.3
@@ -33,7 +33,7 @@ jobs:
     needs: build-and-test-frontend
 
     steps:
-      - name: Checkout 
+      - name: Checkout
         uses: actions/checkout@v2
 
       - uses: actions/setup-java@v2
@@ -44,9 +44,9 @@ jobs:
       - name: Setup python
         uses: actions/setup-python@v2.2.2
         with:
-          python-version: '3.9' 
+          python-version: '3.9'
 
-      - name: Install scancode 
+      - name: Install scancode
         run: |
           pip install -r docker/requirements.txt
           scancode --version
@@ -100,10 +100,10 @@ jobs:
         with:
           name: backend
           path: target
- 
+
       - name: Build Docker Images
         uses: philips-software/docker-ci-scripts@v3.3.1
         with:
           dockerfile: docker/Dockerfile
-          image-name: bom-base 
+          image-name: bom-base
           tags: 0 0.1 0.1.1 v0.1.1 latest ${{ github.sha }}
