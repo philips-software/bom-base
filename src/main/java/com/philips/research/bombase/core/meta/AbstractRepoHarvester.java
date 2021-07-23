@@ -11,6 +11,7 @@ import com.philips.research.bombase.core.meta.registry.MetaRegistry;
 import com.philips.research.bombase.core.meta.registry.PackageAttributeEditor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import pl.tlinkowski.annotation.basic.NullOr;
 
 import java.util.Map;
 import java.util.Optional;
@@ -30,7 +31,7 @@ public abstract class AbstractRepoHarvester implements MetaRegistry.PackageListe
     }
 
     @Override
-    public Optional<Consumer<PackageAttributeEditor>> onUpdated(PackageURL purl, Set<Field> updated, Map<Field, Object> values) {
+    public Optional<Consumer<PackageAttributeEditor>> onUpdated(PackageURL purl, Set<Field> updated, Map<Field, @NullOr Object> values) {
         if (!isSupportedType(purl.getType()) || !updated.isEmpty()) {
             return Optional.empty();
         }

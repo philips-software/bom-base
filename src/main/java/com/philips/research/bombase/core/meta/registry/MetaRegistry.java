@@ -10,6 +10,7 @@ import com.philips.research.bombase.core.meta.MetaStore;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
+import pl.tlinkowski.annotation.basic.NullOr;
 
 import java.util.HashSet;
 import java.util.Map;
@@ -79,7 +80,7 @@ public class MetaRegistry {
         }
     }
 
-    private void notifyListeners(PackageURL purl, Set<Field> modifiedFields, Map<Field, Object> values) {
+    private void notifyListeners(PackageURL purl, Set<Field> modifiedFields, Map<Field, @NullOr Object> values) {
         listeners.forEach(l -> {
             l.onUpdated(purl, modifiedFields, values)
                     .ifPresent(task -> {
@@ -101,6 +102,6 @@ public class MetaRegistry {
          * @param values  current package metadata
          * @return (optional) operation to queue for execution
          */
-        Optional<Consumer<PackageAttributeEditor>> onUpdated(PackageURL purl, Set<Field> updated, Map<Field, Object> values);
+        Optional<Consumer<PackageAttributeEditor>> onUpdated(PackageURL purl, Set<Field> updated, Map<Field, @NullOr Object> values);
     }
 }

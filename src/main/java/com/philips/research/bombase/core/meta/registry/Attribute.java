@@ -11,7 +11,7 @@ import java.util.Objects;
 import java.util.Optional;
 
 /**
- * Current value for a field.
+ * Current metadata value for a field.
  */
 public class Attribute<T> implements AttributeValue<T> {
     private final Field field;
@@ -37,31 +37,6 @@ public class Attribute<T> implements AttributeValue<T> {
         return score;
     }
 
-    boolean setValue(Trust trust, @NullOr T value) {
-        int score = trust.getScore();
-        if (value == null) {
-            return false;
-        }
-
-        field.validate(value);
-        if (trust == Trust.TRUTH) {
-            updateTruth(value);
-            return true;
-        } else if (score >= this.score) {
-            return updateValue(score, value);
-        } else {
-            updateAltValue(score, value);
-            return false;
-        }
-    }
-
-    private void updateTruth(@NullOr T value) {
-        this.score = Trust.TRUTH.getScore();
-        this.value = value;
-        this.altScore = 0;
-        this.altValue = null;
-    }
-
     @Override
     public Optional<T> getAltValue() {
         return Optional.ofNullable((altScore > 0) ? altValue : null);
@@ -72,28 +47,56 @@ public class Attribute<T> implements AttributeValue<T> {
         return altScore;
     }
 
-    private void updateAltValue(int score, @NullOr T value) {
-        if (score >= this.altScore) {
-            this.altScore = score;
-            this.altValue = value;
+    /**
+     * Potentially updates the current and alternative value.
+     *
+     * @param trust indication of how certain the caller is of the value
+     * @param value the new value
+     * @return true if the main value was updated (which is independent from score updates or alt value changes)
+     */
+    boolean setValue(Trust trust, @NullOr T value) {
+        int score = trust.getScore();
+        if (value == null) {
+            return false;
         }
-    }
 
-    private boolean updateValue(int score, @NullOr T value) {
-        if (!Objects.equals(this.value, value)) {
-            replaceValue(score, value);
-            return true;
+        field.validate(value);
+        if (trust == Trust.TRUTH) {
+            return updateTruth(value);
+        } else if (score >= this.score) {
+            return updateValue(score, value);
         } else {
-            this.score = score;
+            updateAltValue(score, value);
             return false;
         }
     }
 
-    private void replaceValue(int score, @NullOr T value) {
+    private boolean updateTruth(T value) {
+        this.value = value;
+        this.score = Trust.TRUTH.getScore();
+        this.altValue = null;
+        this.altScore = Trust.NONE.getScore();
+        return true;
+    }
+
+    private boolean updateValue(int score, T value) {
+        if (Objects.equals(this.value, value)) {
+            this.score = score;
+            return false;
+        }
         this.altScore = this.score;
         this.altValue = this.value;
-        this.value = value;
         this.score = score;
+        this.value = value;
+        return true;
+    }
+
+    private void updateAltValue(int score, T value) {
+        if (score < this.altScore) {
+            return;
+        }
+        this.altScore = score;
+        this.altValue = value;
     }
 
     @Override
