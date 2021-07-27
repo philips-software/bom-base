@@ -42,7 +42,7 @@ public class PackageAttributeEditor {
     /**
      * @return snapshot of the current fields with values
      */
-    public Map<Field, @NullOr Object> getValues() {
+    public Map<Field, Object> getValues() {
         return pkg.getAttributes()
                 .filter(a -> a.getValue().isPresent())
                 .collect(Collectors.toMap(Attribute::getField, attribute -> attribute.getValue().get()));

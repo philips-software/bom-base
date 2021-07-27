@@ -10,7 +10,7 @@ import com.philips.research.bombase.ConfigProperties;
 import com.philips.research.bombase.core.MetaService;
 import com.philips.research.bombase.core.UnknownPackageException;
 import com.philips.research.bombase.core.clearlydefined.domain.ClearlyDefinedHarvester;
-import com.philips.research.bombase.core.license.domain.LicenseCleaner;
+import com.philips.research.bombase.core.license_cleaner.domain.LicenseCleaner;
 import com.philips.research.bombase.core.maven.domain.MavenHarvester;
 import com.philips.research.bombase.core.meta.registry.Field;
 import com.philips.research.bombase.core.meta.registry.MetaRegistry;

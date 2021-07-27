@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: MIT
  */
 
-package com.philips.research.bombase.core.license.domain;
+package com.philips.research.bombase.core.license_cleaner.domain;
 
 import com.github.packageurl.PackageURL;
 import com.philips.research.bombase.core.meta.registry.Field;
