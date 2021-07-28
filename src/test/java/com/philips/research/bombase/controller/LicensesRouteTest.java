@@ -41,12 +41,8 @@ public class LicensesRouteTest {
     @MockBean
     private LicenseCleanerService service;
 
-    private static String encode(String string) {
-        return URLEncoder.encode(string, StandardCharsets.UTF_8);
-    }
-
     @BeforeEach
-    void beforeEach() throws Exception {
+    void beforeEach() {
         Mockito.reset(service);
     }
 
