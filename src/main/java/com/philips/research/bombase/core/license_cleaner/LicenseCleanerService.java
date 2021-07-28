@@ -12,5 +12,5 @@ public interface LicenseCleanerService {
     /**
      * Configures a curation for a URL as override to scanning the content of the URL.
      */
-   void defineCuration(String url, String license);
+    void defineCuration(String url, String license);
 }
