@@ -10,13 +10,13 @@ import com.philips.research.bombase.core.scanner.ScannerStore;
 import org.springframework.stereotype.Repository;
 
 import java.net.URI;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
+import java.util.concurrent.ConcurrentHashMap;
 
 @Repository
 public class MemoryScannerStore implements ScannerStore {
-    private final Map<URI, ScannerService.ScanResult> scans = new HashMap<>();
+    private final Map<URI, ScannerService.ScanResult> scans = new ConcurrentHashMap<>();
 
     @Override
     public void store(URI location, ScannerService.ScanResult scan) {

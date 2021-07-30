@@ -3,10 +3,10 @@
  * SPDX-License-Identifier: MIT
  */
 
-package com.philips.research.bombase.core.license.domain;
+package com.philips.research.bombase.core.license_cleaner.domain;
 
 import com.github.packageurl.PackageURL;
-import com.philips.research.bombase.core.downloader.DownloadService;
+import com.philips.research.bombase.core.license_cleaner.LicenseCleanerStore;
 import com.philips.research.bombase.core.meta.registry.Field;
 import com.philips.research.bombase.core.meta.registry.Package;
 import com.philips.research.bombase.core.meta.registry.PackageAttributeEditor;
@@ -17,10 +17,7 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
 import java.net.URI;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
@@ -31,9 +28,9 @@ class LicenseCleanerTest {
     private static final String LICENSE_URL = "https://example.com/license";
     private static final PackageURL PURL = purlOf("pkg:generic/name@version");
 
-    private final DownloadService downloader = mock(DownloadService.class);
+    private final LicenseCleanerStore store = mock(LicenseCleanerStore.class);
     private final ScannerService scanner = mock(ScannerService.class);
-    private final LicenseCleaner cleaner = new LicenseCleaner(scanner);
+    private final LicenseCleaner cleaner = new LicenseCleaner(store, scanner);
 
     private static PackageURL purlOf(String purl) {
         try {
@@ -88,6 +85,16 @@ class LicenseCleanerTest {
             task.accept(editor);
 
             verify(editor).update(Field.DECLARED_LICENSE, TRUST, PREFIX + LICENSE + POSTFIX);
+        }
+
+        @Test
+        void replacesUrlByCuratedLicense() {
+            editor.update(Field.DECLARED_LICENSE, TRUST, LICENSE_URL);
+            when(store.findCuration(LICENSE_URL)).thenReturn(Optional.of(LICENSE));
+
+            task.accept(editor);
+
+            verify(editor).update(Field.DECLARED_LICENSE, TRUST, LICENSE);
         }
 
         @Test

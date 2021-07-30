@@ -4,4 +4,4 @@
  */
 
 @pl.tlinkowski.annotation.basic.NonNullPackage
-package com.philips.research.bombase.core.license;
+package com.philips.research.bombase.core.license_cleaner;
