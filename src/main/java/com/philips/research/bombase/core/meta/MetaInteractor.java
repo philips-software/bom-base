@@ -10,8 +10,13 @@ import com.philips.research.bombase.ConfigProperties;
 import com.philips.research.bombase.core.MetaService;
 import com.philips.research.bombase.core.UnknownPackageException;
 import com.philips.research.bombase.core.clearlydefined.domain.ClearlyDefinedHarvester;
+import com.philips.research.bombase.core.license_cleaner.domain.LicenseCleaner;
+import com.philips.research.bombase.core.maven.domain.MavenHarvester;
 import com.philips.research.bombase.core.meta.registry.Field;
 import com.philips.research.bombase.core.meta.registry.MetaRegistry;
+import com.philips.research.bombase.core.meta.registry.Trust;
+import com.philips.research.bombase.core.npm.domain.NpmHarvester;
+import com.philips.research.bombase.core.nuget.domain.NugetHarvester;
 import com.philips.research.bombase.core.pypi.domain.PyPiHarvester;
 import com.philips.research.bombase.core.source_scan.domain.SourceLicensesHarvester;
 import org.slf4j.Logger;
@@ -46,8 +51,14 @@ public class MetaInteractor implements MetaService {
     void init() {
         final var properties = context.getBean(ConfigProperties.class);
 
-        installListener(ClearlyDefinedHarvester.class);
+        if (properties.harvestClearlyDefined()) {
+            installListener(ClearlyDefinedHarvester.class);
+        }
         installListener(PyPiHarvester.class);
+        installListener(NpmHarvester.class);
+        installListener(NugetHarvester.class);
+        installListener(MavenHarvester.class);
+        installListener(LicenseCleaner.class);
         if (properties.isScanLicenses()) {
             installListener(SourceLicensesHarvester.class);
         }
@@ -76,7 +87,7 @@ public class MetaInteractor implements MetaService {
     public Map<String, AttributeDto> setAttributes(PackageURL purl, Map<String, @NullOr Object> values) {
         registry.edit(purl, pkg -> values.forEach((key, value) -> {
             final var field = Field.valueOf(Field.class, key.toUpperCase());
-            pkg.update(field, 100, value);
+            pkg.update(field, Trust.TRUTH, value);
         }));
         return getAttributes(purl);
     }

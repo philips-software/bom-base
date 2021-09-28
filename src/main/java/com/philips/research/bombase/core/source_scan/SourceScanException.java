@@ -11,4 +11,8 @@ public class SourceScanException extends BusinessException {
     public SourceScanException(String message) {
         super(message);
     }
+
+    public SourceScanException(String message, Throwable cause) {
+        super(message, cause);
+    }
 }

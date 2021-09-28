@@ -6,17 +6,14 @@
 package com.philips.research.bombase.core.scanner;
 
 import java.io.File;
-import java.nio.file.Path;
+import java.net.URI;
 import java.util.List;
 
 public interface ScannerService {
     /**
-     * Scans the files in a given directory for licenses.
-     *
-     * @param directory location of the files
-     * @return results of the scan
+     * @return list of licenses detected in the content indicated by the URI
      */
-    ScanResult scan(Path directory);
+    List<String> scanLicenses(URI uri);
 
     interface ScanResult {
         List<LicenseResult> getLicenses();

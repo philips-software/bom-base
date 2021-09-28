@@ -42,36 +42,48 @@ public class PackageAttributeEditor {
     /**
      * @return snapshot of the current fields with values
      */
-    public Map<Field, @NullOr Object> getValues() {
+    public Map<Field, Object> getValues() {
         return pkg.getAttributes()
                 .filter(a -> a.getValue().isPresent())
                 .collect(Collectors.toMap(Attribute::getField, attribute -> attribute.getValue().get()));
     }
 
     /**
-     * Updates the value of a field using the provided score as priority
-     *
-     * @param score percentage indicating how trustworthy the value is
+     * @return trust of the current value for the indicated field
      */
-    public PackageAttributeEditor update(Field field, int score, @NullOr Object value) {
+    public Trust trust(Field field) {
+        return pkg.getAttributeFor(field)
+                .map(Attribute::getScore)
+                .map(Trust::of)
+                .orElse(Trust.NONE);
+    }
+
+    /**
+     * Optionally updates the value of a field based on its relative trust.
+     *
+     * @param field the metadata attribute to overwrite
+     * @param trust indicates how reliable the value is
+     * @param value new value to assign
+     */
+    public PackageAttributeEditor update(Field field, Trust trust, @NullOr Object value) {
         if (value == null) {
             return this;
         }
 
-        final var modified = getOrCreateAttr(field).setValue(score, value);
+        final var modified = getOrCreateAttr(field).setValue(trust, value);
         if (modified) {
             modifiedFields.add(field);
         }
         return this;
     }
 
-    private Attribute getOrCreateAttr(Field field) {
-        return pkg.getAttributeFor(field).orElseGet(() -> createAttribute(field));
+    private <T> Attribute<T> getOrCreateAttr(Field field) {
+        return pkg.<T>getAttributeFor(field).orElseGet(() -> createAttribute(field));
     }
 
     // Necessary to allow generation of a tracked persistence entity.
-    protected Attribute createAttribute(Field field) {
-        return pkg.add(new Attribute(field));
+    protected <T> Attribute<T> createAttribute(Field field) {
+        return pkg.add(new Attribute<>(field));
     }
 
     /**
@@ -91,5 +103,4 @@ public class PackageAttributeEditor {
         }
         return modified;
     }
-
 }

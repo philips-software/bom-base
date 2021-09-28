@@ -5,57 +5,23 @@
 
 package com.philips.research.bombase.core.clearlydefined.domain;
 
-import com.github.packageurl.PackageURL;
-import com.philips.research.bombase.core.meta.registry.Field;
-import com.philips.research.bombase.core.meta.registry.MetaRegistry;
-import com.philips.research.bombase.core.meta.registry.PackageAttributeEditor;
+import com.philips.research.bombase.core.meta.AbstractRepoHarvester;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.Map;
-import java.util.Optional;
 import java.util.Set;
-import java.util.function.Consumer;
 
 @Service
-public class ClearlyDefinedHarvester implements MetaRegistry.PackageListener {
-    private final ClearlyDefinedClient client;
+public class ClearlyDefinedHarvester extends AbstractRepoHarvester {
+    private static final Set<String> SUPPORTED_TYPES = Set.of("npm", "gem", "pypi", "maven", "nuget", "github", "cargo", "deb", "composer", "cocoapods");
 
     @Autowired
-    public ClearlyDefinedHarvester() {
-        this(new ClearlyDefinedClient());
-    }
-
     ClearlyDefinedHarvester(ClearlyDefinedClient client) {
-        this.client = client;
+        super(client::getPackageMetadata);
     }
 
     @Override
-    public Optional<Consumer<PackageAttributeEditor>> onUpdated(PackageURL purl, Set<Field> updated, Map<Field, ?> values) {
-        if (!updated.isEmpty()) {
-            return Optional.empty();
-        }
-
-        return Optional.of(pkg -> harvest(purl, pkg));
-    }
-
-    private void harvest(PackageURL purl, PackageAttributeEditor pkg) {
-        client.getPackageDefinition(purl).ifPresent(def -> {
-            int metaScore = def.getDescribedScore();
-            int licenseScore = def.getLicensedScore();
-            storeField(pkg, Field.TITLE, metaScore, def.getTitle());
-            storeField(pkg, Field.SOURCE_LOCATION, metaScore, def.getSourceLocation());
-            storeField(pkg, Field.DOWNLOAD_LOCATION, metaScore, def.getDownloadLocation());
-            storeField(pkg, Field.HOME_PAGE, metaScore, def.getHomepage());
-            storeField(pkg, Field.ATTRIBUTION, metaScore, def.getAuthors());
-            storeField(pkg, Field.DECLARED_LICENSE, metaScore, def.getDeclaredLicense());
-            storeField(pkg, Field.DETECTED_LICENSES, licenseScore, def.getDetectedLicenses());
-            storeField(pkg, Field.SHA1, metaScore, def.getSha1());
-            storeField(pkg, Field.SHA256, metaScore, def.getSha256());
-        });
-    }
-
-    private <T> void storeField(PackageAttributeEditor pkg, Field field, int score, Optional<T> value) {
-        value.ifPresent(v -> pkg.update(field, score, v));
+    protected boolean isSupportedType(String type) {
+        return SUPPORTED_TYPES.contains(type);
     }
 }

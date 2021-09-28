@@ -98,7 +98,7 @@ class FileJson {
                 return key;
             }
 
-            score = Math.min(score, (int) lic.score);
+            score = Math.min(score, (int) lic.effectiveScore());
             startLine = Math.min(startLine, lic.startLine);
             endLine = Math.max(endLine, lic.endLine);
             return lic.getIdentifier();
@@ -109,8 +109,7 @@ class FileJson {
 @JsonIgnoreProperties(ignoreUnknown = true)
 class LicenseJson {
     @JsonProperty("key")
-    @NullOr
-    String key;
+    @NullOr String key;
     @JsonProperty("score")
     double score;
     @JsonProperty("start_line")
@@ -135,6 +134,12 @@ class LicenseJson {
     String getIdentifier() {
         assert spdx != null || key != null;
         return (spdx != null) ? spdx : key;
+    }
+
+    double effectiveScore() {
+        return getIdentifier().contains("LicenseRef")
+                ? 0.8f * score
+                : score;
     }
 
     public int lines() {

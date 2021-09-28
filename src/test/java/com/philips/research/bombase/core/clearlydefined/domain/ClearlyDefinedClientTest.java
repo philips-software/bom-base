@@ -8,6 +8,7 @@ package com.philips.research.bombase.core.clearlydefined.domain;
 import com.github.packageurl.MalformedPackageURLException;
 import com.github.packageurl.PackageURL;
 import com.philips.research.bombase.core.clearlydefined.ClearlyDefinedException;
+import com.philips.research.bombase.core.meta.PackageMetadata;
 import okhttp3.mockwebserver.MockResponse;
 import okhttp3.mockwebserver.MockWebServer;
 import org.json.JSONArray;
@@ -66,7 +67,7 @@ class ClearlyDefinedClientTest {
                 .put("scores", new JSONObject()
                         .put("effective", 0)).toString()));
 
-        assertThat(client.getPackageDefinition(PURL)).isEmpty();
+        assertThat(client.getPackageMetadata(PURL)).isEmpty();
     }
 
     @Test
@@ -99,20 +100,20 @@ class ClearlyDefinedClientTest {
                 .put("scores", new JSONObject()
                         .put("effective", 100)).toString()));
 
-        final var definition = client.getPackageDefinition(PURL).orElseThrow();
+        final var metadata = client.getPackageMetadata(PURL).orElseThrow();
 
         final var request = mockServer.takeRequest();
         assertThat(request.getMethod()).isEqualTo("GET");
         assertThat(request.getPath()).isEqualTo(String.format("/definitions/%s/%s/%s/%s/%s", TYPE, TYPE, NAMESPACE, NAME, VERSION));
-        assertThat(definition.getTitle()).contains(NAME);
-        assertThat(definition.getSourceLocation()).contains(URI.create(SOURCE_LOCATION));
-        assertThat(definition.getDownloadLocation()).contains(URI.create(DOWNLOAD_LOCATION));
-        assertThat(definition.getHomepage()).contains(URI.create(HOMEPAGE));
-        assertThat(definition.getSha1()).contains(SHA1);
-        assertThat(definition.getSha256()).contains(SHA256);
-        assertThat(definition.getDeclaredLicense()).contains(DECLARED_LICENSE);
-        assertThat(definition.getDetectedLicenses()).contains(List.of(DETECTED_LICENSE));
-        assertThat(definition.getAuthors()).contains(List.of(ATTRIBUTION));
+        assertThat(metadata.getTitle()).contains(NAME);
+        assertThat(metadata.getSourceLocation()).contains(SOURCE_LOCATION);
+        assertThat(metadata.getDownloadLocation()).contains(URI.create(DOWNLOAD_LOCATION));
+        assertThat(metadata.getHomepage()).contains(URI.create(HOMEPAGE));
+        assertThat(metadata.getSha1()).contains(SHA1);
+        assertThat(metadata.getSha256()).contains(SHA256);
+        assertThat(metadata.getDeclaredLicense()).contains(DECLARED_LICENSE);
+        assertThat(metadata.getDetectedLicenses()).contains(List.of(DETECTED_LICENSE));
+        assertThat(metadata.getAuthors()).contains(List.of(ATTRIBUTION));
     }
 
     @Test
@@ -123,15 +124,43 @@ class ClearlyDefinedClientTest {
                 .put("scores", new JSONObject()
                         .put("effective", 100)).toString()));
 
-        final var metadata = client.getPackageDefinition(PURL).orElseThrow();
+        final var metadata = client.getPackageMetadata(PURL).orElseThrow();
 
-        assertThat(metadata).isInstanceOf(PackageDefinition.class);
+        assertThat(metadata).isInstanceOf(PackageMetadata.class);
+    }
+
+    @Test
+    void ignoresNoAssertionLicense() throws Exception {
+        mockServer.enqueue(new MockResponse().setBody(new JSONObject()
+                .put("licensed", new JSONObject()
+                        .put("declared", "NOASSERTION"))
+                .put("scores", new JSONObject()
+                        .put("effective", 100))
+                .toString()));
+
+        final var definition = client.getPackageMetadata(PURL).orElseThrow();
+
+        assertThat(definition.getDeclaredLicense()).isEmpty();
+    }
+
+    @Test
+    void ignoresOtherLicense() throws Exception {
+        mockServer.enqueue(new MockResponse().setBody(new JSONObject()
+                .put("licensed", new JSONObject()
+                        .put("declared", "OTHER"))
+                .put("scores", new JSONObject()
+                        .put("effective", 100))
+                .toString()));
+
+        final var definition = client.getPackageMetadata(PURL).orElseThrow();
+
+        assertThat(definition.getDeclaredLicense()).isEmpty();
     }
 
     @Test
     void mapsPurlTypeToClearlyDefinedProvider() throws Exception {
         mockServer.enqueue(new MockResponse().setBody("{}"));
-        client.getPackageDefinition(new PackageURL("cargo", NAMESPACE, NAME, VERSION, null, null));
+        client.getPackageMetadata(new PackageURL("cargo", NAMESPACE, NAME, VERSION, null, null));
 
         final var request = mockServer.takeRequest();
         assertThat(request.getPath()).contains("/crate/cratesio/");
@@ -145,7 +174,7 @@ class ClearlyDefinedClientTest {
                 .put("scores", new JSONObject()
                         .put("effective", 100)).toString()));
 
-        client.getPackageDefinition(new PackageURL(TYPE, null, NAME, VERSION, null, null)).orElseThrow();
+        client.getPackageMetadata(new PackageURL(TYPE, null, NAME, VERSION, null, null)).orElseThrow();
 
         final var request = mockServer.takeRequest();
         assertThat(request.getPath()).contains(TYPE + "/-/" + NAME);
@@ -155,7 +184,7 @@ class ClearlyDefinedClientTest {
     void throws_serverNotReachable() {
         var serverlessClient = new ClearlyDefinedClient(URI.create("http://localhost:1234"));
 
-        assertThatThrownBy(() -> serverlessClient.getPackageDefinition(PURL))
+        assertThatThrownBy(() -> serverlessClient.getPackageMetadata(PURL))
                 .isInstanceOf(ClearlyDefinedException.class)
                 .hasMessageContaining("not reachable");
     }
@@ -164,7 +193,7 @@ class ClearlyDefinedClientTest {
     void throws_unexpectedResponseFromServer() {
         mockServer.enqueue(new MockResponse().setResponseCode(404));
 
-        assertThatThrownBy(() -> client.getPackageDefinition(PURL))
+        assertThatThrownBy(() -> client.getPackageMetadata(PURL))
                 .isInstanceOf(ClearlyDefinedException.class)
                 .hasMessageContaining("status 404");
     }

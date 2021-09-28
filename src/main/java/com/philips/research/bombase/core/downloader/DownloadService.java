@@ -7,7 +7,7 @@ package com.philips.research.bombase.core.downloader;
 
 import java.net.URI;
 import java.nio.file.Path;
-import java.util.function.Consumer;
+import java.util.function.Function;
 
 /**
  * Makes files available in a directory local to this machine for processing.
@@ -18,8 +18,9 @@ public interface DownloadService {
     /**
      * Downloads a file or directory structure from an online location.
      *
-     * @param location download location
-     * @param callback lambda to invoke with the downloaded base directory
+     * @param location  download location
+     * @param operation lambda to invoke with the downloaded base directory
+     * @return the result of the operation
      */
-    void download(URI location, Consumer<Path> callback);
+    <T> T download(URI location, Function<Path, T> operation);
 }

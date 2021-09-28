@@ -198,9 +198,9 @@ collect all available attributes from the available sources.
 
 As (some) sources could be updated after harvesting of metadata for a package,
 it is important to periodically refresh the metadata from sources that are still
-in use. Upon reading a package, new harvesting tasks are triggered based on
-the completion timestamp of the most recent harvest task. (This
-mechanism has not been implemented yet.)
+in use. Upon reading a package, new harvesting tasks are triggered based on the
+completion timestamp of the most recent harvest task. (This mechanism has not
+been implemented yet.)
 
 ## Process view
 

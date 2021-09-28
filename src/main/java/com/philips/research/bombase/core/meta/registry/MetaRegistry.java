@@ -80,13 +80,11 @@ public class MetaRegistry {
     }
 
     private void notifyListeners(PackageURL purl, Set<Field> modifiedFields, Map<Field, Object> values) {
-        listeners.forEach(l -> {
-            l.onUpdated(purl, modifiedFields, values)
-                    .ifPresent(task -> {
-                        LOG.info("Scheduled {} task for {}", nameFor(l), purl);
-                        runner.execute(purl, task, this::cascadeListeners);
-                    });
-        });
+        listeners.forEach(l -> l.onUpdated(purl, modifiedFields, values)
+                .ifPresent(task -> {
+                    LOG.info("Scheduled {} task for {}", nameFor(l), purl);
+                    runner.execute(purl, task, this::cascadeListeners);
+                }));
     }
 
     /**
@@ -101,6 +99,6 @@ public class MetaRegistry {
          * @param values  current package metadata
          * @return (optional) operation to queue for execution
          */
-        Optional<Consumer<PackageAttributeEditor>> onUpdated(PackageURL purl, Set<Field> updated, Map<Field, ?> values);
+        Optional<Consumer<PackageAttributeEditor>> onUpdated(PackageURL purl, Set<Field> updated, Map<Field, Object> values);
     }
 }

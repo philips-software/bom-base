@@ -5,6 +5,9 @@
 
 package com.philips.research.bombase.core.clearlydefined.domain;
 
+import com.philips.research.bombase.core.meta.PackageMetadata;
+import com.philips.research.bombase.core.meta.registry.Field;
+import com.philips.research.bombase.core.meta.registry.Trust;
 import pl.tlinkowski.annotation.basic.NullOr;
 import retrofit2.Call;
 import retrofit2.http.GET;
@@ -14,39 +17,35 @@ import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.function.Function;
 
 public interface ClearlyDefinedAPI {
-    //TODO Is this even a realistic score?
-    int MAX_SCORE = 70;
+    Set<String> IGNORED_LICENSES = Set.of("NOASSERTION", "OTHER");
 
     @GET("definitions/{type}/{provider}/{namespace}/{name}/{revision}")
     Call<ResponseJson> getDefinition(@Path("type") String type, @Path("provider") String provider, @Path("namespace") String namespace,
                                      @Path("name") String name, @Path("revision") String revision);
 
     @SuppressWarnings("NotNullFieldNotInitialized")
-    class ResponseJson implements PackageDefinition {
+    class ResponseJson implements PackageMetadata {
         DescribedJson described;
         LicensedJson licensed;
         @NullOr ScoresJson scores;
 
-        @Override
         public boolean isValid() {
-            return (scores != null) && scores.effective > 0;
+            return scores != null && scores.effective > 0;
         }
 
         @Override
-        public int getDescribedScore() {
-            return relativeScore(described.score.total);
-        }
-
-        @Override
-        public int getLicensedScore() {
-            return relativeScore(licensed.score.total);
-        }
-
-        private int relativeScore(int score) {
-            return Math.round((score / 100f) * MAX_SCORE);
+        public Trust trust(Field field) {
+            //noinspection SwitchStatementWithTooFewBranches
+            switch (field) {
+                case DETECTED_LICENSES:
+                    return Trust.LIKELY;
+                default:
+                    return Trust.PROBABLY;
+            }
         }
 
         @Override
@@ -55,12 +54,17 @@ public interface ClearlyDefinedAPI {
         }
 
         @Override
+        public Optional<String> getDescription() {
+            return Optional.empty();
+        }
+
+        @Override
         public Optional<URI> getDownloadLocation() {
             return described.getDownloadLocation();
         }
 
         @Override
-        public Optional<URI> getSourceLocation() {
+        public Optional<String> getSourceLocation() {
             return described.getSourceLocation();
         }
 
@@ -112,7 +116,7 @@ public interface ClearlyDefinedAPI {
             return Optional.ofNullable((urls != null && urls.download != null) ? urls.download : null);
         }
 
-        Optional<URI> getSourceLocation() {
+        Optional<String> getSourceLocation() {
             return Optional.ofNullable((sourceLocation != null && sourceLocation.url != null) ? sourceLocation.url : null);
         }
 
@@ -131,7 +135,7 @@ public interface ClearlyDefinedAPI {
 
     class SourceLocationJson {
         @NullOr String name;
-        @NullOr URI url;
+        @NullOr String url;
     }
 
     class UrlJson {
@@ -149,10 +153,10 @@ public interface ClearlyDefinedAPI {
         ScoreJson score;
 
         Optional<String> getDeclaredLicense() {
-            if ("NOASSERTION".equals(declared)) {
+            if (declared == null || IGNORED_LICENSES.contains(declared)) {
                 return Optional.empty();
             }
-            return Optional.ofNullable(declared);
+            return Optional.of(declared);
         }
 
         List<String> getDetectedLicenses() {

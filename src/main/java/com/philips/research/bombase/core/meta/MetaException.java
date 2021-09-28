@@ -11,5 +11,9 @@ public class MetaException extends BusinessException {
     public MetaException(String message) {
         super(message);
     }
+
+    public MetaException(String message, Throwable cause) {
+        super(message, cause);
+    }
 }
 

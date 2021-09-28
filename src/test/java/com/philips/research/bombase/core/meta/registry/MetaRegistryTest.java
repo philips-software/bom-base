@@ -28,7 +28,7 @@ class MetaRegistryTest {
     private static final PackageURL PURL = toPurl("pkg:" + TYPE + "/" + NAME + "@" + VERSION);
     private static final Field FIELD = Field.TITLE;
     private static final String VALUE = "Value";
-    private static final int SCORE = 50;
+    private static final Trust TRUST = Trust.PROBABLY;
 
     final MetaStore store = mock(MetaStore.class);
     final MetaRegistry registry = new MetaRegistry(store, new QueuedTaskRunner(store));
@@ -51,17 +51,17 @@ class MetaRegistryTest {
 
     @Test
     void readsPackageFieldValues() {
-        registry.edit(PURL, pkg -> pkg.update(FIELD, SCORE, VALUE));
+        registry.edit(PURL, pkg -> pkg.update(FIELD, TRUST, VALUE));
 
         final var values = registry.getAttributeValues(PURL).orElseThrow();
 
-        assertThat(values.get(FIELD).getScore()).isEqualTo(SCORE);
+        assertThat(values.get(FIELD).getScore()).isEqualTo(TRUST.getScore());
         assertThat(values.get(FIELD).getValue()).isEqualTo(Optional.of(VALUE));
     }
 
     @Test
     void editsPackageFields() {
-        registry.edit(PURL, editor -> editor.update(FIELD, SCORE, VALUE));
+        registry.edit(PURL, editor -> editor.update(FIELD, TRUST, VALUE));
 
         assertThat(pkg.getAttributeFor(FIELD).orElseThrow().getValue()).contains(VALUE);
     }
@@ -85,7 +85,7 @@ class MetaRegistryTest {
 
         @Test
         void notifiesListeners_modifiedFields() {
-            registry.edit(PURL, pkg -> pkg.update(FIELD, SCORE, VALUE));
+            registry.edit(PURL, pkg -> pkg.update(FIELD, TRUST, VALUE));
 
             verify(listener).onUpdated(PURL, Set.of(FIELD), Map.of(FIELD, VALUE));
         }
@@ -103,7 +103,7 @@ class MetaRegistryTest {
             //noinspection unchecked
             when(listener.onUpdated(any(), any(), any())).thenReturn(Optional.of(task));
 
-            registry.edit(PURL, editor -> editor.update(FIELD, SCORE, VALUE));
+            registry.edit(PURL, editor -> editor.update(FIELD, TRUST, VALUE));
 
             //noinspection unchecked
             verify(task).accept(any(PackageAttributeEditor.class));
@@ -111,7 +111,7 @@ class MetaRegistryTest {
 
         @Test
         void cascadesEditsToListenersUntilNoMoreEditsAreMade() {
-            final var counter = new AtomicInteger();
+            final var counter = new AtomicInteger(1);
             final var task = mock(Consumer.class);
             //noinspection unchecked
             when(listener.onUpdated(any(), any(), any())).thenReturn(Optional.of(task));
@@ -119,16 +119,16 @@ class MetaRegistryTest {
             doAnswer(param -> {
                 final PackageAttributeEditor editor = param.getArgument(0);
                 final var offset = counter.incrementAndGet();
-                if (offset < 10) {
-                    editor.update(FIELD, SCORE + offset, VALUE + offset);
+                if (offset < Trust.values().length) {
+                    editor.update(FIELD, Trust.values()[offset], VALUE + offset);
                 }
                 return null;
             }).when(task).accept(any());
 
-            registry.edit(PURL, editor -> editor.update(FIELD, SCORE, VALUE));
+            registry.edit(PURL, editor -> editor.update(FIELD, TRUST, VALUE));
 
             //noinspection unchecked
-            verify(task, times(10)).accept(any());
+            verify(task, times(Trust.values().length - 1)).accept(any());
         }
     }
 }
