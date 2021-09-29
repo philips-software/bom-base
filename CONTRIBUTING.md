@@ -64,7 +64,7 @@ git commit -m "Prepare for release vx.x.x"
 ### Finish a release
 
 ```
-git flow release finish vx.x.x
+git flow release finish vx.x.x -s
 git push origin develop
 git checkout main
 git push origin main --tags
