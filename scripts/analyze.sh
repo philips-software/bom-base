@@ -4,7 +4,10 @@
 # Script to batch-analyze Black Duck component licenses against 3rd
 # party metadata.
 #
-# Optional $1 parameter is the URL of a BOM-Base server
+# Mandatory $1 Blackduck project
+# Mandatory $2 Blackduck version
+# Mandatory $3 filename
+# Optional $4 parameter is the URL of a BOM-Base server
 #
 # Recipe of this script:
 #
@@ -13,16 +16,9 @@
 # to create a second SPDX file using independent metadata from ClearlyDefined
 # and package management repositories. The declared licenses from both
 # sources are compared, resulting in a list of all packages and a diff list of
-# packages where the declared licenses don't match. These lists are merged 
-# across all projects, and separate lists are extracted for specific package 
-# types (e.g. Maven, NuGet, NPM). These lists provide an indications of the 
-# license diffs per type of development environment.
+# packages where the declared licenses don't match.
 ###################################################################
 set -e
-
-BLACKDUCK_PROJECT="blackduck-project"
-BLACKDUCK_VERSION="blackduck-version"
-FILENAME="analyse-output-filename"
 
 function info () {
   echo " +================================================================================================ "
@@ -46,8 +42,8 @@ function checkEnvironmentVariables () {
 checkEnvironmentVariables
 
 BOM_BASE_URL="http://localhost:8080"
-if [ "$1" ]; then
-    BOM_BASE_URL=$1
+if [ "$4" ]; then
+    BOM_BASE_URL=$4
 fi
 
 function checkBOMBaseAvailable () {
@@ -107,11 +103,8 @@ function licensesDiff () {
 # $1 is the nick name
 function listPackages() {
     echo " | list Packages"
-    bompare bom --spdx-tag-value "$1.spdx" --out "$1-all.csv" 
+    bompare bom --spdx-tag-value "$1.spdx" --out "$1-all.csv"
 }
-
-# Start with and empty list of projects
-ALL=()
 
 # Processes a single project
 # $1 is the Black Duck project
@@ -123,35 +116,7 @@ function blackduck () {
     listPackages $3
     buildFromTree $3
     licensesDiff $3
-    ALL+=( $3 )
 }
 
 # Collect and process per Black Duck project version
-blackduck $BLACKDUCK_PROJECT $BLACKDUCK_VERSION $FILENAME 
-
-# Truncate totals files
-rm -f packages.csv
-rm -f diffs.csv
-
-# Merge packages of all projects
-for PROJECT in ${ALL[@]}; do
-    cat "$PROJECT-all.csv" >> packages.csv
-    cat "$PROJECT-diff.csv" >> diffs.csv
-done
-sort -u "packages.csv" -o "packages.csv"
-sort -u "diffs.csv" -o "diffs.csv"
-
-# Extracts a package type from the diffs
-# $1 is the group name
-function extractType () {
-    grep "^\"pkg:$1/" packages.csv > "$1-packages.csv"
-    PACKAGES=$(grep -c ^ "$1-packages.csv")
-    grep "^\"pkg:$1/" diffs.csv > "$1-diffs.csv"
-    DIFFS=$(grep -c ^ "$1-diffs.csv")
-    echo "Type $1 totals $PACKAGES with $DIFFS license mismatches"
-}
-
-extractType nuget
-extractType npm
-extractType maven
-extractType pypi
+blackduck $1 $2 $3
