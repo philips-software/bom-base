@@ -20,6 +20,12 @@
 ###################################################################
 set -e
 
+
+BOM_BASE_URL="http://localhost:8080"
+if [ "$1" ]; then
+    BOM_BASE_URL=$1
+fi
+
 readonly projects=(
   'blackduck-project|blackduck-version|analyse-output-filename'
   'blackduck-project-2|blackduck-version-2|analyse-output-filename-2'
@@ -40,17 +46,17 @@ ALL=()
 # $3 is the nick name
 # $4 is the BomBase url
 function blackduck () {
-    ./analyze.sh $1 $2 $3 $4
+    ./analyze.sh "$1" "$2" "$3" "$4"
     ALL+=( $3 )
 }
 
 function scan_projects () {
     local project version filename
-    for fields in ${projects[@]}
+    for fields in "${projects[@]}"
     do
         IFS=$'|' read -r project version filename <<< "$fields"
         # Collect and process per Black Duck project version
-        blackduck "$project" "$version" "$filename" "$1"
+        blackduck "$project" "$version" "$filename" "$BOM_BASE_URL"
     done
 }
 
@@ -61,11 +67,11 @@ rm -f packages.csv
 rm -f diffs.csv
 
 # Merge packages of all projects
-for PROJECT in ${ALL[@]}; do
+for PROJECT in "${ALL[@]}"; do
     cat "$PROJECT-all.csv" >> packages.csv
     cat "$PROJECT-diff.csv" >> diffs.csv
 done
-§
+
 sort -u "packages.csv" -o "packages.csv"
 sort -u "diffs.csv" -o "diffs.csv"
 

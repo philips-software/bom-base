@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/usr/bin/env bash
 
 ###################################################################
 # Script to batch-analyze Black Duck component licenses against 3rd
@@ -28,12 +28,12 @@ function info () {
 
 function checkEnvironmentVariables () {
   info "Check Environment Variables"
-  if [ -z $BLACKDUCK_API_TOKEN ]; then
+  if [ -z "$BLACKDUCK_API_TOKEN" ]; then
     echo " | BLACKDUCK_API_TOKEN is not set"
     exit 1
   fi
 
-  if [ -z $BLACKDUCK_URL ]; then
+  if [ -z "$BLACKDUCK_URL" ]; then
     echo " | BLACKDUCK_URL is not set"
     exit 1
   fi
@@ -111,12 +111,12 @@ function listPackages() {
 # $2 is the Black Duck project version
 # $3 is the nick name
 function blackduck () {
-    info "Blackduck function $1 $2 $3"
-    exportFromBD $1 $2 $3
-    listPackages $3
-    buildFromTree $3
-    licensesDiff $3
+    info "Blackduck function "$1" "$2" "$3""
+    exportFromBD "$1" "$2" "$3"
+    listPackages "$3"
+    buildFromTree "$3"
+    licensesDiff "$3"
 }
 
 # Collect and process per Black Duck project version
-blackduck $1 $2 $3
+blackduck "$1" "$2" "$3"
