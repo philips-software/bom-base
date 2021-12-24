@@ -51,9 +51,7 @@ This needs to be improved in the future, but for now:
 Change version into new version in file / linenumber:
 
 - `pom.xml` : line 13.
-- `.spdx-builder.yml` : line 8.
-- `.spdx-builder.yml` : line 9.
-- `.github/workflows/build.yml` : line 95. (docker tags)
+- `.github/workflows/build.yml` : line 109. (docker tags)
 
 Commit changes:
 
