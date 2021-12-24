@@ -1,0 +1,4 @@
+document:
+  title: Sample SPDX SBOM for analysis
+  organization: Philips Research
+  comment: "*** This is NOT a production SBOM ***"
