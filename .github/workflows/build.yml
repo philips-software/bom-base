@@ -107,3 +107,5 @@ jobs:
           dockerfile: docker/Dockerfile
           image-name: bom-base
           tags: 0 0.3 0.3.0 v0.3.0 latest ${{ github.sha }}
+          sign: true
+          slsa: true
