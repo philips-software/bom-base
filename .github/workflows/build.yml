@@ -83,6 +83,9 @@ jobs:
 
     runs-on: ubuntu-latest
 
+    permissions:
+      id-token: write
+
     if: success()
 
     env:
@@ -90,9 +93,7 @@ jobs:
       DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
       DOCKER_ORGANIZATION: philipssoftware
       GITHUB_ORGANIZATION: philips-software
-      COSIGN_PASSWORD: ${{ secrets.COSGIN_PASSWORD }}
-      COSIGN_PRIVATE_KEY: ${{ secrets.COSGIN_PRIVATE_KEY }}
-      COSIGN_PUBLIC_KEY: ${{ secrets.COSGIN_PUBLIC_KEY }}
+      KEYLESS: true
 
     steps:
       - name: Checkout
