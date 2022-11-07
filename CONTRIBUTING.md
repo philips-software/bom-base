@@ -51,7 +51,7 @@ This needs to be improved in the future, but for now:
 Change version into new version in file / linenumber:
 
 - `pom.xml` : line 13.
-- `.github/workflows/build.yml` : line 109. (docker tags)
+- `.github/workflows/build.yml` : line 113. (docker tags)
 
 Commit changes:
 
