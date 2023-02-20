@@ -8,7 +8,7 @@ package com.philips.research.bombase.core.downloader.domain;
 import com.philips.research.bombase.core.downloader.DownloadService;
 import org.springframework.stereotype.Service;
 
-import javax.annotation.PreDestroy;
+import jakarta.annotation.PreDestroy;
 import java.net.URI;
 import java.nio.file.Path;
 import java.util.function.Function;

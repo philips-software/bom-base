@@ -26,7 +26,7 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Service;
 import pl.tlinkowski.annotation.basic.NullOr;
 
-import javax.annotation.PostConstruct;
+import jakarta.annotation.PostConstruct;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
